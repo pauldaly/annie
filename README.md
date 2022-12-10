@@ -33,7 +33,7 @@ For the form:<br/>
 
 <h3>Annie</h3>
 <code>
-  &lt;div data-trigger_='[{"type":"xhr","form":["form1"]'&gt;<br/>
+  &lt;div data-trigger_='[{"type":"xhr","form":["form1"],"query":["update-query-name"]'&gt;<br/>
     Submit Form<br/>
   &lt;/div&gt;
 </code><br/>
