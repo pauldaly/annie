@@ -30,7 +30,7 @@ jobs:
   deploy:
     environment:
       name: 'Azure'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}      
+      url: 'ftp://waws-prod-ch1-019.ftp.azurewebsites.windows.net/site/wwwroot/Views' #${{ steps.deploy-to-webapp.outputs.webapp-url }}      
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
