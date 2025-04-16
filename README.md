@@ -1,3 +1,133 @@
+# Bolt Framework: ReadMe + Architecture Overview
+
+This document provides an in-depth technical overview of the Bolt Framework, a powerful, custom-built single-page application (SPA) engine designed for fully dynamic, data-driven web interfaces. It leverages declarative HTML attributes, dynamic dataset hydration, and a reactive observer pattern to build performant, flexible UI applications with minimal manual JavaScript.
+
+---
+
+## 🚀 Core Architecture Summary
+
+### 1. `boltObj.InitDB()` – The Entry Point
+This function kicks off the entire lifecycle:
+
+- Initializes observables (`InitializeObservables`)
+- Loads datasets for initial rendering (`dbXHR("load")`)
+- Resolves and displays the correct initial view (`InitialRoute()`)
+- Loads remote and lazy datasets
+- Triggers `pageinit()` and `pageloaded()` lifecycle functions
+- Reveals the main UI wrapper (`.page-wrapper`)
+
+---
+
+## 🧩 Core Concepts & Components
+
+### ⚙️ Declarative UI Binding via `data-observe`
+
+Each DOM element can specify how it should be hydrated or updated using a JSON structure inside `data-observe`. This defines:
+- The `type` of binding (`html`, `select`, `attr`, `template`, `this`, etc.)
+- The source `datasource` and `value` field
+- Optional formatting (e.g., `prepend`, `append`, `sanitize`, `upper`, `lower`)
+
+**Live updates** are enabled by registering the element as an observer using `dataObserver.addObserver()`.
+
+---
+
+### 🧠 Reactive Observer System (`dataObserver`)
+
+Custom-built pub/sub system that:
+- Registers callbacks for dataset changes
+- Triggers template re-renders when data changes
+- Is used by `AddObserver` to handle all dynamic DOM updates
+
+This decouples logic from view rendering.
+
+---
+
+### 🧱 Template Hydration Engine
+- Declarative templates are defined using `<template id="...">` tags
+- Hydrated via the `AddObserver` function when `type = "template"`
+- Can populate inner elements based on inner `data-observe` rules
+- Support for:
+  - `data-key` binding
+  - Attribute formatting (`attr`, `prepend`, `append`, etc.)
+  - Function calls (`type: function`)
+  - Cascading includes (via nested `data-observe`)
+
+---
+
+### 🔀 Navigation System with `data-route` + `data-routecontainer`
+
+- Declarative nav state binding based on dataset conditions
+- Nav buttons can be conditionally enabled/disabled using dataset logic
+- Includes `SetNavState()` helper to manage class states
+- Uses `data-route` and `data-routecontainer` attributes to control nav-to-view mappings
+
+---
+
+### 📡 API Call Engine (`dbXHR`)
+Supports:
+- Load, remote, lazyload datasets
+- Automatic dataset mapping into `_rex.datasets`
+- Dynamic procedure alias support
+- Auto-generates `FormData` and appends query metadata
+- Handles single or multiple result sets
+- Observers are auto-notified post-call
+
+---
+
+### 🧬 Dataset Management (`_rex.datasets`)
+Each dataset contains:
+```ts
+{
+  meta: { object: boolean, count: number },
+  data: object[],
+  all: function,
+  ...custom functions like `where`, `save`, etc.
+}
+```
+All datasets are stored under `_rex.datasets[datasetname]`, with name normalization (hyphens → underscores).
+
+---
+
+### 🧮 JSON Logic Integration
+
+Custom `jsonLogic` engine allows rules to be embedded declaratively in:
+- View selection
+- Nav state logic
+- Data rendering
+- Anything else via `jsonLogic.apply(logic, data)`
+
+Supports:
+- All standard logic (`==`, `>`, `if`, `and`, `or`, `map`, `reduce`...)
+- Custom operations (`add_operation()`)
+- Wildcard-based rule pattern matching (`rule_like()`)
+- Data dependency analysis (`uses_data()`)
+
+---
+
+### 🪟 Logger Console + Keyboard Toggles
+
+- Console logging can be toggled with:
+  - Ctrl+Alt+L (log)
+  - Ctrl+Alt+I (info)
+  - Ctrl+Alt+E (error)
+  - Ctrl+Alt+C (toggle full logger UI)
+- `Logger` outputs to a floating, styled console overlay
+- `console.format()` provides customizable, grouped output
+
+---
+
+## 🔧 Utilities
+- `SanitizeNumber()` – strip non-digits
+- `Transform()` – applies `sanitize`, `upper`, `lower`
+- `objToFormData()` – converts object to `FormData` recursively
+- `decodeTrustedEntities()` – HTML entity decoding
+- `downloadCSV()` – Export CSV from object array
+- `arrayUnique()` – Returns array with unique values
+
+---
+---
+
+
 ## What is Annie
 Annie is a framework to build enterprise applications. Annie is the code name for the client side component. 
 
