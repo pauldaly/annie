@@ -1,0 +1,853 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title></title>
+  <link rel="stylesheet" type="text/css" href="/assets/plugins/bootstrap/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="/assets/plugins/line-icons/line-icons.css">
+  <link rel="stylesheet" href="/assets/plugins/font-awesome/css/font-awesome.min.css">
+
+  <style comment="place this in its own css file">
+    body {
+      font-family: 'Open Sans', sans-serif;
+    }
+
+    view {
+      display: none;
+      border: solid 1px #eee;
+    }
+
+    /* manage nav style separately */
+    .btn-spa-nav:hover {
+      box-shadow: inset 0 0 0 0px #55592a, 0 5px 15px #2a2c15;
+    }
+
+    .btn-spa-nav {
+      height: 75px;
+      margin: 5px auto 5px auto;
+      width: 300px;
+      text-align: center;
+      opacity: .9;
+      color: #fff;
+    }
+
+    .btn-spa-nav-active:hover {
+      cursor: default;
+      color: #fff;
+    }
+
+    .btn-spa-nav-active, .btn-spa-nav-active:active {
+      background-image: -webkit-linear-gradient(top, #5cb85c 0, #419641 100%);
+      background-image: -o-linear-gradient(top, #5cb85c 0, #419641 100%);
+      background-image: linear-gradient(to bottom, #5cb85c 0, #419641 100%);
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5cb85c', endColorstr='#ff419641', GradientType=0);
+      filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+      background-repeat: repeat-x;
+      border-color: #3e8f3e;
+    }
+
+    .btn-spa-nav-enabled:hover {
+      cursor: pointer;
+      color: #fff;
+    }
+
+    .btn-spa-nav-enabled, .btn-spa-nav-enabled:active {
+      background-color: #ddd;
+      background: #0085fa;
+      background: -moz-linear-gradient(top, #0085fa 0%, #0068c4 100%);
+      background: -webkit-linear-gradient(top, #0085fa 0%,#0068c4 100%);
+      background: linear-gradient(to bottom, #0085fa 0%,#0068c4 100%);
+      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebf0b8', endColorstr='#e1eaa2',GradientType=0 );
+      color: #fff;
+    }
+
+    .btn-spa-nav-disabled {
+      color: #fff;
+      background-color: #6c757d;
+      border-color: #6c757d;
+    }
+
+    .btn-spa-nav-visited {
+      cursor: pointer;
+      background-color: rgb(249, 107, 7);
+    }
+
+    .divbtn-text {
+      /*color: #fff !important;*/
+      white-space: pre-wrap;
+    }
+
+    .btn-spa-nav-danger {
+      background-image: -webkit-linear-gradient(top, #d9534f 0, #c12e2a 100%);
+      background-image: -o-linear-gradient(top, #d9534f 0, #c12e2a 100%);
+      background-image: linear-gradient(to bottom, #d9534f 0, #c12e2a 100%);
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffd9534f', endColorstr='#ffc12e2a', GradientType=0);
+      filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+      background-repeat: repeat-x;
+      border-color: #b92c28;
+    }
+
+    .btn-admin {
+    }
+
+    .btn-plump {
+    }
+
+    .btn-lg {
+    }
+
+    .btn-block {
+    }
+
+
+    .btn-admin_:hover {
+      box-shadow: inset 0 0 0 0px #55592a, 0 5px 15px #2a2c15;
+    }
+
+    .btn-admin_ {
+      border-radius: 5px !important;
+      text-decoration: none !important;
+      white-space: nowrap;
+      color: #fff;
+    }
+  </style>
+
+  <style comment="place this in its own css file">
+    body {
+      font-family: 'Open Sans', sans-serif;
+    }
+
+    view {
+      display: none;
+      border: solid 1px #eee;
+    }
+
+    /* manage nav style separately */
+    .btn-spa-nav:hover {
+      box-shadow: inset 0 0 0 0px #55592a, 0 5px 15px #2a2c15;
+    }
+
+    .btn-spa-nav {
+      height: 75px;
+      margin: 5px auto 5px auto;
+      width: 300px;
+      text-align: center;
+      opacity: .9;
+      color: #fff;
+    }
+
+    .btn-spa-nav-active:hover {
+      cursor: default;
+      color: #fff;
+    }
+
+    .btn-spa-nav-active, .btn-spa-nav-active:active {
+      background-image: -webkit-linear-gradient(top, #5cb85c 0, #419641 100%);
+      background-image: -o-linear-gradient(top, #5cb85c 0, #419641 100%);
+      background-image: linear-gradient(to bottom, #5cb85c 0, #419641 100%);
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5cb85c', endColorstr='#ff419641', GradientType=0);
+      filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+      background-repeat: repeat-x;
+      border-color: #3e8f3e;
+    }
+
+    .btn-spa-nav-enabled:hover {
+      cursor: pointer;
+      color: #fff;
+    }
+
+    .btn-spa-nav-enabled, .btn-spa-nav-enabled:active {
+      background-color: #ddd;
+      background: #0085fa;
+      background: -moz-linear-gradient(top, #0085fa 0%, #0068c4 100%);
+      background: -webkit-linear-gradient(top, #0085fa 0%,#0068c4 100%);
+      background: linear-gradient(to bottom, #0085fa 0%,#0068c4 100%);
+      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebf0b8', endColorstr='#e1eaa2',GradientType=0 );
+      color: #fff;
+    }
+
+    .btn-spa-nav-disabled {
+      color: #fff;
+      background-color: #6c757d;
+      border-color: #6c757d;
+    }
+
+    .btn-spa-nav-visited {
+      cursor: pointer;
+      background-color: rgb(249, 107, 7);
+    }
+
+    .divbtn-text {
+      /*color: #fff !important;*/
+      white-space: pre-wrap;
+    }
+
+    .btn-spa-nav-danger {
+      background-image: -webkit-linear-gradient(top, #d9534f 0, #c12e2a 100%);
+      background-image: -o-linear-gradient(top, #d9534f 0, #c12e2a 100%);
+      background-image: linear-gradient(to bottom, #d9534f 0, #c12e2a 100%);
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffd9534f', endColorstr='#ffc12e2a', GradientType=0);
+      filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+      background-repeat: repeat-x;
+      border-color: #b92c28;
+    }
+
+    .btn-admin {
+    }
+
+    .btn-plump {
+    }
+
+    .btn-lg {
+    }
+
+    .btn-block {
+    }
+
+
+    .btn-admin_:hover {
+      box-shadow: inset 0 0 0 0px #55592a, 0 5px 15px #2a2c15;
+    }
+
+    .btn-admin_ {
+      border-radius: 5px !important;
+      text-decoration: none !important;
+      white-space: nowrap;
+      color: #fff;
+    }
+  </style>
+
+  <script>
+    //request params are automatically added to page via server
+    var _requestparams = { "idempotentstamp": "1660795975843", "accountguid": "1df71f97-f6ac-4de7-98b3-0720726409e8", "first": "Shannon", "last": "Daly", "radiofirst": "b", "selectfirst": "Shannon", "checkboxfirst": "0", "textareafirst": "Shannon" };
+  </script>
+
+
+  <script>
+    //this is manually added to page to ... auto include these from request parameters into the persistent dataset
+    var _persistent = ["accountguid", "first", "last"];
+    var _datasets = {
+      "load": ["formfield_firstname", "public-client-profile-list", "public-location-get", "public-services-get", "public-organization-details-get", "public-add-ons-get"],
+      "lazyload": ["public-skills-get", "public-products-get", "public-staff-get", "public-staff-and-services-get"],
+      "remote": [{ "url": "https://node-hnapi.herokuapp.com/news", "dataset": "heroku", "method": "GET" }]
+    }
+  </script>
+</head>
+<body>
+      <div class="container">
+        <div style="position: fixed; visibility: visible; cursor: pointer; border: none; background-color: transparent; padding: 0px; margin: 0px;
+         top: 60px; right: -1px; width: 125px; transition: all 0.5s ease 0s; height: auto;">
+          <div style="background: #75bcfb; color: #777; padding: 10px; position: relative; font-size: 5em; display: flex;
+flex-direction: row; z-index: -1; writing-mode: vertical-rl; border-top-right-radius: 0px; border-bottom-right-radius: 0px;">
+            <div><div></div></div><div>
+              <i class="fa fa-shopping-cart"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="row margin-bottom-10 detached-device" style="height:100%;"
+             data-observe='[{"type":"nav","datasource": ["account","cart"],"function":"csfName"}]'
+             data-routecontainer='{"classstates":{"active":"btn-spa-nav-active","enabled":"btn-spa-nav-enabled","visited":"btn-spa-nav-visited","disabled":"btn-spa-nav-disabled"}}'>
+
+          <div class="col-md-4 col-sm-12 hidden-xs hidden-sm">
+            <div type="button" class="btn btn-spa-nav btn-spa-nav-enabled btn-admin btn-plump btn-lg btn-block"
+                 data-route='{"target": [{"name":"view0","condition":{"datasource":"public-organization-details-get","datafield":"attacheddevice","value":"false"}},{"name":"view0_withsession","condition":{"datasource":"public-organization-details-get","datafield":"attacheddevice","value":"true"}}]}'>
+              <div class="divbtn-text"><span class="translate" lang-content-guid="">My account</span></div>
+            </div>
+          </div>
+          <div class="col-md-4 col-sm-12 hidden-xs hidden-sm">
+            <div type="button" class="btn btn-spa-nav btn-spa-nav-enabled btn-admin btn-plump btn-lg btn-block"
+                 data-route='{"target": "view1"}'>
+              <div class="divbtn-text"><span class="translate" lang-content-guid="">1. Choose treatment</span></div>
+            </div>
+          </div>
+          <div class="col-md-4 col-sm-12 hidden-xs hidden-sm">
+            <div type="button" class="btn btn-spa-nav btn-spa-nav-disabled btn-admin btn-plump btn-lg btn-block" disabled
+                 data-route='{"target": "view2", "state":{"classactive":"btn-spa-nav-active", "classenabled":"btn-spa-nav-enabled", "classdisabled":"btn-spa-nav-disabled", "condition":[{"type":"enabled", "removeattribute":"disabled", "datasource":"cart", "datafield":"serviceguids", "count":"0", "operator":">"}, {"type":"disabled", "setattribute":"disabled", "datasource":"cart", "datafield":"serviceguids", "count":"0", "operator":"="}]}}'>
+              <div class="divbtn-text"><span class="translate" lang-content-guid="">2. Choose date/time</span></div>
+            </div>
+          </div>
+
+          <div class="col-md-4 col-sm-12 hidden-xs hidden-sm">
+            <div id="btnproduct" type="button" class="btn btn-spa-nav btn-spa-nav-enabled btn-admin btn-plump btn-lg btn-block"
+                 data-route='{"target": "view3", "state":{"function":"RouteProduct"}}'>
+              <div class="divbtn-text"><span class="translate" lang-content-guid="">3. Products</span></div>
+            </div>
+          </div>
+          <div class="col-md-4 col-sm-12 hidden-xs hidden-sm">
+            <div type="button" class="btn btn-spa-nav btn-spa-nav-disabled btn-admin btn-plump btn-lg btn-block" disabled
+                 data-route='{"target": "view4"}'>
+              <div class="divbtn-text"><span class="translate" lang-content-guid="">4. Question/Comment</span></div>
+            </div>
+          </div>
+          <div class="col-md-4 col-sm-12 hidden-xs hidden-sm">
+            <div type="button" class="btn btn-spa-nav btn-spa-nav-disabled btn-admin btn-plump btn-lg btn-block" disabled
+                 data-route='{"target": "view5"}'>
+              <div class="divbtn-text"><span class="translate" lang-content-guid="">5. Appointment review</span></div>
+            </div>
+          </div>
+        </div>
+
+        <view id="view0" data-view='{"default":"true","condition":{"datasource":"public-organization-details-get","datafield":"attacheddevice","value":"true"}}'>
+          <div class="row margin-bottom-10 detached-device" style="height:100%;">
+            <div class="col-lg-6">
+              <div class="col-lg-12">
+                <h2>Sign In With:</h2>
+              </div>
+
+              <div class="fb-login-button" data-width="" data-size="large" data-button-type="continue_with" data-layout="default" data-auto-logout-link="false" data-use-continue-as="false"></div>
+
+              <style>
+                .signin-button {
+                  width: 210px;
+                  height: 40px;
+                }
+              </style>
+              <div id="appleid-signin"
+                   data-mode="center-align"
+                   data-type="sign-in"
+                   data-color="black"
+                   data-border="false"
+                   data-border-radius="15"
+                   data-width="200"
+                   data-height="32"></div>
+              <script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
+
+
+            </div>
+
+            <div class="col-lg-6">
+              <div class="col-lg-12">
+                <h2>Create Account:</h2>
+              </div>
+
+
+              <div class="col-lg-12">
+                <div class="form-group" style="margin-top:1em;">
+                  <h4><span class="translate" lang-content-guid="E8E242DD-89A1-497A-8158-99151DB34AA0">First name</span><sup class="required">*</sup>:</h4>
+                  <input type="text" class="form-control" id="formfield_firstname" name="formfield_encryptsalt_firstname" data-copyto="fn" value="" data-validation="required" autocomplete="off" />
+                </div>
+                <div style="clear:both;"></div>
+              </div>
+              <div class="col-lg-12">
+                <div class="form-group" style="margin-top:1em;">
+                  <h4><span class="translate" lang-content-guid="633F2C3C-E742-487A-9EAD-984699EE9898">Last name</span><sup class="required">*</sup>:</h4>
+                  <input type="text" class="form-control" id="formfield_lastname" name="formfield_encryptsalt_lastname" data-copyto="ln" value="" data-validation="required" autocomplete="off" />
+                </div>
+                <div style="clear:both;"></div>
+              </div>
+              <div class="col-md-12 col-sm-6" style="height:100%;max-width:1780px;">
+                <div class="form-group" style="margin-top:1em;">
+                  <h4><span class="translate" lang-content-guid="F275A65E-CE24-4892-959C-C5E9A74DA884">Phone</span><sup class="required">*</sup>:</h4>
+                  <div class="input-group">
+                    <div id="flag-select" class="input-group-addon addon-type flag-select">
+                      <div tabindex="0" class="selected-flag" title="">
+                        <div class="iti-flag" style="float:left;margin-right:9px;"></div>
+                        <div class="fa fa-caret-down" style="color:#000 !important;"> <span id="countrycode_value" style="padding-left:3px;font-family:'Open Sans', sans-serif;">+1</span></div>
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                      </div>
+
+                    </div>
+                    <div class="input-group-addon addon-type trunk-code"><span>0</span></div>
+                    <input type="hidden" id="formfield_countrycode" name="formfield_countrycode">
+                    <input type="hidden" id="formfield_phonecountrycodesanitized" name="formfield_systemsalt_phonecountrycodesanitized">
+                    <input type="hidden" id="formfield_phonetrunkcodesanitized" name="formfield_systemsalt_phonetrunkcodesanitized">
+                    <input type="text" class="form-control t-phone-required" id="formfield_phone" name="formfield_systemsalt_phone" value="" data-copyto-sanitize-systemsalt="sanitizesalted" data-validation="required" data-validation-help="Phone must be entered" />
+                  </div>
+                  {{phone-flags}}
+                </div>
+                <div style="clear:both;"></div>
+              </div>
+              <div class="col-lg-12">
+                <div class="form-group" style="margin-top:1em;">
+                  <h4><span class="translate" lang-content-guid="34428EB5-CFD6-456D-9DF3-1517FB4B173D">Email</span><sup class="required">*</sup>:</h4>
+                  <input type="text" class="form-control t-email-required" id="formfield_email" name="formfield_systemsalt_email" value="" data-copyto-lower-html="emailcheck" data-validation="required" data-validation-help="Email name must be entered" />
+                </div>
+                <div style="clear:both;"></div>
+              </div>
+
+            </div>
+
+          </div>
+        </view>
+
+        <view id="view0_withsession">
+          <div class="row margin-bottom-10 detached-device" style="height:100%;">
+            <div class="col-lg-12">
+              <div class="col-lg-12">
+                <h2>Show account details:</h2>
+              </div>
+            </div>
+          </div>
+        </view>
+
+        <view id="view1" data-view='{"default":"true","condition":{"datasource":"public-organization-details-get","datafield":"attacheddevice","value":"false"}}'>
+          <div class="row margin-bottom-10 detached-device" style="height:100%;">
+            <div class="col-lg-12">
+              <div class="col-lg-6">
+                <h2>Choose one or more treatments:</h2>
+                <div id="brandcontainer" data-observe_='[{"type":"template", "name":"item-brand", "target": "dom", "datasource":"public-services-get", "options":{"filter":"true", "target":"servicecontainer", "key":"brandguid", "layout":"list"}}]'></div>
+                <div id="categorycontainer" data-observe_='[{"type":"template", "name":"item-category", "target": "dom", "datasource":"public-services-get", "options":{"filter":"true", "target":"servicecontainer", "key":"categoryguid", "layout":"list"}}]'></div>
+                <div id="servicecontainer" data-observe='[{"type":"template", "name":"item-service", "datasource":"public-services-get", "key":"serviceguid", "options":{"filter":"true","page":"10", "layout":"list"}}]'></div>
+                <!--
+            vs. group-by can be an string array or an object array with filter and template options for each group
+              duh: in general, use a separate container and template for each group
+            data-observe='[{"type":"template", "name":"item-service", "target": "shadow", "datasource":"public-services-get", "options":{"groupby":[{"by":"brand", "filter":"false"},{"by":"category", "filter":"true"},{"by":"servicename", "filter":"true"}],"page":"10", "layout":"list"}}]'
+            -->
+              </div>
+              <div class="col-lg-6">
+                <h2>Booking Details:</h2>
+                <div id="cartcontainer" data-observe='[{"type":"template", "name":"cart", "datasource":"cart", "default":"cart-default"}]'></div>
+              </div>
+            </div>
+          </div>
+        </view>
+
+        <view id="view2">
+
+          <div class="row margin-bottom-10 detached-device" style="height:100%;">
+            <div class="col-lg-12">
+              <div class="col-lg-6">
+                <h2>Choose a Practitioner</h2>
+                <div id="staffcontainer" data-observe='[{"type":"template", "name":"item-staff", "datasource":"public-staff-get", "key":"accountguid"}]'></div>
+                <!--
+            vs. group-by can be an string array or an object array with filter and template options for each group
+              duh: in general, use a separate container and template for each group
+            data-observe='[{"type":"template", "name":"item-service", "target": "shadow", "datasource":"public-services-get", "options":{"groupby":[{"by":"brand", "filter":"false"},{"by":"category", "filter":"true"},{"by":"servicename", "filter":"true"}],"page":"10", "layout":"list"}}]'
+            -->
+              </div>
+              <div class="col-lg-6">
+                <h2>Choose booking date and time</h2>
+                <h3>put calendar here</h3>
+              </div>
+            </div>
+          </div>
+        </view>
+
+        <view id="view3">
+          <h2>Choose products</h2>
+          <div id="productcontainer" data-observe_='[{"type":"template", "name":"item-product", "target": "dom", "datasource":"public-products-get", "paramname":"productguids", "options":{"filter":"true","page":"10", "layout":"list"}}]'></div>
+          <div id="hackercontainer" data-observe_='[{"type":"template", "format":"list", "options":{"filter":"true","page":"10", "layout":"list"}, "name":"item-news", "target": "shadow", "datasource":"heroku"}]'></div>
+        </view>
+
+        <view id="view4">
+          <h2>Questions/Comments</h2>
+          <div id="navbtn1" class="btn btn-plump btn-primary btn-block btn-marginleft"
+               style="border:solid 1px #ccc;cursor:pointer;padding:5px;width:200px;"
+               data-route_='{"target": "view2","classes":["default":"initial-state","active":"btn-spa-nav-active","enabled":"btn-spa-nav-enabled","visited":"btn-spa-nav-visited","disabled":"btn-spa-nav-disabled"]}'>
+            Go to page 2
+          </div>
+
+
+          Hullo <span data-observe='[{"type":"html","value": "first"}]'></span>
+          <br />
+          buhbye <span data-observe='[{"type":"html","value": "last"}]'></span>
+          <br />
+          <span data-observe='[{"type":"html", "value": "first"},{"type":"this", "action": "upper"}]'></span>
+          <br />
+
+          Client disabled <span data-observe_='[{"type":"html", "datasource":"clients","value": "firstname"},{"type":"this", "action": "lower"}]'></span>
+          <br />
+
+          <h2>Input 1</h2>
+          <input id="formfield_baz" name="first_" class="bind"
+                 data-observe_='[
+         {"type":"clone","value": "name_of_clone",
+         "action":"[duplicate,sanitize,upper,lower,encrypt,copyto/clone]",
+         "dataset":"name_of_dataset/form"},{"type":"this","action":"upper"}]' />
+          <br />
+          <br />
+          <br />
+
+
+          <br />
+          <br />
+          <select id="selectfirst" name="selectfirst">
+            <option value="">Select</option>
+            <option value="shannon">Shannon</option>
+          </select>
+          <br />
+          <br />
+          <input id="checkboxfirst" type="checkbox" name="checkboxfirst" />
+          <br />
+          <br />
+          <input id="radiofirsta" type="radio" name="radiofirst" value="a" />
+          <input id="radiofirstb" type="radio" name="radiofirst" value="b" />
+          <br />
+          <br />
+          <textarea id="textareafirst" name="textareafirst" data-trigger='{"triggers":[{"type":"change"}]}'></textarea>
+          <br />
+
+          <div id="shadowhost" data-observe_='[{"type":"template", "name":"template-name", "target": "shadow", "datasource":"formfield_firstname"}]'></div>
+
+          <div id="button_id" class="bind"
+               data-description="bind on click can do many things;
+       :handle page functions without submitting
+       :xhr or redirect; submit data using form or other dataset object;
+       convert forms into datasets dynamically
+       forms can be parent child
+       any input updates are auto stored in a table related to parent forms
+       input fields can also reference modified data such as upper, lower, sanitized; saved in same table
+       persistent dataset and all form datasets referenced are submitted
+       how are sortable lists, json, li, calendar, etc. handled
+       include modal response, toast, any cleanup
+       "
+               data-trigger_='[{"type":"click","method":"post","action": "/some-url-or","callback":"cbOrSomeFunctionName","form":["form1","form2"],"query":["update-table-query","another_query_to_call"]}]'>
+            Submit me
+          </div>
+
+          <br />
+          <br />
+
+          <div id="button1" class="btn btn-plump btn-primary btn-block btn-marginleft" style="border:solid 1px #ccc;cursor:pointer;padding:5px;width:200px;">
+            Go to view 2
+          </div>
+        </view>
+
+        <view id="view5" view-name="view 2" name="view 2" data-name="view 2" style="display:none;">
+          <h3>Reactive Observer: <span data-observe='[{"type":"html","value": "first"}]'></span></h3>
+          <h2 id="button">Reactive Input [first]</h2>
+          <input id="c" name="first" data-trigger='{"triggers":[{"type":"keyup", "autoreset": "true"}, {"type":"change"}]}' />
+          <br />
+          <h3>Reactive Observer: <span data-observe='[{"type":"html","value": "last"}]'></span></h3>
+          <h2 id="button">Reactive Input [last]</h2>
+          <input id="a" name="last" data-trigger='{"triggers":[{"type":"keyup", "autoreset": "true"}, {"type":"change"}]}' />
+          <br />
+          <h2 id="button">Reactive Input [last] w/ datasource</h2>
+          <input id="b" name="other" data-trigger_='{"datasource":"client", "triggers":[{"type":"keyup", "autoreset": "true"}, {"type":"change"}]}' />
+          <div class="btn btn-plump btn-primary btn-block btn-marginleft"
+               data-trigger='{"triggers":[{"type":"undo"}]}'>
+            UNDO
+          </div>
+          <br />
+          <br />
+          <div class="btn btn-plump btn-primary btn-block btn-marginleft"
+               data-trigger='{"triggers":[{"type":"redo"}]}'>
+            REDO
+          </div>
+          <br />
+          <br />
+
+          <div class="btn btn-plump btn-primary btn-block btn-marginleft"
+               data-trigger_='[{"type":"click","method":"post","callbefore": {"function":"cbparams","params":["-","30","-","1"]},"form":["form1"]}]'>
+            Last 30
+          </div>
+
+          <div id="button2" class="btn btn-plump btn-primary btn-block btn-marginleft" style="border:solid 1px #ccc;cursor:pointer;padding:5px;width:200px;">
+            Go to view 1
+          </div>
+
+        </view>
+      </div>
+    <template id="template-shadow">
+      <style>
+        div {
+          text-align: left;
+          margin-bottom: 10px;
+          float: left;
+          border-width: 0px;
+          margin-right: 10px;
+        }
+
+        p {
+          color: red;
+        }
+      </style>
+      <div>
+        <h1>{header}</h1>
+        <p>Shadow text</p>
+      </div>
+    </template>
+
+    <!--
+      allow templates to include conditional to display or hide content/elements
+      -->
+    <template id="template-name">
+      <div data-observe='[{"type":"html","value": "autosuggest"}]'>Name</div>
+    </template>
+
+    <!-- TEMPLATES -->
+    <!--
+      toggle checkmark
+      add/remove service to cart
+
+      -->
+    <template id="item-service-css">
+      <style>
+        .list-item {
+          text-align: left;
+          font-size: 20px;
+          padding: 10px 5px 10px 15px;
+          margin-top: 10px;
+        }
+
+          .list-item:hover {
+            cursor: pointer;
+          }
+
+        .toggle-show {
+          display: block;
+        }
+
+        .toggle-hide {
+          display: none;
+        }
+
+        .toggle-inert {
+          border: solid 1px #ccc;
+          background-color: #fefefe;
+          color: #999;
+        }
+
+          .toggle-inert:hover {
+            border: solid 1px #333;
+            background-color: #ccc;
+            color: #fff;
+          }
+
+        .toggle-active-2:hover {
+          border: solid 1px #333;
+          background-image: -webkit-linear-gradient(top, #ccc 0, #ccc 100%);
+          background-image: -o-linear-gradient(top, #ccc 0, #ccc 100%);
+          background-image: linear-gradient(to bottom, #ccc 0, #ccc 100%);
+          filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ccc', endColorstr='#ccc', GradientType=0);
+          filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+          background-color: #ccc;
+          color: #fff;
+        }
+
+        .toggle-active:hover {
+          border: solid 1px #333;
+          color: #fff;
+          background-image: -webkit-linear-gradient(top, #419641 0, #5cb85c 90%);
+          background-image: -o-linear-gradient(top, #419641 0, #5cb85c 90%);
+          background-image: linear-gradient(to bottom, #419641 0, #5cb85c 90%);
+          filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff419641', endColorstr='#ff5cb85c', GradientType=0);
+          filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+        }
+
+        .toggle-active {
+          border: solid 1px #333;
+          color: #fff;
+          background-image: -webkit-linear-gradient(top, #5cb85c 0, #419641 100%);
+          background-image: -o-linear-gradient(top, #5cb85c 0, #419641 100%);
+          background-image: linear-gradient(to bottom, #5cb85c 0, #419641 100%);
+          filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5cb85c', endColorstr='#ff419641', GradientType=0);
+          filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+          background-repeat: repeat-x;
+          border-color: #3e8f3e;
+        }
+      </style>
+    </template>
+    <template id="item-service" data-trigger='{"triggers":[{"type":"crud", "datatype":"toggle", "targeticon":"service-icon", "classinert":"toggle-inert", "classactive":"toggle-active", "classshow":"toggle-show", "classhide":"toggle-hide", "targetobject":"cart", "paramname":"serviceguids"}]}' class="list-item toggle-inert">
+      <div class="row">
+        <div class="col-12-xs col-12-sm col-md-12" style="min-width:0px;">
+          <i id="service-icon" class="fa fa-check toggle-hide" style="float:left;margin-top:3px;margin-left:0px;"></i>
+          <div class="itemprice" style="float:right;" data-observe='[{"type":"function", "value":"CalculateServicePrice"}]'></div>
+          <div class="itemname" style="padding-left:25px;" data-observe='[{"type":"html","value": "servicename"}]'></div>
+          <div class="itemdescription" style="padding-left:25px;"></div>
+        </div>
+      </div>
+    </template>
+    <template id="item-brand">
+      <div id="" class="list-item filter-service item-filter-service">
+        <div class="row">
+          <div class="col-12-xs col-12-sm col-md-12" style="min-width:0px;">
+            <i class="fa fa-check filter-service-check" style="float:left;margin-top:3px;margin-left:0px;display:none;"></i>
+            <div class="itemtime" style="float:right;" data-observe='[{"type":"html","value": "defaulttime"}]'></div>
+            <div class="itemprice" style="float:right;" data-observe='[{"type":"html","value": "finalprice"}]'></div>
+            <div class="itemname" style="padding-left:25px;" data-observe='[{"type":"html","value": "servicename"}]'></div>
+            <div class="itemdescription" style="padding-left:25px;"></div>
+          </div>
+        </div>
+      </div>
+    </template>
+    <template id="item-category">
+      <div id="" class="list-item filter-service item-filter-service">
+        <div class="row">
+          <div class="col-12-xs col-12-sm col-md-12" style="min-width:0px;">
+            <i class="fa fa-check filter-service-check" style="float:left;margin-top:3px;margin-left:0px;display:none;"></i>
+            <div class="itemtime" style="float:right;" data-observe='[{"type":"html","value": "defaulttime"}]'></div>
+            <div class="itemprice" style="float:right;" data-observe='[{"type":"html","value": "finalprice"}]'></div>
+            <div class="itemname" style="padding-left:25px;" data-observe='[{"type":"html","value": "servicename"}]'></div>
+            <div class="itemdescription" style="padding-left:25px;"></div>
+          </div>
+        </div>
+      </div>
+    </template>
+    <!--
+
+
+      <template id="item-service" data-trigger='{"triggers":[{"type":"crud", "datatype":"toggle", "targeticon":"service-icon", "classinert":"toggle-inert", "classactive":"toggle-active", "classshow":"toggle-show", "classhide":"toggle-hide", "targetobject":"cart", "paramname":"serviceguids"}]}' class="list-item toggle-inert">
+    -->
+
+    <template id="item-staff" data-trigger='{"triggers":[{"type":"crud", "datatype":"single", "targeticon":"staff-icon", "classinert":"toggle-inert", "classactive":"toggle-active", "classshow":"toggle-show", "classhide":"toggle-hide", "targetobject":"cart", "paramname":"accountguid"}]}' class="list-item toggle-inert">
+      <div id="" data-accountguid="" data-itemname="">
+        <div class="row">
+          <div class="col-12-xs col-12-sm col-md-12" style="min-width:0px;">
+            <i id="staff-icon" class="fa fa-check toggle-hide" style="float:left;margin-top:3px;margin-left:0px;"></i>
+            <img data-observe='[{"type":"attr", "name":"src", "value": "accountguid", "prepend": "/assets/img/profile_photos/", "append": "_sm.jpg?v=", "bustcache": "true"}]' class="input-json image-style profile-photo" style="width:60px;float:left;border: solid 1px #999;border-radius: 3px !important;">
+            <div style="padding-left:5px;float: left;width:75%;">
+              <div data-observe='[{"type":"html","value": "nickname"}]'></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template id="cart">
+      <div class="row">
+        <div class="col-12-xs col-12-sm col-md-12" style="min-width:0px;">
+          <div>
+            <h3>Appointment</h3>
+            <h4>Date</h4>
+            <h4>Time</h4>
+            <h4>With</h4>
+          </div>
+          <div>
+            <h3>Services</h3>
+          </div>
+          <div>
+            <h4>Service Sub-total</h4>
+          </div>
+          <div>
+            <h3>Products</h3>
+          </div>
+          <div>
+            <h4>Product Sub-total</h4>
+          </div>
+          <div>
+            <h3>Total</h3>
+          </div>
+          <div>
+            <h4>Discount</h4>
+          </div>
+          <div>
+            <h4>Giftcard</h4>
+            <h4>Total</h4>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template id="item-news-css">
+      <style>
+        a, a:visited, a:link, a:any-link {
+          text-decoration: none !important;
+          color: blue !important;
+        }
+
+        .list-item {
+          text-align: left;
+          border: solid 1px #ccc;
+          font-size: 20px;
+          padding: 10px 5px 10px 15px;
+          margin: 10px 5px 10px 15px;
+          background-color: #fefefe;
+          color: #999;
+        }
+
+          .list-item:hover {
+            border: solid 1px #333;
+            background-color: #ccc;
+            color: #fff;
+            cursor: pointer;
+          }
+      </style>
+    </template>
+    <template id="item-news" class="list-item">
+      <div class="row">
+        <div class="col-12-xs col-12-sm col-md-12" style="min-width:0px;">
+          <a href="" target="_blank" data-observe='[{"type":"attr","name":"href","value": "url"}]'>
+            <div class="itemtime" style="float:right;">&nbsp;(<span data-observe='[{"type":"html","value": "comments_count"}]'></span> comments) </div>
+            <div class="itemprice" style="float:right;" data-observe='[{"type":"html","value": "time_ago"}]'></div>
+            <div class="itemname" style="padding-left:5px;" data-observe='[{"type":"html","value": "title"}]'></div>
+            <div class="itemdescription" style="padding-left:25px;"></div>
+          </a>
+        </div>
+      </div>
+    </template>
+
+    <script>
+      function csfName(elements) {
+        //custom logic to set all nav elements based on state of data
+        //is there a clean way to handle this logic either here or instead of a promise
+
+        return new Promise(function (success, error) {
+          console.log('csfName called');
+          //surround by try/catch or something
+          var j = { "class": "btn-spa-nav-active" }
+          //var j = { "disabled": "true", "class": "btn-spa-nav-active" }
+          success(j); // when successful
+          error();  // when error
+        });
+      }
+
+      var _locale = 'en-US';
+      var _currencycode = 'usd';
+      var options = {
+        style: "currency",
+        currency: _currencycode
+      }
+
+      function RouteProduct() {
+        return new Promise(function (success, error) {
+          console.log('RouteProduct called');
+          var element = document.getElementById('btnproduct')
+          var _classenabled = 'btn-spa-nav-enabled';
+          var _classdisabled = 'btn-spa-nav-disabled';
+
+          element.removeAttribute('disabled');
+          element.classList.remove(_classdisabled);
+          element.classList.add(_classenabled);
+
+          //if (typeof db.datasets.cart.bookingslot != 'undefined' && typeof db.datasets.cart.bookingslot == 'object') {
+          //  element.removeAttribute('disabled');
+          //  element.classList.remove(_classdisabled);
+          //  element.classList.add(_classenabled);
+          //} else {
+          //  element.setAttribute('disabled', '');
+          //  element.classList.remove(_classenabled);
+          //  element.classList.add(_classdisabled);
+          //}
+
+          success(true); // when successful
+          error();  // when error
+        });
+      }
+
+      var _locale = 'en-US';
+      var _currencycode = 'usd';
+      var options = {
+        style: "currency",
+        currency: _currencycode
+      }
+
+      function CalculateServicePrice(row) {
+
+        return new Promise(function (success, error) {
+          console.log('CalculateServicePrice called', row);
+          _locale = db.datasets.public_organization_details_get.data[0].locale;
+          _currencycode = db.datasets.public_organization_details_get.data[0].currencycode;
+
+          if (!isNaN(row.maxprice)) {
+            try {
+              if (parseInt(row.minprice, 10) == parseInt(row.maxprice, 10)) {
+                success(Number(row.maxprice).toLocaleString(_locale, options)); // when successful
+              } else {
+                success(Number(row.minprice) + ' - ' + Number(row.maxprice)); // when successful
+              }
+            } catch (e) {
+            }
+          }
+          error('');  // when error
+        });
+      }
+
+
+
+    </script>
+    <script type="text/javascript" src="/assets/js/bolt.js?v=1_0_4"></script>
+</body>
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Intelligent Voice Commands Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-menu {
+            background: #2c3e50;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .nav-menu a:hover {
+            background: #3498db;
+        }
+
+        .button-group {
+            margin: 15px 0;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn.secondary {
+            background: #95a5a6;
+        }
+
+        .btn.danger {
+            background: #e74c3c;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .status {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #3498db;
+        }
+
+        .log {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .voice-controls {
+            background: #e8f5e8;
+            border: 2px solid #27ae60;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .test-commands {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .ambiguous-elements {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎤 Annie Framework - Intelligent Voice Commands</h1>
+    
+    <div class="voice-controls">
+        <h2>🎙️ Voice Recognition Control</h2>
+        <button class="btn" onclick="window.annie.startVoiceRecognition()">Start Voice Recognition</button>
+        <button class="btn secondary" onclick="window.annie.stopVoiceRecognition()">Stop Voice Recognition</button>
+        <button class="btn" onclick="window.annie.toggleVoiceRecognition()">Toggle Voice</button>
+        <button class="btn secondary" onclick="window.annie.clearVoiceDisambiguation()">Clear Disambiguation</button>
+        
+        <p><strong>Voice Status:</strong> <span id="voiceStatus">Not started</span></p>
+    </div>
+
+    <div class="section">
+        <h2>🧭 Navigation Menu</h2>
+        <nav class="nav-menu">
+            <a href="#home" id="home-link">Home Page</a>
+            <a href="#staff" id="staff-link">Staff Directory</a>
+            <a href="#employees" id="employees-link">Employee Portal</a>
+            <a href="#team" id="team-link">Team Members</a>
+            <a href="#about" id="about-link">About Us</a>
+            <a href="#contact" id="contact-link">Contact Information</a>
+        </nav>
+        
+        <p><strong>Try saying:</strong> 
+            <code>"navigate to staff"</code>, 
+            <code>"go to employees"</code>, 
+            <code>"visit team"</code>
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>🔘 Action Buttons</h2>
+        <div class="button-group">
+            <button class="btn" onclick="alert('Save clicked!')">Save Document</button>
+            <button class="btn" onclick="alert('Save Profile clicked!')">Save Profile</button>
+            <button class="btn secondary" onclick="alert('Cancel clicked!')">Cancel</button>
+            <button class="btn danger" onclick="alert('Delete clicked!')">Delete Item</button>
+            <button class="btn" onclick="alert('Submit clicked!')">Submit Form</button>
+        </div>
+
+        <p><strong>Try saying:</strong> 
+            <code>"click save"</code> (should show disambiguation), 
+            <code>"click cancel"</code>, 
+            <code>"press submit"</code>
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>📝 Form Fields</h2>
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="Enter username">
+        </div>
+        <div class="form-group">
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email" placeholder="Enter email">
+        </div>
+        <div class="form-group">
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" name="phone" placeholder="Enter phone">
+        </div>
+
+        <p><strong>Try saying:</strong> 
+            <code>"type 'john_doe' into username"</code>, 
+            <code>"enter 'test@example.com' into email"</code>
+        </p>
+    </div>
+
+    <div class="ambiguous-elements">
+        <h2>🎯 Disambiguation Test Area</h2>
+        <p>These elements have similar names to test disambiguation:</p>
+        <div class="button-group">
+            <button class="btn" onclick="alert('User Bob A clicked!')">Bob Anderson</button>
+            <button class="btn" onclick="alert('User Bob B clicked!')">Bob Brown</button>
+            <button class="btn" onclick="alert('User Bob C clicked!')">Bob Chen</button>
+        </div>
+        
+        <p><strong>Try saying:</strong> <code>"click bob"</code> - Should show numbered options, then say <code>"2"</code> or <code>"select two"</code></p>
+    </div>
+
+    <div class="test-commands">
+        <h2>🧪 Testing Commands</h2>
+        <button class="btn" onclick="testPageElements()">Show Page Elements</button>
+        <button class="btn" onclick="testMatching()">Test Matching</button>
+        <button class="btn secondary" onclick="testVoiceCommand()">Test Voice Command</button>
+        <button class="btn secondary" onclick="clearLogs()">Clear Logs</button>
+        
+        <div class="form-group">
+            <label for="testInput">Test Target:</label>
+            <input type="text" id="testInput" placeholder="e.g., 'staff', 'save', 'bob'" value="staff">
+        </div>
+        
+        <div class="form-group">
+            <label for="testCommandInput">Test Command:</label>
+            <input type="text" id="testCommandInput" placeholder="e.g., 'navigate to staff', 'click save'" value="navigate to staff">
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📋 System Log</h2>
+        <div id="systemLog" class="log">
+            System ready - Start voice recognition to begin...
+        </div>
+    </div>
+
+    <div class="status">
+        <h3>📖 How the Intelligent Matching Works:</h3>
+        <ol>
+            <li><strong>Exact Match:</strong> Perfect text match (highest priority)</li>
+            <li><strong>Normalized Match:</strong> Ignores punctuation, case, extra spaces</li>
+            <li><strong>Fuzzy Match:</strong> Handles typos using Levenshtein distance</li>
+            <li><strong>Phonetic Match:</strong> Matches similar sounds (simplified Double Metaphone)</li>
+            <li><strong>Disambiguation:</strong> When multiple matches found, presents numbered options</li>
+        </ol>
+        
+        <p><strong>Voice Commands:</strong></p>
+        <ul>
+            <li><code>navigate to [target]</code> or <code>go to [target]</code></li>
+            <li><code>click [target]</code> or <code>press [target]</code></li>
+            <li><code>type "[text]" into [field]</code></li>
+            <li>Numbers for disambiguation: <code>1</code>, <code>2</code>, <code>select one</code>, etc.</li>
+        </ul>
+    </div>
+
+    <!-- Include Annie Framework -->
+    <script type="module">
+        import { AnnieFramework } from './dist/annie.js';
+
+        // Initialize Annie with voice commands enabled
+        const config = {
+            logLevel: 'info',
+            enableVoiceCommands: true,
+            autoInitialize: true
+        };
+
+        console.log('🚀 Initializing Annie Framework with intelligent voice commands...');
+        
+        try {
+            window.annie = new AnnieFramework(config);
+            
+            // Set up logging to display in the UI
+            const originalLog = console.log;
+            const originalError = console.error;
+            const logElement = document.getElementById('systemLog');
+            
+            function addLogMessage(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = `[${timestamp}] ${message}`;
+                
+                if (logElement) {
+                    logElement.innerHTML += logEntry + '\n';
+                    logElement.scrollTop = logElement.scrollHeight;
+                }
+                
+                // Also log to browser console
+                if (type === 'error') {
+                    originalError(logEntry);
+                } else {
+                    originalLog(logEntry);
+                }
+            }
+            
+            // Override console methods to capture logs
+            console.log = function(...args) {
+                addLogMessage(args.join(' '), 'info');
+            };
+            
+            console.error = function(...args) {
+                addLogMessage('ERROR: ' + args.join(' '), 'error');
+            };
+            
+            // Global testing functions
+            window.testPageElements = function() {
+                const elements = window.annie.getPageElements();
+                addLogMessage('📄 Page Elements Found:');
+                addLogMessage(`  Menu items: ${elements.menuItems.length}`);
+                addLogMessage(`  Buttons: ${elements.buttons.length}`);
+                addLogMessage(`  Inputs: ${elements.inputs.length}`);
+                originalLog('Page Elements:', elements);
+            };
+            
+            window.testMatching = function() {
+                const target = document.getElementById('testInput').value;
+                if (!target) {
+                    addLogMessage('❌ Please enter a target to test');
+                    return;
+                }
+                
+                addLogMessage(`🧪 Testing matches for: "${target}"`);
+                const matches = window.annie.testVoiceMatching(target, 'click');
+                addLogMessage(`Found ${matches.length} matches`);
+                originalLog('Matches:', matches);
+            };
+            
+            window.testVoiceCommand = async function() {
+                const command = document.getElementById('testCommandInput').value;
+                if (!command) {
+                    addLogMessage('❌ Please enter a command to test');
+                    return;
+                }
+                
+                addLogMessage(`🎤 Testing command: "${command}"`);
+                try {
+                    const result = await window.annie.testVoiceCommand(command);
+                    addLogMessage(`✅ Command processed, ${result.length} actions generated`);
+                    originalLog('Command result:', result);
+                } catch (error) {
+                    addLogMessage(`❌ Command failed: ${error.message}`);
+                }
+            };
+            
+            window.clearLogs = function() {
+                if (logElement) {
+                    logElement.innerHTML = 'Logs cleared...\n';
+                }
+            };
+            
+            // Update voice status
+            function updateVoiceStatus() {
+                const statusElement = document.getElementById('voiceStatus');
+                const processor = window.annie.getAICommandProcessor();
+                
+                if (processor && processor.isVoiceEnabled()) {
+                    statusElement.textContent = '🎤 Listening...';
+                    statusElement.style.color = '#27ae60';
+                } else {
+                    statusElement.textContent = '🔇 Stopped';
+                    statusElement.style.color = '#e74c3c';
+                }
+            }
+            
+            // Update status every second
+            setInterval(updateVoiceStatus, 1000);
+            
+            addLogMessage('🎉 Annie Framework initialized successfully!');
+            addLogMessage('🎤 Click "Start Voice Recognition" to begin');
+            addLogMessage('🧪 Use the test buttons to explore the intelligent matching system');
+            
+        } catch (error) {
+            console.error('Failed to initialize Annie Framework:', error);
+        }
+    </script>
+</body>
+</html>

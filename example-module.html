@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - ES6 Module Example</title>
+</head>
+<body>
+    <h1>Annie Framework with ES6 Modules</h1>
+    
+    <!-- Use type="module" to enable ES6 imports -->
+    <script type="module">
+        // Import Annie from the compiled dist folder
+        import { AnnieFramework } from './dist/annie.js';
+        
+        // Initialize Annie with configuration
+        const config = {
+            apiConfig: {
+                baseUrl: 'https://api.example.com',
+                timeout: 5000
+            },
+            logLevel: 'info',
+            autoInitialize: true
+        };
+        
+        // Create Annie instance
+        const annie = new AnnieFramework(config);
+        
+        // Make annie globally available if needed
+        window.annie = annie;
+        
+        // Define global callbacks for post-initialization
+        window.pageinit = function() {
+            console.log('Page initialized - framework is ready');
+            // Add your initialization code here
+        };
+        
+        window.pageloaded = function() {
+            console.log('Page loaded - framework and data are ready');
+            // Add your post-data-load code here
+        };
+    </script>
+</body>
+</html>

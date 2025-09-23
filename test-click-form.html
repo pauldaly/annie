@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Click Trigger Form Submission Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5; 
+        }
+        .test-section { 
+            background: white; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 5px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+        .trigger-button {
+            background: #007cba;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            display: inline-block;
+        }
+        .trigger-button:hover {
+            background: #005a8b;
+        }
+        .debug-info {
+            background: #f0f8ff;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #007cba;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .row-button {
+            background: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .row-button:hover {
+            background: #1e7e34;
+        }
+    </style>
+</head>
+<body>
+    <h1>Annie Framework - Click Trigger Form Submission Test</h1>
+    <p>Current URL: <span id="current-url"></span></p>
+    <p>Expected behavior: URLs like <code>/staff-overview</code> should become <code>/en/staff-overview</code></p>
+    <p><strong>Note:</strong> Form submissions are intercepted for testing - check debug log below</p>
+
+    <div class="test-section">
+        <h2>1. Simple Click Trigger (Form Submission)</h2>
+        <p>This should submit a POST form to <code>/en/staff-overview</code> with no parameters:</p>
+        <button class="trigger-button" 
+                data-trigger='{"type": "click", "method": "post", "action": "/staff-overview"}'>
+            Navigate to Staff Overview
+        </button>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Click Trigger with Parameters</h2>
+        <p>This should submit a POST form to <code>/en/staff-overview</code> with accountguid parameter:</p>
+        <button class="trigger-button" 
+                data-trigger='{"type": "click", "method": "post", "action": "/staff-overview", "params": [{"accountguid": "12345", "role": "admin"}]}'
+                data-accountguid="button-data-12345">
+            Navigate with Params
+        </button>
+    </div>
+
+    <div class="test-section">
+        <h2>3. DataTable-like Rows (Click Navigation)</h2>
+        <p>Simulating DataTable rows where each row navigates to staff detail with POST form:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Account GUID</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="staff-table">
+                <tr>
+                    <td>Alice Johnson</td>
+                    <td>Marketing</td>
+                    <td>staff-001</td>
+                    <td>
+                        <button class="row-button"
+                                data-trigger='{"type": "click", "method": "post", "action": "/staff-overview", "params": [{"accountguid": "staff-001", "name": "Alice Johnson", "dept": "Marketing"}]}'
+                                data-accountguid="staff-001"
+                                data-name="Alice Johnson"
+                                data-dept="Marketing">
+                            View Details
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Bob Wilson</td>
+                    <td>Sales</td>
+                    <td>staff-002</td>
+                    <td>
+                        <button class="row-button"
+                                data-trigger='{"type": "click", "method": "post", "action": "/staff-overview", "params": [{"accountguid": "staff-002", "name": "Bob Wilson", "dept": "Sales"}]}'
+                                data-accountguid="staff-002"
+                                data-name="Bob Wilson"
+                                data-dept="Sales">
+                            View Details
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Carol Davis</td>
+                    <td>Engineering</td>
+                    <td>staff-003</td>
+                    <td>
+                        <button class="row-button"
+                                data-trigger='{"type": "click", "method": "post", "action": "/staff-overview", "params": [{"accountguid": "staff-003", "name": "Carol Davis", "dept": "Engineering"}]}'
+                                data-accountguid="staff-003"
+                                data-name="Carol Davis"
+                                data-dept="Engineering">
+                            View Details
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="test-section">
+        <h2>4. External URL Test (Regular Navigation)</h2>
+        <p>This should use window.location (not form submission) for external URLs:</p>
+        <button class="trigger-button" 
+                data-trigger='{"type": "click", "action": "https://www.google.com"}'>
+            Navigate to Google
+        </button>
+    </div>
+
+    <div class="test-section">
+        <h2>Debug Information</h2>
+        <div class="debug-info" id="debug-log">
+            Framework loading...
+        </div>
+        <button onclick="clearDebugLog()" style="margin-top: 10px;">Clear Debug Log</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Dynamic Content Test</h2>
+        <p>Test if dynamically added click triggers work (MutationObserver):</p>
+        <div id="dynamic-container">
+            <!-- Dynamic content will be added here -->
+        </div>
+        <button onclick="addDynamicTrigger()">Add Dynamic Click Trigger</button>
+    </div>
+
+    <!-- Load Annie Framework -->
+    <script type="module">
+        import { Annie } from './src/annie.js';
+        
+        // Initialize framework
+        const annie = new Annie();
+        annie.initialize();
+        
+        // Display current URL
+        document.getElementById('current-url').textContent = window.location.href;
+        
+        // Add debug logging to show what's happening
+        const debugLog = document.getElementById('debug-log');
+        const originalConsoleLog = console.log;
+        const originalConsoleDebug = console.debug;
+        const originalConsoleError = console.error;
+        
+        function addToDebugLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.style.color = type === 'error' ? 'red' : type === 'debug' ? 'blue' : 'black';
+            div.textContent = `[${timestamp}] ${message}`;
+            debugLog.appendChild(div);
+            debugLog.scrollTop = debugLog.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            addToDebugLog(args.join(' '), 'info');
+            originalConsoleLog.apply(console, args);
+        };
+        
+        console.debug = function(...args) {
+            addToDebugLog(args.join(' '), 'debug');
+            originalConsoleDebug.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            addToDebugLog(args.join(' '), 'error');
+            originalConsoleError.apply(console, args);
+        };
+        
+        // Clear debug log function
+        window.clearDebugLog = function() {
+            debugLog.innerHTML = 'Debug log cleared...';
+        };
+        
+        // Add dynamic trigger function
+        window.addDynamicTrigger = function() {
+            const container = document.getElementById('dynamic-container');
+            const newButton = document.createElement('button');
+            newButton.className = 'trigger-button';
+            newButton.textContent = `Dynamic Button ${container.children.length + 1}`;
+            newButton.setAttribute('data-trigger', JSON.stringify({
+                type: "click",
+                method: "post", 
+                action: "/staff-overview",
+                params: [{"accountguid": `dynamic-${Date.now()}`, "source": "dynamic"}]
+            }));
+            newButton.setAttribute('data-dynamic-id', Date.now().toString());
+            container.appendChild(newButton);
+            
+            addToDebugLog(`Added dynamic trigger button with ID: dynamic-${Date.now()}`);
+        };
+        
+        addToDebugLog('Annie Framework initialized successfully');
+        addToDebugLog('Click trigger test page loaded');
+        addToDebugLog('Language code detection: Current path = ' + window.location.pathname);
+        
+        // Test language code detection
+        const pathParts = window.location.pathname.split('/').filter(part => part.length > 0);
+        const detectedLang = pathParts.length > 0 && pathParts[0].length === 2 ? pathParts[0] : 'en';
+        addToDebugLog(`Detected language code: ${detectedLang}`);
+        
+        // Intercept form submissions to log them (for testing)
+        const originalSubmit = HTMLFormElement.prototype.submit;
+        HTMLFormElement.prototype.submit = function() {
+            addToDebugLog(`FORM SUBMISSION: ${this.method} ${this.action}`);
+            const formData = new FormData(this);
+            for (let [key, value] of formData.entries()) {
+                addToDebugLog(`  - ${key}: ${value}`);
+            }
+            addToDebugLog('Form would submit now (intercepted for testing)');
+            
+            // Uncomment next line to actually submit the form:
+            // originalSubmit.call(this);
+            
+            return false; // Prevent actual submission for testing
+        };
+        
+    </script>
+</body>
+</html>

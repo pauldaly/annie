@@ -1,0 +1,45 @@
+{
+  "name": "annie-framework",
+  "version": "1.0.0",
+  "description": "A modular client-side framework for reactive data binding and UI management",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rimraf dist",
+    "dev": "npm run build:watch",
+    "bundle": "rollup -c",
+    "bundle:watch": "rollup -c --watch"
+  },
+  "keywords": [
+    "framework",
+    "reactive",
+    "data-binding",
+    "ui",
+    "typescript"
+  ],
+  "author": "Annie Framework",
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.44.0",
+    "@typescript-eslint/parser": "^8.44.0",
+    "eslint": "^9.36.0",
+    "globals": "^16.4.0",
+    "jiti": "^2.5.1",
+    "rimraf": "^5.0.0",
+    "rollup": "^3.0.0",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.44.0"
+  },
+  "files": [
+    "dist/**/*",
+    "src/**/*",
+    "README.md",
+    "LICENSE.md"
+  ]
+}

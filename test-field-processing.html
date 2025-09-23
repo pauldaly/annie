@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Field Processing Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5; 
+        }
+        .test-section { 
+            background: white; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 5px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .readonly {
+            background-color: #f0f0f0;
+            color: #666;
+        }
+        .debug-info {
+            background: #f0f8ff;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #007cba;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .dataset-display {
+            background: #fff9c4;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #f39c12;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        button {
+            background: #007cba;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #005a8b;
+        }
+    </style>
+</head>
+<body>
+    <h1>Annie Framework - Field Processing Test</h1>
+    <p>Test the new field processing capabilities for data transformation and sanitization.</p>
+
+    <div class="test-section">
+        <h2>1. Copy to Upper/Lower Case</h2>
+        <p>Type text in the input below. It will automatically copy to uppercase and lowercase fields.</p>
+        
+        <div class="form-group">
+            <label for="source-text">Source Text:</label>
+            <input type="text" 
+                   id="source-text" 
+                   name="source-text"
+                   data-copyto-upper="upper-text"
+                   data-copyto-lower="lower-text"
+                   placeholder="Type something here..."
+                   autocomplete="off">
+        </div>
+
+        <div class="form-group">
+            <label for="formfield_upper-text">Uppercase Copy:</label>
+            <input type="text" id="formfield_upper-text" name="upper-text" class="readonly" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="formfield_lower-text">Lowercase Copy:</label>
+            <input type="text" id="formfield_lower-text" name="lower-text" class="readonly" readonly>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Phone Number Sanitization</h2>
+        <p>Enter a phone number in any format. It will be sanitized and stored in a dataset.</p>
+        
+        <div class="form-group">
+            <label for="phone-input">Phone Number:</label>
+            <input type="text" 
+                   id="phone-input" 
+                   name="phone"
+                   data-sanitize='{"type": "sanitize-phone", "dataset": "contacts", "target": "phone_sanitized"}'
+                   placeholder="(555) 123-4567 or 555.123.4567"
+                   autocomplete="off">
+        </div>
+
+        <div class="form-group">
+            <label for="formfield_phone_sanitized">Sanitized Phone:</label>
+            <input type="text" id="formfield_phone_sanitized" name="phone_sanitized" class="readonly" readonly>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Email Sanitization</h2>
+        <p>Enter an email address. It will be sanitized (trimmed and lowercased).</p>
+        
+        <div class="form-group">
+            <label for="email-input">Email Address:</label>
+            <input type="text" 
+                   id="email-input" 
+                   name="email"
+                   data-sanitize='{"type": "sanitize-email", "dataset": "contacts"}'
+                   placeholder="  USER@EXAMPLE.COM  "
+                   autocomplete="off">
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Multiple Field Operations</h2>
+        <p>This field demonstrates multiple operations on the same input.</p>
+        
+        <div class="form-group">
+            <label for="multi-input">Multi-Operation Field:</label>
+            <input type="text" 
+                   id="multi-input" 
+                   name="multifield"
+                   data-copyto-upper="multi-upper"
+                   data-sanitize='{"type": "sanitize-alpha", "dataset": "processed"}'
+                   placeholder="Type text with numbers: Hello123World!"
+                   autocomplete="off">
+        </div>
+
+        <div class="form-group">
+            <label for="formfield_multi-upper">Uppercase Copy:</label>
+            <input type="text" id="formfield_multi-upper" name="multi-upper" class="readonly" readonly>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Currency Formatting</h2>
+        <p>Enter a number and it will be formatted as currency.</p>
+        
+        <div class="form-group">
+            <label for="currency-input">Amount:</label>
+            <input type="text" 
+                   id="currency-input" 
+                   name="amount"
+                   data-format="format-currency"
+                   data-sanitize='{"type": "format-currency", "dataset": "financial"}'
+                   placeholder="1234.56"
+                   autocomplete="off">
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Dataset Contents</h2>
+        <p>View the sanitized data stored in datasets:</p>
+        
+        <button onclick="showDatasets()">Refresh Dataset Display</button>
+        <button onclick="clearDatasets()">Clear All Datasets</button>
+        
+        <div id="dataset-display" class="dataset-display">
+            Dataset contents will appear here...
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>7. Dynamic Field Addition</h2>
+        <p>Test adding fields dynamically (should work automatically with MutationObserver):</p>
+        
+        <button onclick="addDynamicField()">Add Dynamic Field</button>
+        <div id="dynamic-container">
+            <!-- Dynamic fields will be added here -->
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Debug Information</h2>
+        <div class="debug-info" id="debug-log">
+            Framework loading...
+        </div>
+        <button onclick="clearDebugLog()" style="margin-top: 10px;">Clear Debug Log</button>
+    </div>
+
+    <!-- Load Annie Framework -->
+    <script type="module">
+        import { Annie } from './src/annie.js';
+        
+        // Initialize framework
+        const annie = new Annie();
+        annie.initialize();
+        
+        // Make annie available globally for testing
+        window.annie = annie;
+        
+        // Add debug logging to show what's happening
+        const debugLog = document.getElementById('debug-log');
+        const originalConsoleLog = console.log;
+        const originalConsoleDebug = console.debug;
+        const originalConsoleError = console.error;
+        
+        function addToDebugLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.style.color = type === 'error' ? 'red' : type === 'debug' ? 'blue' : 'black';
+            div.textContent = `[${timestamp}] ${message}`;
+            debugLog.appendChild(div);
+            debugLog.scrollTop = debugLog.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            addToDebugLog(args.join(' '), 'info');
+            originalConsoleLog.apply(console, args);
+        };
+        
+        console.debug = function(...args) {
+            addToDebugLog(args.join(' '), 'debug');
+            originalConsoleDebug.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            addToDebugLog(args.join(' '), 'error');
+            originalConsoleError.apply(console, args);
+        };
+        
+        // Global functions for buttons
+        window.clearDebugLog = function() {
+            debugLog.innerHTML = 'Debug log cleared...';
+        };
+        
+        window.showDatasets = function() {
+            const dataStore = annie.getDataStore();
+            const datasets = dataStore.all();
+            const display = document.getElementById('dataset-display');
+            display.innerHTML = '<h3>All Datasets:</h3><pre>' + JSON.stringify(datasets, null, 2) + '</pre>';
+        };
+        
+        window.clearDatasets = function() {
+            const dataStore = annie.getDataStore();
+            // Clear processing datasets but keep the main store
+            dataStore.unload('contacts');
+            dataStore.unload('processed');
+            dataStore.unload('financial');
+            dataStore.unload('sanitized');
+            dataStore.unload('formatted');
+            addToDebugLog('Cleared all processing datasets');
+            window.showDatasets();
+        };
+        
+        let dynamicFieldCounter = 0;
+        window.addDynamicField = function() {
+            dynamicFieldCounter++;
+            const container = document.getElementById('dynamic-container');
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-group';
+            fieldDiv.innerHTML = `
+                <label for="dynamic-${dynamicFieldCounter}">Dynamic Field ${dynamicFieldCounter}:</label>
+                <input type="text" 
+                       id="dynamic-${dynamicFieldCounter}" 
+                       name="dynamic-${dynamicFieldCounter}"
+                       data-copyto-upper="dynamic-upper-${dynamicFieldCounter}"
+                       data-sanitize='{"type": "sanitize-numeric", "dataset": "dynamic"}'
+                       placeholder="Type text with numbers..."
+                       autocomplete="off">
+                <input type="text" 
+                       id="formfield_dynamic-upper-${dynamicFieldCounter}" 
+                       name="dynamic-upper-${dynamicFieldCounter}" 
+                       class="readonly" 
+                       readonly 
+                       placeholder="Uppercase copy will appear here">
+            `;
+            container.appendChild(fieldDiv);
+            addToDebugLog(`Added dynamic field: dynamic-${dynamicFieldCounter}`);
+        };
+        
+        addToDebugLog('Annie Framework initialized successfully');
+        addToDebugLog('Field processor test page loaded');
+        addToDebugLog('Try typing in the input fields to see field processing in action');
+        
+        // Show initial dataset state
+        setTimeout(() => {
+            window.showDatasets();
+        }, 1000);
+        
+    </script>
+</body>
+</html>

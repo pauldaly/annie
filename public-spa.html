@@ -1,0 +1,460 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title></title>
+  <style>
+    view {
+      display: block;
+    }
+  </style>
+  <script>
+    //request params are automatically added to page via server
+    var loglevel = "DEBUG";
+    var _requestparams = { "idempotentstamp": "1660795975843", "accountguid": "1df71f97-f6ac-4de7-98b3-0720726409e8", "first": "Shannon", "last": "Daly", "radiofirst": "b", "selectfirst": "Shannon", "checkboxfirst": "0", "textareafirst": "Shannon" };
+    /*
+     "public-organization-details-get"
+      , "public-client-profile-list"
+      , "public-skills-get"
+      , "public-location-get"
+      , "public-services-get"
+      , "public-products-get"
+      "system": ["dataset-one", "domain-details-get", "persistent-data"], "external": [{ "url": "https://node-hnapi.herokuapp.com/news", "dataset": "heroku" }, { "url": "https://another-url", "dataset": "another-dataset" }]
+     */
+  </script>
+
+
+  <script>
+    //this is manually added to page to ... auto include these from request parameters into the persistent dataset
+    var _persistent = ["accountguid", "first", "last"];
+    var _datasetsinit = {
+      "load": ["formfield_firstname", "public-client-profile-list", "public-location-get", "public-services-get", "public-organization-details-get", "public-add-ons-get"],
+      "lazyload": ["public-skills-get", "public-products-get", "public-staff-get", "public-staff-and-services-get"],
+      "remote": [{ "url": "https://node-hnapi.herokuapp.com/news", "dataset": "heroku", "method": "GET", "options": [{ "option1": "value" }] }]
+
+
+      //"load": ["formfield_firstname", "public-client-profile-list", "public-skills-get", "public-location-get", "public-services-get", "public-products-get"], "external": [{ "method": "GET", "url": "https://node-hnapi.herokuapp.com/news", "dataset": "heroku" }]
+    }
+    var _datasets = {
+      "load": [{ "query": "formfield_firstname", "dataset": "firstnames" }, { "query": "public-get", "datasets": ["staff", "locations", "services"] }],
+      "lazyload": ["public-skills-get", "public-products-get", "public-staff-get", "public-staff-and-services-get"],
+      "remote": [{ "url": "https://node-hnapi.herokuapp.com/news", "dataset": "heroku", "method": "GET", "options": [{ "option1": "value" }] }]
+      //"load": ["formfield_firstname", "public-client-profile-list", "public-skills-get", "public-location-get", "public-services-get", "public-products-get"], "external": [{ "method": "GET", "url": "https://node-hnapi.herokuapp.com/news", "dataset": "heroku" }]
+    }
+  </script>
+</head>
+<body>
+  <!--
+  default for view is hide
+      set default view to display FOR SPA
+  a completely different spa is shown when public vs signed in
+  user will always create account or sign in from public view
+
+  WHAT IS NAV FORMAT
+  data-trigger_='[{"type":"route","target":"view2"}]'
+  figure out how to handle back/forward button click since we are on spa
+
+  each view can be managed using {{view-name}} to enable code splitting
+  let view decide how to format nav and bread crumbs; highlight etc
+  for public site we are using steps 1, 2, 3, 4 to schedule an appointment
+       view element contains all html for page
+        should their be a contianer also for header and footer
+
+    need view container to embed spa within another website in shadow doc
+    can parameters from outside shadow dom be passed in to auto populate selected service
+
+      -->
+  <div class="container">
+    <header>
+      Header
+    </header>
+    <footer>
+      Footer
+    </footer>
+
+    <view id="view1">
+      <div id="navbtn1" class="btn btn-plump btn-primary btn-block btn-marginleft"
+           style="border:solid 1px #ccc;cursor:pointer;padding:5px;width:200px;"
+           data-route='{"target": "view2"}'>
+        Go to page 2
+      </div>
+
+
+      Hullo <span id="first" data-observe='[{"type":"html","value": "first"}]'></span>
+      <br />
+      buhbye <span data-observe='[{"type":"html","value": "last"}]'></span>
+      <br />
+      <span data-observe='[{"type":"html", "value": "first"},{"type":"this", "method": "upper"}]'></span>
+      <br />
+
+      Client disabled <span data-observe='[{"type":"html", "datasource":"clients","value": "firstname"},{"type":"this", "method": "lower"}]'></span>
+      <br />
+
+      <h2>Input 1</h2>
+      <input id="formfield_baz" name="first_" class="bind"
+             data-observe_='[
+         {"type":"clone","value": "name_of_clone",
+         "method":"[duplicate,sanitize,upper,lower,encrypt,copyto/clone]",
+         "dataset":"first"},{"type":"this","method":"upper"}]' />
+      <br />
+      <br />
+      <br />
+
+
+      <br />
+      <br />
+      <select id="selectfirst" name="selectfirst">
+        <option value="">Select</option>
+        <option value="shannon">Shannon</option>
+      </select>
+      <br />
+      <br />
+      <input id="checkboxfirst" type="checkbox" name="checkboxfirst" />
+      <br />
+      <br />
+      <input id="radiofirsta" type="radio" name="radiofirst" value="a" />
+      <input id="radiofirstb" type="radio" name="radiofirst" value="b" />
+      <br />
+      <br />
+      <textarea id="textareafirst" name="textareafirst" data-trigger='{"triggers":[{"type":"change"}]}'></textarea>
+      <br />
+
+      <div id="shadowhost" data-observe='[{"type":"template", "name":"template-name", "target": "shadow", "datasource":"formfield_firstname"}]'></div>
+
+      <div id="button_id" class="bind"
+           data-description="bind on click can do many things;
+       :handle page functions without submitting
+       :xhr or redirect; submit data using form or other dataset object;
+       convert forms into datasets dynamically
+       forms can be parent child
+       any input updates are auto stored in a table related to parent forms
+       input fields can also reference modified data such as upper, lower, sanitized; saved in same table
+       persistent dataset and all form datasets referenced are submitted
+       how are sortable lists, json, li, calendar, etc. handled
+       include modal response, toast, any cleanup
+       "
+           data-trigger_='[{"type":"click","method":"post","action": "/some-url-or","callback":"cbOrSomeFunctionName","form":["form1","form2"],"query":["update-table-query","another_query_to_call"]}]'>
+        Submit me
+      </div>
+
+      <br />
+      <br />
+
+      <div id="button1" class="btn btn-plump btn-primary btn-block btn-marginleft" style="border:solid 1px #ccc;cursor:pointer;padding:5px;width:200px;">
+        Go to view 2
+      </div>
+    </view>
+
+    <view id="view2" view-name="view 2" name="view 2" data-name="view 2" style="display:none;">
+      <h3>Reactive Observer: <span data-observe='[{"type":"html","value": "first"}]'></span></h3>
+      <h2 id="button">Reactive Input [first]</h2>
+      <input id="c" name="first" data-trigger='{"triggers":[{"type":"keyup", "autoreset": "true"}, {"type":"change"}]}' />
+      <br />
+      <h3>Reactive Observer: <span data-observe='[{"type":"html","value": "last"}]'></span></h3>
+      <h2 id="button">Reactive Input [last]</h2>
+      <input id="a" name="last" data-trigger='{"triggers":[{"type":"keyup", "autoreset": "true"}, {"type":"change"}]}' />
+      <br />
+      <h2 id="button">Reactive Input [last] w/ datasource</h2>
+      <input id="b" name="other" data-trigger='{"datasource":"client", "triggers":[{"type":"keyup", "autoreset": "true"}, {"type":"change"}]}' />
+      <div class="btn btn-plump btn-primary btn-block btn-marginleft"
+           data-trigger='{"triggers":[{"type":"undo"}]}'>
+        UNDO
+      </div>
+      <br />
+      <br />
+      <div class="btn btn-plump btn-primary btn-block btn-marginleft"
+           data-trigger='{"triggers":[{"type":"redo"}]}'>
+        REDO
+      </div>
+      <br />
+      <br />
+
+      <div class="btn btn-plump btn-primary btn-block btn-marginleft"
+           data-trigger='{"triggers":[{"type":"click","method":"post","callbefore": {"function":"cbparams","params":["-","30","-","1"]},"form":["form1"]}]}'>
+        Last 30 (local cb function to console.log date 30 days prior to today and yesterday)
+      </div>
+
+      <div id="navbtn2" class="btn btn-plump btn-primary btn-block btn-marginleft"
+           style="border:solid 1px #ccc;cursor:pointer;padding:5px;width:200px;"
+           data-route='{"target": "view1"}'>
+        Go to view 1
+      </div>
+
+    </view>
+  </div>
+
+  <template id="template-shadow">
+    <style>
+      div {
+        text-align: left;
+        margin-bottom: 10px;
+        float: left;
+        border-width: 0px;
+        margin-right: 10px;
+      }
+
+      p {
+        color: red;
+      }
+    </style>
+    <div>
+      <h1>{header}</h1>
+      <p>Shadow text</p>
+    </div>
+  </template>
+
+  <!--
+    allow templates to include conditional to display or hide content/elements
+    -->
+  <template id="template-name">
+    <div data-observe='[{"type":"html","value": "autosuggest"}]'>Name</div>
+  </template>
+  <script>
+/*
+   var _insert = 'MY VALUE HERE';
+    console.log(`string text line 1
+${_insert}
+string text line 3`);
+
+    var _insert2 = `MY VALUE HERE\nhullo\nagain`;
+    console.log(_insert2);
+
+    const state = { page_id: 1, user_id: 5 };
+    const url = "hello-world.html";
+
+    history.pushState(state, "", url);
+
+      <div id="navbtn1" class="btn btn-plump btn-primary btn-block btn-marginleft"
+           style="border:solid 1px #ccc;cursor:pointer;padding:5px;width:200px;"
+           data-route='{"target": "view2"}'>
+        Go to page 2
+      </div>
+
+ */
+    const locationpath = window.location.pathname; 
+    console.log('locationpath', window.location.hostname, locationpath);
+
+    if (locationpath == '/spa-view-2') {
+
+    }
+
+    //any calbefore function needs to be added before bolt.js and be in this format to return a promise
+    //get format to accept parameters
+    function cfDates() {
+      return new Promise(function (success, error) {
+        // "Producing Code" (May take some time)
+        success('done'); // when successful
+        error();  // when error
+      });
+    }
+
+    /*
+      create structure to download dataset
+      can be added to button rather than separate function
+      need:
+        dataset name
+        columns to remove
+        filename
+        delimiter
+        value to replace any content that matches delimiter used: space, _, remove/empty, other
+
+      use comma as delimited value
+      can we escape/convert delimited value in case delimiter exists in dataset
+      can allow for custom function to manipulate dataset further and return to save
+     */
+
+    function cbparams(p) {
+
+      return new Promise(function (success, error) {
+        /*
+          WHEN INCLUDES ALL reports-appointment FUNCTIONS
+            MIGRATE TO THAT PAGE AND TEST
+            MINIFY CSS AND JS
+            MAKE SURE ALL XHR CALLS ARE ASYNC ESPECIALLY IF SAME END POINT
+
+         this function actually need to know if we are looking for a calculation of days from current date
+         or calculation to get start and stop date for today, this week or this month where we need date for start of week and month
+
+
+         */
+
+        //i will know what params I am passing so they should be handled here
+        var addsubstart = p[0]
+        var daystart = p[1]
+        var addsubstop = p[2]
+        var daystop = p[3]
+
+        var dystart = Number(addsubstart + daystart);
+        var dystop = Number(addsubstop + daystop);
+
+        let dtbegin = new Date();
+        let dtend = new Date();
+        var firstDay = new Date(dtbegin.setDate(dtbegin.getDate() + dystart));//date.setDate(date.getDate() + dystart);
+        var lastDay = new Date(dtend.setDate(dtend.getDate() + dystop));//date.setDate(date.getDate() + dystop);
+
+        console.log('firstDay, lastDay', firstDay.toISOString().split('T')[0], lastDay.toISOString().split('T')[0]);
+
+        //review how all persistent; auto created (sanitize), cart objects to be passed to server
+        //look at how perform passes json data and it is processed on the server in a loop to insert multiple values
+        //look at bulk insert options to reduce load on db and process from db
+
+        //this will set form values before an xhr call is made
+        //$("#formfield_fromdate").datepicker("setDate", new Date(firstDay));
+        //$("#formfield_todate").datepicker("setDate", new Date(lastDay));
+
+        //surround by try/catch or something
+        success('done'); // when successful
+        error();  // when error
+      });
+    }
+
+
+              //const el = document.querySelectorAll("view");
+              //el[0].addEventListener("click", modifyText, false);
+  </script>
+
+
+
+  <script type="text/javascript" src="/assets/js/boltts.js?v=1_0_4"></script>
+
+  <script>
+
+
+//cfDates3.then(
+//  function (value) { console.log('/* code if successful continue ************************************************************ ') },
+//  function (error) { console.log('/* code if error ************************************************************ ') }
+//);
+
+
+          /*
+
+          var shadowContainer = document.getElementById("shadowhost");
+
+          //const shadow = shadowContainer.attachShadow({ mode: 'open' });
+          const shadow = shadowContainer.attachShadow({ mode: 'closed' });
+
+          let template = document.getElementById('template-shadow');
+          let templateContent = template.content;
+
+          shadow.appendChild(templateContent);
+
+            */
+          //db.datasets.clients = [];
+
+          //tmp code stubbed to mirror xhr dataset call
+          //db.datasets.clients = _tempdb;
+          //db.datasets.store = _rp;
+          //_r.first = 'Shannon';
+          //_r.last = 'Cook';
+
+          //    db.datasets.store.xxx = 'Cook';
+          //    db.datasets.store.address = 'lake house';
+
+          /*
+            <span data-observe='[{"type":"html","value": "first"},{"type":"attr","name":"data-example","value": "is array because multiple elements can be handled"}]'></span>
+            <span data-observe='[{"type":"html","value": "first"}]'></span>
+            <span data-listen='[{"type":"html","value": "first"}]'></span>
+
+            */
+          //var element = document.getElementById("hum");
+          //element.innerHTML = db.store['baz'];
+          //const el = document.body.querySelector("[data-observe]");
+          //console.log('db', db.store['baz']);
+          //el.innerHTML(db.store['baz'])
+
+
+          //console.log('elements', elements, elements.length);
+          /*
+            incorporate dataset as part of hydration
+            and templates to add multiple values
+            and select lists etc.
+            */
+
+          //########################################################################################################################
+          //START OF THE HYDRATE FUNCTIONS
+          //########################################################################################################################
+          //var elements = document.querySelectorAll('[data-observe]'); // All with attribute named "property"
+          //for (let element of elements) {
+          //  console.log('element', element);
+          //  let observe = element.getAttribute('data-observe');
+          //  console.log('observe', observe);
+
+          //  //object could be an array of items to observe of which html is only one
+          //  //need to loop over all items
+          //  var obj = JSON.parse(observe)[0];
+          //  console.log('obj.type', obj);
+          //  var _store = 'store';
+          //  if (typeof obj.src !== 'undefined') {
+          //    _store = obj.src;
+          //  }
+
+          //  switch (obj.type) {
+          //    case 'html':
+          //      var field = obj.value;
+          //      console.log(db.all());
+          //      console.log(_store, field);
+          //      console.log(db.datasets[_store]);
+          //      if (db.datasets[_store].length > 1) {
+          //        element.innerHTML = db.datasets[_store][0][field];
+          //      } else {
+          //        element.innerHTML = db.datasets[_store][field];
+          //      }
+          //      element.classList.add(obj.value);
+          //      break;
+          //  }
+          //}
+
+                    ////########################################################################################################################
+
+
+                    ///*
+                    // blur sets history
+                    // trigger for undo/redo/
+                    // reset/flush
+
+                    //[[requestparams]] are all params passed to client including persistent data explicitly deemed necessary for request
+                    //[[persistent]] is a store that always passes on to xhr request
+
+                    // */
+
+                    ////########################################################################################################################
+                    ////START OF BINDING FUNCTIONS THAT LISTEN TO FORM FIELD EVENTS
+                    ////########################################################################################################################
+                    //var bindings = document.querySelectorAll('.bind'); // All with attribute named "property"
+                    //for (let target of bindings) {
+                    //  target.addEventListener("keyup", () => {
+                    //    //console.log(target.name, target.value);
+                    //    var elements = document.querySelectorAll('.' + target.name); // All with attribute named "property"
+                    //    //console.log('elements', elements);
+                    //    _r[target.name] = target.value;
+
+
+                    //    //move this to the setter; no need to have here; or is there
+                    //    for (let element of elements) {
+                    //      //console.log('element', element);
+                    //      let hydrate = element.getAttribute('data-hydrate');
+                    //      var obj = JSON.parse(hydrate)[0];
+                    //      //console.log('obj.type', obj.type);
+                    //      switch (obj.type) {
+                    //        case 'html':
+                    //          var field = obj.value;
+                    //          //console.log('db', db);
+                    //          //console.log('db.store', db.store);
+                    //          //console.log('db.store[field]', db.store[field]);
+
+                    //          //element.innerHTML = db.store[field];
+                    //          break;
+                    //      }
+                    //    }
+
+                    //  });
+                    ////########################################################################################################################
+
+
+                    //}
+
+
+    console.log('_rex.datasets', _rex.datasets);
+  </script>
+</body>
+</html>

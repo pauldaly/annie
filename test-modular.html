@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Modular Test</title>
+</head>
+<body>
+    <h1>Annie Framework - Modular Version</h1>
+    
+    <!-- Data binding test -->
+    <div data-observe='[{"datasource": "store", "type": "html", "field": "message"}]'>Loading...</div>
+    
+    <!-- Form input test -->
+    <input type="text" name="username" 
+           data-trigger='{"type": "change", "datasource": "store"}' 
+           placeholder="Enter your name">
+    
+    <!-- Button trigger test -->
+    <button data-trigger='{"type": "click", "callbefore": {"function": "testCallback", "params": ["Hello from Annie!"]}}'>
+        Test Button
+    </button>
+    
+    <!-- Routing test -->
+    <nav data-routecontainer='{"classstates": {"active": "nav-active", "enabled": "nav-enabled"}}'>
+        <a href="#" data-route='{"target": "home"}' data-nav-state="nav-enabled">Home</a>
+        <a href="#" data-route='{"target": "about"}' data-nav-state="nav-enabled">About</a>
+    </nav>
+    
+    <view id="home" style="display: block;">
+        <h2>Home View</h2>
+        <p>Welcome to the modular Annie Framework!</p>
+        <p>Username: <span data-observe='[{"datasource": "store", "type": "html", "field": "username"}]'>Not set</span></p>
+    </view>
+    
+    <view id="about" style="display: none;">
+        <h2>About View</h2>
+        <p>This is the modular version of Annie Framework, refactored from boltts.ts</p>
+    </view>
+
+    <style>
+        .nav-active { background: #007acc; color: white; padding: 5px 10px; }
+        .nav-enabled { background: #f0f0f0; color: #333; padding: 5px 10px; }
+        view { border: 1px solid #ccc; padding: 20px; margin: 10px 0; }
+    </style>
+
+    <!-- Initialize global variables -->
+    <script>
+        // Set up global variables that Annie expects
+        window._requestparams = { 
+            message: "Hello from Modular Annie!", 
+            username: "" 
+        };
+        window._datasetsinit = {
+            load: [],
+            remote: [],
+            lazyload: []
+        };
+        window.loglevel = "Debug";
+        
+        // Test callback function
+        function testCallback(message) {
+            alert(message);
+            console.log("Test callback executed:", message);
+        }
+    </script>
+
+    <!-- Load the compiled Annie Framework -->
+    <script type="module" src="./dist/index.js"></script>
+</body>
+</html>

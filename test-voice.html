@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Test - Annie Framework</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .voice-status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .listening {
+            background: #d4edda;
+            color: #155724;
+        }
+        .not-listening {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .start-btn {
+            background: #28a745;
+            color: white;
+        }
+        .stop-btn {
+            background: #dc3545;
+            color: white;
+        }
+        .toggle-btn {
+            background: #007bff;
+            color: white;
+        }
+        #log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Annie Framework Voice Test</h1>
+        
+        <div id="voice-status" class="voice-status not-listening">
+            Voice Recognition: Not Active
+        </div>
+
+        <div>
+            <button id="start-btn" class="start-btn">Start Listening</button>
+            <button id="stop-btn" class="stop-btn">Stop Listening</button>
+            <button id="toggle-btn" class="toggle-btn">Toggle Listening</button>
+        </div>
+
+        <h3>Console Log:</h3>
+        <div id="log"></div>
+
+        <h3>Instructions:</h3>
+        <ul>
+            <li>Click "Start Listening" to begin voice recognition</li>
+            <li>Speak clearly into your microphone</li>
+            <li>Watch the log for speech transcripts</li>
+            <li>Try commands like: "Navigate to home", "Click login button", "Scroll down"</li>
+        </ul>
+    </div>
+
+    <script type="module">
+        import { AnnieFramework } from './dist/index.js';
+
+        let annie = null;
+        let processor = null;
+
+        const statusDiv = document.getElementById('voice-status');
+        const logDiv = document.getElementById('log');
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const toggleBtn = document.getElementById('toggle-btn');
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+
+        function updateStatus(isListening) {
+            if (isListening) {
+                statusDiv.textContent = '🎤 Voice Recognition: LISTENING';
+                statusDiv.className = 'voice-status listening';
+            } else {
+                statusDiv.textContent = '🔇 Voice Recognition: STOPPED';
+                statusDiv.className = 'voice-status not-listening';
+            }
+        }
+
+        async function initAnnie() {
+            try {
+                log('🚀 Creating Annie Framework with voice commands...');
+                annie = new AnnieFramework({
+                    enableVoiceCommands: true,
+                    openAiApiKey: undefined // We don't need OpenAI for basic speech recognition
+                });
+
+                log('⚙️ Initializing Annie Framework...');
+                await annie.initialize();
+                
+                processor = annie.getAICommandProcessor();
+                if (processor) {
+                    log('✅ AI Command Processor available');
+                    log('🎤 Speech recognition should be active');
+                } else {
+                    log('❌ No AI Command Processor found');
+                }
+
+                window.annie = annie;
+                window.processor = processor;
+                
+            } catch (error) {
+                log(`❌ Failed to initialize Annie: ${error.message}`);
+                console.error('Annie initialization error:', error);
+            }
+        }
+
+        // Button event handlers
+        startBtn.addEventListener('click', () => {
+            if (processor) {
+                processor.startListening();
+                log('▶️ Manually started voice recognition');
+                updateStatus(true);
+            } else {
+                log('❌ No processor available');
+            }
+        });
+
+        stopBtn.addEventListener('click', () => {
+            if (processor) {
+                processor.stopListening();
+                log('⏹️ Manually stopped voice recognition');
+                updateStatus(false);
+            } else {
+                log('❌ No processor available');
+            }
+        });
+
+        toggleBtn.addEventListener('click', () => {
+            if (processor) {
+                processor.toggleListening();
+                log('🔄 Toggled voice recognition');
+            } else {
+                log('❌ No processor available');
+            }
+        });
+
+        // Initialize when page loads
+        log('🔄 Starting initialization...');
+        initAnnie();
+
+        // Override console.log to also show in our log div
+        const originalLog = console.log;
+        const originalInfo = console.info;
+        const originalError = console.error;
+
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            if (args[0] && typeof args[0] === 'string' && args[0].includes('🎤')) {
+                log(args.join(' '));
+                updateStatus(args[0].includes('Listening'));
+            }
+        };
+
+        console.info = function(...args) {
+            originalInfo.apply(console, args);
+            if (args[0] && typeof args[0] === 'string' && (args[0].includes('🎤') || args[0].includes('Voice') || args[0].includes('Speech'))) {
+                log(args.join(' '));
+                if (args[0].includes('Listening')) {
+                    updateStatus(true);
+                } else if (args[0].includes('ended')) {
+                    updateStatus(false);
+                }
+            }
+        };
+
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            if (args[0] && typeof args[0] === 'string' && args[0].includes('Speech')) {
+                log(`❌ ${args.join(' ')}`);
+                updateStatus(false);
+            }
+        };
+    </script>
+</body>
+</html>

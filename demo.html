@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - No Build Required</title>
+</head>
+<body>
+    <h1>Annie Framework Demo</h1>
+    
+    <!-- Example data-bound elements -->
+    <div data-observe='[{"datasource": "store", "type": "html", "field": "title"}]'>Loading...</div>
+    
+    <input type="text" name="username" 
+           data-trigger='{"type": "change", "datasource": "store"}' 
+           placeholder="Enter username">
+    
+    <button data-trigger='{"type": "api", "query": ["test-api"]}'>
+        Load Data
+    </button>
+    
+    <!-- Voice Control Buttons -->
+    <div style="margin: 20px 0; padding: 10px; border: 1px solid #ccc;">
+        <h3>Voice Commands</h3>
+        <button id="startVoice" onclick="console.log('Start button clicked'); console.log('Annie:', window.annie); window.annie?.aiCommandProcessor?.startListening()">🎤 Start Voice</button>
+        <button id="stopVoice" onclick="console.log('Stop button clicked'); window.annie?.aiCommandProcessor?.stopListening()">🔇 Stop Voice</button>
+        <p><small>Try saying: "click home", "navigate to profile", "scroll down"</small></p>
+    </div>
+    
+    <!-- Views for routing -->
+    <nav data-routecontainer='{"classstates": {"active": "active", "enabled": "enabled"}}'>
+        <a href="#" data-route='{"target": "home"}'>Home</a>
+        <a href="#" data-route='{"target": "profile"}'>Profile</a>
+    </nav>
+    
+    <view id="home" style="display: block;">
+        <h2>Home View</h2>
+        <p>Welcome to the home page!</p>
+    </view>
+    
+    <view id="profile" style="display: none;">
+        <h2>Profile View</h2>
+        <p>Your profile information.</p>
+    </view>
+
+    <!-- Import TypeScript modules directly (requires modern browser) -->
+    <script type="module">
+        // Import the pre-configured annie instance
+        import { AnnieFramework } from '/assets/annie/dist/index.js';
+
+        // Wrap in async function to handle await properly
+        async function initAnnie() {
+            try {
+                console.log('Creating Annie Framework with voice commands...');
+                const annie = new AnnieFramework({
+                    enableVoiceCommands: true,
+                    // ... your custom config
+                });
+
+                console.log('Initializing Annie Framework...');
+                await annie.initialize();  // YOU control when this happens
+                console.log('Annie loaded:', annie);
+                window.annie = annie;  // Make it globally available
+                
+                // Test if aiCommandProcessor exists
+                console.log('AI Command Processor:', annie.aiCommandProcessor);
+                console.log('Start Listening method:', annie.aiCommandProcessor?.startListening);
+                
+            } catch (error) {
+                console.error('Failed to initialize Annie:', error);
+            }
+        }
+        
+        // Initialize when page loads
+        initAnnie();
+
+        // Initialize global variables that the framework expects
+        window._requestparams = { title: "Annie Framework Demo", username: "" };
+        window._datasetsinit = {
+            load: ["initial-data"],
+            remote: [],
+            lazyload: []
+        };
+        window.loglevel = "Debug";
+        
+        // Simple initialization without the full framework
+        console.log("Annie Framework loading...");
+        
+        // You can add your own simple reactive system here
+        function updateUI() {
+            const titleElement = document.querySelector('[data-observe]');
+            if (titleElement) {
+                titleElement.innerHTML = window._requestparams.title;
+            }
+        }
+        
+        updateUI();
+        
+        // Simple event handling
+        document.addEventListener('change', function(e) {
+            if (e.target.dataset.trigger) {
+                const config = JSON.parse(e.target.dataset.trigger);
+                if (config.type === 'change') {
+                    window._requestparams[e.target.name] = e.target.value;
+                    console.log('Data updated:', window._requestparams);
+                }
+            }
+        });
+        
+        console.log("Annie Framework initialized!");
+    </script>
+</body>
+</html>

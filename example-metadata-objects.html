@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Metadata-Driven Object Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .button { background: #007cba; color: white; padding: 8px 16px; border: none; cursor: pointer; margin: 5px; }
+        .button:hover { background: #005a85; }
+        .output { background: #f5f5f5; padding: 10px; margin: 10px 0; font-family: monospace; white-space: pre-wrap; }
+        .error { color: red; }
+        .success { color: green; }
+        .warning { color: orange; }
+    </style>
+</head>
+<body>
+    <h1>Annie Framework - Metadata-Driven Object Management</h1>
+    <p>This example demonstrates how the Annie Framework can use server-provided metadata to dynamically manage complex data objects across multiple tables without hardcoded configurations.</p>
+
+    <div class="section">
+        <h3>1. Load Metadata from Server</h3>
+        <p>Instead of hardcoding object configurations, metadata is loaded from the server:</p>
+        <button class="button" onclick="loadServerMetadata()">Load Server Metadata</button>
+        <button class="button" onclick="loadCachedMetadata()">Load Cached Metadata</button>
+        <div id="metadata-output" class="output"></div>
+    </div>
+
+    <div class="section">
+        <h3>2. Available Object Types</h3>
+        <p>Once metadata is loaded, the framework knows what object types are available:</p>
+        <button class="button" onclick="showAvailableTypes()">Show Available Object Types</button>
+        <div id="types-output" class="output"></div>
+    </div>
+
+    <div class="section">
+        <h3>3. Create Data Objects</h3>
+        <p>Create complex objects that span multiple datasets/tables:</p>
+        <input type="text" id="person-id" placeholder="Person ID (e.g., 123)" value="123">
+        <button class="button" onclick="createPersonObject()">Create Person Object</button>
+        <div id="person-output" class="output"></div>
+    </div>
+
+    <div class="section">
+        <h3>4. Update Data Objects</h3>
+        <p>Update objects across multiple tables automatically:</p>
+        <input type="text" id="update-id" placeholder="Person ID to update" value="123">
+        <input type="text" id="new-name" placeholder="New name" value="John Updated">
+        <button class="button" onclick="updatePersonObject()">Update Person</button>
+        <div id="update-output" class="output"></div>
+    </div>
+
+    <div class="section">
+        <h3>5. Submit Changes</h3>
+        <p>Submit all changes back to the server with proper tracking:</p>
+        <button class="button" onclick="submitChanges()">Submit All Changes</button>
+        <div id="submit-output" class="output"></div>
+    </div>
+
+    <script type="module">
+        import { AnnieFramework } from './src/annie.js';
+
+        // Initialize Annie Framework with metadata endpoint
+        const annie = new AnnieFramework({
+            logLevel: 'debug',
+            apiConfig: {
+                baseUrl: '/api',
+                timeout: 30000
+            },
+            metadataOptions: {
+                endpoint: '/api/metadata/objects',  // Server endpoint for metadata
+                cacheKey: 'annie_object_metadata',  // Local storage key
+                ttl: 60,                           // Cache for 60 minutes
+                version: '1.0'                     // Expected version
+            },
+            autoInitialize: false
+        });
+
+        // Sample metadata that would come from the server
+        const sampleMetadata = [
+            {
+                objectType: "person",
+                primaryKey: "id",
+                version: "1.0",
+                lastModified: new Date().toISOString(),
+                tables: [
+                    {
+                        tableName: "people",
+                        dataset: "people", 
+                        keyField: "id",
+                        isCollection: false,
+                        required: true,
+                        fields: [
+                            { source: "id", target: "id" },
+                            { source: "firstName", target: "first_name" },
+                            { source: "lastName", target: "last_name" },
+                            { source: "email", target: "email" }
+                        ]
+                    },
+                    {
+                        tableName: "person_demographics",
+                        dataset: "demographics",
+                        keyField: "person_id", 
+                        isCollection: false,
+                        fields: [
+                            { source: "personId", target: "person_id" },
+                            { source: "age", target: "age" },
+                            { source: "gender", target: "gender" },
+                            { source: "birthDate", target: "birth_date" }
+                        ]
+                    },
+                    {
+                        tableName: "person_phones",
+                        dataset: "phones",
+                        keyField: "person_id",
+                        isCollection: true,
+                        fields: [
+                            { source: "personId", target: "person_id" },
+                            { source: "phoneNumber", target: "phone_number" },
+                            { source: "phoneType", target: "phone_type" }
+                        ]
+                    },
+                    {
+                        tableName: "person_addresses", 
+                        dataset: "addresses",
+                        keyField: "person_id",
+                        isCollection: true,
+                        fields: [
+                            { source: "personId", target: "person_id" },
+                            { source: "street", target: "street_address" },
+                            { source: "city", target: "city" },
+                            { source: "state", target: "state" },
+                            { source: "zip", target: "zip_code" },
+                            { source: "addressType", target: "address_type" }
+                        ]
+                    }
+                ]
+            },
+            {
+                objectType: "order",
+                primaryKey: "id", 
+                version: "1.0",
+                tables: [
+                    {
+                        tableName: "orders",
+                        dataset: "orders",
+                        keyField: "id",
+                        isCollection: false,
+                        required: true
+                    },
+                    {
+                        tableName: "order_items",
+                        dataset: "orderItems", 
+                        keyField: "order_id",
+                        isCollection: true
+                    }
+                ]
+            }
+        ];
+
+        // Sample data for demonstration
+        const sampleData = {
+            people: [
+                { id: 123, firstName: "John", lastName: "Doe", email: "john.doe@example.com" },
+                { id: 124, firstName: "Jane", lastName: "Smith", email: "jane.smith@example.com" }
+            ],
+            demographics: [
+                { personId: 123, age: 30, gender: "M", birthDate: "1993-05-15" },
+                { personId: 124, age: 28, gender: "F", birthDate: "1995-08-22" }
+            ],
+            phones: [
+                { personId: 123, phoneNumber: "555-1234", phoneType: "mobile" },
+                { personId: 123, phoneNumber: "555-5678", phoneType: "work" },
+                { personId: 124, phoneNumber: "555-9999", phoneType: "mobile" }
+            ],
+            addresses: [
+                { personId: 123, street: "123 Main St", city: "Anytown", state: "CA", zip: "12345", addressType: "home" },
+                { personId: 124, street: "456 Oak Ave", city: "Somewhere", state: "NY", zip: "67890", addressType: "home" }
+            ]
+        };
+
+        // Initialize framework
+        await annie.initialize();
+
+        // Load sample data
+        Object.keys(sampleData).forEach(datasetName => {
+            annie.getDataStore().setDataSource(datasetName, sampleData[datasetName]);
+        });
+
+        // Make functions globally available for buttons
+        window.loadServerMetadata = async function() {
+            const output = document.getElementById('metadata-output');
+            try {
+                // In a real scenario, this would fetch from the server
+                // Here we simulate it by setting the metadata directly
+                annie.setObjectMetadata(sampleMetadata);
+                output.textContent = "✓ Server metadata loaded successfully!\n\nLoaded metadata for object types: " + 
+                    sampleMetadata.map(m => m.objectType).join(", ");
+                output.className = "output success";
+            } catch (error) {
+                output.textContent = "✗ Failed to load metadata: " + error.message;
+                output.className = "output error";
+            }
+        };
+
+        window.loadCachedMetadata = function() {
+            const output = document.getElementById('metadata-output');
+            // Simulate loading from cache
+            if (localStorage.getItem('annie_object_metadata')) {
+                output.textContent = "✓ Cached metadata found and loaded";
+                output.className = "output success";
+            } else {
+                output.textContent = "⚠ No cached metadata found. Load from server first.";
+                output.className = "output warning";
+            }
+        };
+
+        window.showAvailableTypes = function() {
+            const output = document.getElementById('types-output');
+            const types = annie.getAvailableObjectTypes();
+            if (types.length > 0) {
+                output.textContent = "Available object types:\n" + types.map(type => `- ${type}`).join("\n");
+                output.className = "output success";
+            } else {
+                output.textContent = "No object types available. Load metadata first.";
+                output.className = "output warning";
+            }
+        };
+
+        window.createPersonObject = function() {
+            const output = document.getElementById('person-output');
+            const personId = document.getElementById('person-id').value;
+            
+            try {
+                const person = annie.createDataObject('person', parseInt(personId));
+                if (person) {
+                    output.textContent = "✓ Person object created:\n\n" + JSON.stringify(person, null, 2);
+                    output.className = "output success";
+                } else {
+                    output.textContent = "✗ Failed to create person object. Check if metadata is loaded and person exists.";
+                    output.className = "output error";
+                }
+            } catch (error) {
+                output.textContent = "✗ Error: " + error.message;
+                output.className = "output error";
+            }
+        };
+
+        window.updatePersonObject = function() {
+            const output = document.getElementById('update-output');
+            const personId = document.getElementById('update-id').value;
+            const newName = document.getElementById('new-name').value;
+            
+            try {
+                annie.updateDataObject('person', parseInt(personId), {
+                    first_name: newName,
+                    last_name: "Updated"
+                });
+                output.textContent = `✓ Person ${personId} updated with name: ${newName}`;
+                output.className = "output success";
+            } catch (error) {
+                output.textContent = "✗ Error: " + error.message;
+                output.className = "output error";
+            }
+        };
+
+        window.submitChanges = function() {
+            const output = document.getElementById('submit-output');
+            try {
+                const submissionData = annie.getDataObjectManager().buildSubmissionData({
+                    mode: 'auto',
+                    datasets: [
+                        { name: 'people', format: 'nested', filter: { changedOnly: true } },
+                        { name: 'demographics', format: 'nested', filter: { changedOnly: true } },
+                        { name: 'phones', format: 'nested', filter: { changedOnly: true } },
+                        { name: 'addresses', format: 'nested', filter: { changedOnly: true } }
+                    ]
+                });
+                
+                output.textContent = "✓ Submission data prepared:\n\n" + JSON.stringify(submissionData, null, 2);
+                output.className = "output success";
+            } catch (error) {
+                output.textContent = "✗ Error: " + error.message;
+                output.className = "output error";
+            }
+        };
+
+        // Show initial state
+        document.getElementById('metadata-output').textContent = "Ready to load metadata...";
+        document.getElementById('types-output').textContent = "Load metadata first to see available types.";
+        document.getElementById('person-output').textContent = "Load metadata and create a person object.";
+        document.getElementById('update-output').textContent = "Ready to update objects.";
+        document.getElementById('submit-output').textContent = "Ready to submit changes.";
+    </script>
+</body>
+</html>
