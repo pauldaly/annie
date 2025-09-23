@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Observer Auto-Notification Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Annie Framework - Observer Auto-Notification Test</h1>
+    
+    <div class="status info">
+        <strong>Test Purpose:</strong> Verify that observers automatically update when data is loaded, without manual notification.
+    </div>
+
+    <div class="test-section">
+        <h2>Test 1: Store Data Binding</h2>
+        <p><strong>Expected:</strong> Should display "Hello from store!" when page loads</p>
+        <p><strong>Actual:</strong> <span data-observe='[{"datasource": "store", "type": "html", "field": "message"}]'>Loading...</span></p>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Persistent Data Binding</h2>
+        <p><strong>Expected:</strong> Should display "Persistent data loaded!" when page loads</p>
+        <p><strong>Actual:</strong> <span data-observe='[{"datasource": "persistent_data", "type": "html", "field": "status"}]'>Loading...</span></p>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: User Data Binding</h2>
+        <p><strong>Expected:</strong> Should display "John Doe" when page loads</p>
+        <p><strong>Actual:</strong> <span data-observe='[{"datasource": "user_data", "type": "html", "field": "name"}]'>Loading...</span></p>
+    </div>
+
+    <div class="test-section">
+        <h2>Manual Test Button</h2>
+        <button onclick="manualNotify()">Manually Notify Observers (should work same as auto)</button>
+        <button onclick="loadMoreData()">Load Additional Data</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Debug Information</h2>
+        <div id="debug-info"></div>
+    </div>
+
+    <!-- Initialize global variables -->
+    <script>
+        // Set up global variables that Annie expects
+        window._requestparams = { 
+            message: "Hello from store!",
+            username: "test_user"
+        };
+        
+        // Initialize datasets - this should trigger automatic observer updates
+        window._datasetsinit = {
+            load: [], // No API calls for this test
+            remote: [],
+            lazyload: []
+        };
+        
+        window.loglevel = "Debug";
+        
+        // Function to manually notify observers (for comparison)
+        function manualNotify() {
+            if (window.annie) {
+                console.log("Manually notifying observers...");
+                window.annie.getUIObserver().notifyObservers('persistent_data');
+                window.annie.getUIObserver().notifyObservers('store');
+                window.annie.getUIObserver().notifyObservers('user_data');
+            }
+        }
+        
+        // Function to load additional data to test auto-notification
+        function loadMoreData() {
+            if (window.annie) {
+                console.log("Loading additional data...");
+                // Simulate loading new data
+                annie.getDataStore().setData('test_dataset', [
+                    { message: "Dynamically loaded data!", timestamp: Date.now() }
+                ]);
+            }
+        }
+        
+        // Function to check results after initialization
+        function checkResults() {
+            const debugDiv = document.getElementById('debug-info');
+            let html = '<h3>Debug Info:</h3>';
+            
+            if (window.annie) {
+                html += '<p>✅ Annie Framework loaded successfully</p>';
+                
+                // Check if data is in store
+                const storeData = annie.getData('store');
+                const persistentData = annie.getData('persistent_data');
+                const userData = annie.getData('user_data');
+                
+                html += `<p><strong>Store data:</strong> ${JSON.stringify(storeData)}</p>`;
+                html += `<p><strong>Persistent data:</strong> ${JSON.stringify(persistentData)}</p>`;
+                html += `<p><strong>User data:</strong> ${JSON.stringify(userData)}</p>`;
+                
+                // Check if elements were updated
+                const storeElement = document.querySelector('[data-observe*="store"]');
+                const persistentElement = document.querySelector('[data-observe*="persistent_data"]');
+                const userElement = document.querySelector('[data-observe*="user_data"]');
+                
+                html += `<p><strong>Store element content:</strong> "${storeElement?.textContent}"</p>`;
+                html += `<p><strong>Persistent element content:</strong> "${persistentElement?.textContent}"</p>`;
+                html += `<p><strong>User element content:</strong> "${userElement?.textContent}"</p>`;
+                
+                // Determine test results
+                const storeSuccess = storeElement?.textContent === "Hello from store!";
+                const persistentSuccess = persistentElement?.textContent === "Persistent data loaded!";
+                const userSuccess = userElement?.textContent === "John Doe";
+                
+                html += '<h3>Test Results:</h3>';
+                html += `<p>${storeSuccess ? '✅' : '❌'} Store data auto-update</p>`;
+                html += `<p>${persistentSuccess ? '✅' : '❌'} Persistent data auto-update</p>`;
+                html += `<p>${userSuccess ? '✅' : '❌'} User data auto-update</p>`;
+                
+                if (storeSuccess && persistentSuccess && userSuccess) {
+                    html += '<div class="status success"><strong>🎉 All tests passed!</strong> Observers are working automatically.</div>';
+                } else {
+                    html += '<div class="status error"><strong>❌ Some tests failed.</strong> Observers may not be working automatically.</div>';
+                }
+            } else {
+                html += '<p>❌ Annie Framework not loaded</p>';
+            }
+            
+            debugDiv.innerHTML = html;
+        }
+        
+        // Pre-load some test data into the data store after Annie initializes
+        function initializeTestData() {
+            if (window.annie) {
+                console.log("Initializing test data...");
+                
+                // Add data to different datasources
+                annie.getDataStore().setData('store', [
+                    { message: "Hello from store!" }
+                ]);
+                
+                annie.getDataStore().setData('persistent_data', [
+                    { status: "Persistent data loaded!" }
+                ]);
+                
+                annie.getDataStore().setData('user_data', [
+                    { name: "John Doe", email: "john@example.com" }
+                ]);
+                
+                console.log("Test data initialized");
+                
+                // Check results after a short delay to allow observers to update
+                setTimeout(checkResults, 100);
+            }
+        }
+        
+        // Set up page initialization callback
+        window.pageinit = function() {
+            console.log("Page initialization callback triggered");
+            initializeTestData();
+        };
+    </script>
+
+    <!-- Load the compiled Annie Framework -->
+    <script type="module" src="./dist/index.js"></script>
+</body>
+</html>

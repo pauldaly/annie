@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - SignalR Notifications Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        [data-component="demo-container"] {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        [data-component="config-section"] {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f9f9f9;
+        }
+
+        [data-button] {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        [data-button]:hover {
+            background: #0056b3;
+        }
+
+        [data-button="success"] {
+            background: #28a745;
+        }
+
+        [data-button="success"]:hover {
+            background: #1e7e34;
+        }
+
+        [data-button="warning"] {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        [data-button="warning"]:hover {
+            background: #e0a800;
+        }
+
+        [data-button="danger"] {
+            background: #dc3545;
+        }
+
+        [data-button="danger"]:hover {
+            background: #c82333;
+        }
+
+        [data-status] {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        [data-status="connected"] {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        [data-status="disconnected"] {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        [data-status="polling"] {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        [data-component="code-block"] {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: monospace;
+            white-space: pre-line;
+            overflow-x: auto;
+        }
+
+        [data-component="log-output"] {
+            height: 200px;
+            overflow-y: auto;
+            background: #343a40;
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        [data-layout="input-group"] {
+            display: flex;
+            margin: 10px 0;
+        }
+
+        [data-layout="input-group"] input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+        }
+
+        [data-layout="input-group"] button {
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Annie Framework - SignalR Notifications Demo</h1>
+    
+    <div data-component="demo-container">
+        <h2>📱 Real-time Notifications vs Polling</h2>
+        <p>This demo shows how Annie Framework can use SignalR for real-time notifications instead of traditional polling.</p>
+        
+        <h3>⚡ SignalR Benefits:</h3>
+        <ul>
+            <li><strong>Real-time:</strong> Instant notifications (no polling delay)</li>
+            <li><strong>Efficient:</strong> Push-based, not continuous polling</li>
+            <li><strong>Scalable:</strong> Server controls when to send updates</li>
+            <li><strong>Bidirectional:</strong> Server can push data, client can send commands</li>
+        </ul>
+
+        <h3>🔄 Polling Issues:</h3>
+        <ul>
+            <li><strong>Latency:</strong> Updates delayed by polling interval</li>
+            <li><strong>Inefficient:</strong> Continuous requests even when no updates</li>
+            <li><strong>Resource intensive:</strong> Each client polls independently</li>
+            <li><strong>Scaling problems:</strong> More clients = more requests</li>
+        </ul>
+    </div>
+
+    <div data-component="demo-container">
+        <h2>🛠 Configuration</h2>
+        
+        <div data-component="config-section">
+            <h4>SignalR Settings</h4>
+            <label>
+                <input type="radio" name="signalr-mode" value="self-hosted" checked> Self-hosted Hub
+            </label>
+            <input type="text" id="signalr-url-self" value="https://localhost:5001/notificationHub" style="width: 300px; margin-left: 10px;">
+            <br><br>
+            <label>
+                <input type="radio" name="signalr-mode" value="azure"> Azure SignalR Service
+            </label>
+            <input type="text" id="signalr-url-azure" value="https://your-app.service.signalr.net/notificationHub" style="width: 300px; margin-left: 10px;">
+            <br><br>
+            <label>
+                <input type="checkbox" id="enable-signalr" checked> Enable SignalR Notifications
+            </label>
+            <br>
+            <label>
+                <input type="checkbox" id="enable-polling-fallback" checked> Enable Polling Fallback
+            </label>
+            <br>
+            <label>
+                Polling Interval: 
+                <input type="number" id="polling-interval" value="30000" style="width: 80px; margin-left: 10px;"> ms
+            </label>
+        </div>
+
+        <div data-component="config-section">
+            <h4>Notification Groups</h4>
+            <label>
+                <input type="checkbox" checked> data-updates
+            </label>
+            <label>
+                <input type="checkbox" checked> system-alerts
+            </label>
+            <label>
+                <input type="checkbox" checked> user-notifications
+            </label>
+        </div>
+
+        <button data-button onclick="initializeAnnie()">🚀 Initialize Annie Framework</button>
+        <span id="connection-status" data-status="disconnected">Disconnected</span>
+    </div>
+
+    <div data-component="demo-container">
+        <h2>📬 Notification Testing</h2>
+        
+        <div data-layout="input-group">
+            <input type="text" id="notification-title" placeholder="Notification title" value="Test Notification">
+            <input type="text" id="notification-message" placeholder="Notification message" value="This is a test notification">
+            <select id="notification-priority">
+                <option value="low">Low Priority</option>
+                <option value="normal" selected>Normal Priority</option>
+                <option value="high">High Priority</option>
+                <option value="urgent">Urgent Priority</option>
+            </select>
+            <button data-button onclick="sendTestNotification()">Send Notification</button>
+        </div>
+
+        <div style="margin: 15px 0;">
+            <button data-button="success" onclick="simulateDataUpdate()">📊 Simulate Data Update</button>
+            <button data-button="warning" onclick="simulateSystemAlert()">⚠️ System Alert</button>
+            <button data-button="danger" onclick="simulateUrgentNotification()">🚨 Urgent Alert</button>
+            <button data-button onclick="clearNotifications()">🗑️ Clear All</button>
+        </div>
+
+        <div>
+            <button data-button onclick="requestNotificationPermission()">🔔 Request Browser Permissions</button>
+            <button data-button onclick="testPollingFallback()">🔄 Test Polling Fallback</button>
+        </div>
+    </div>
+
+    <div data-component="demo-container">
+        <h2>📊 Performance Comparison</h2>
+        <div id="performance-stats" data-component="code-block">
+SignalR vs Polling Performance:
+
+Self-hosted SignalR:
+- Max connections: ~1,000-5,000 per server
+- Memory usage: ~4KB per connection
+- CPU overhead: High for broadcasting
+- Scaling: Requires backplane (Redis/SQL)
+- Cost: Server resources + maintenance
+
+Azure SignalR Service:
+- Max connections: 100,000+ per unit
+- Memory usage: Offloaded to Azure
+- CPU overhead: Minimal on app server
+- Scaling: Automatic
+- Cost: ~$1.50/1000 connections/month
+
+Polling Mode (30s interval):
+- Network requests: 120 requests/hour per client
+- Update latency: 0-30 seconds
+- Resource usage: High (continuous requests)
+- Scalability: Poor (N clients = N × 120 requests/hour)
+
+Migration Threshold:
+- Self-hosted: < 1,000 concurrent users
+- Azure SignalR: > 1,000 concurrent users
+- Consider at: 500+ users or multi-region needs
+        </div>
+    </div>
+
+    <div data-component="demo-container">
+        <h2>🏪 Central State Manager Demo</h2>
+        <p>The StateManager provides centralized, reactive state management for the entire application.</p>
+        
+        <div data-layout="input-group">
+            <input type="text" id="state-key" placeholder="State key" value="user.name">
+            <input type="text" id="state-value" placeholder="State value" value="John Doe">
+            <button data-button onclick="setState()">Set State</button>
+        </div>
+
+        <div style="margin: 15px 0;">
+            <button data-button="success" onclick="getState()">📊 Get State</button>
+            <button data-button="warning" onclick="subscribeToState()">👁️ Subscribe to Changes</button>
+            <button data-button onclick="batchUpdateState()">📦 Batch Update</button>
+            <button data-button="danger" onclick="clearAllState()">🗑️ Clear All State</button>
+        </div>
+
+        <div>
+            <button data-button onclick="createSnapshot()">📸 Create Snapshot</button>
+            <button data-button onclick="showDebugInfo()">🔍 Debug Info</button>
+        </div>
+
+        <h4>Current State:</h4>
+        <div id="state-display" data-component="code-block">No state to display</div>
+
+        <h4>State Changes Log:</h4>
+        <div id="state-changes" data-component="log-output" style="height: 150px;">State changes will appear here...</div>
+    </div>
+
+    <div data-component="demo-container">
+        <h2>📝 Activity Log</h2>
+        <div id="log-output" data-component="log-output">
+Annie Framework Notification Demo - Ready
+        </div>
+        <button data-button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <!-- Load Annie Framework -->
+    <script type="module">
+        import { AnnieFramework } from './dist/index.js';
+        
+        window.AnnieFramework = AnnieFramework;
+        window.annie = null;
+        
+        // Configure global variables for Annie Framework
+        window.signalRUrl = document.getElementById('signalr-url').value;
+        window.enableRemoteControl = false; // Disable for this demo
+        window.loglevel = 'Info';
+
+        // Global functions for demo
+        window.initializeAnnie = async function() {
+            try {
+                const signalRMode = document.querySelector('input[name="signalr-mode"]:checked').value;
+                const signalRUrl = signalRMode === 'self-hosted' 
+                    ? document.getElementById('signalr-url-self').value
+                    : document.getElementById('signalr-url-azure').value;
+                
+                const enableSignalR = document.getElementById('enable-signalr').checked;
+                const enablePollingFallback = document.getElementById('enable-polling-fallback').checked;
+                const pollingInterval = parseInt(document.getElementById('polling-interval').value);
+
+                const config = {
+                    logLevel: 'Info',
+                    apiConfig: {
+                        baseUrl: '/api',
+                        timeout: 30000
+                    },
+                    autoInitialize: false,
+                    stateManagerConfig: {
+                        enableDevTools: true,
+                        enableTimeTravel: true,
+                        enableLocalStorage: true,
+                        maxHistorySize: 50
+                    },
+                    notificationConfig: {
+                        enablePollingFallback: enablePollingFallback,
+                        pollingInterval: pollingInterval,
+                        batchNotifications: true,
+                        batchDelay: 1000,
+                        notificationGroups: ['data-updates', 'system-alerts', 'user-notifications']
+                    }
+                };
+
+                if (enableSignalR && signalRUrl) {
+                    config.signalRUrl = signalRUrl;
+                }
+
+                window.annie = new AnnieFramework(config);
+                await window.annie.initialize();
+
+                // Setup notification subscriptions
+                const notificationManager = window.annie.getNotificationManager();
+                if (notificationManager) {
+                    // Subscribe to all notifications
+                    notificationManager.subscribe('demo-all', {
+                        callback: (notification) => {
+                            logToConsole(`📬 Notification: ${notification.title} - ${notification.message} [${notification.priority}]`);
+                        }
+                    });
+
+                    // Subscribe to data updates
+                    notificationManager.subscribe('demo-data', {
+                        type: ['data-update'],
+                        callback: (notification) => {
+                            logToConsole(`📊 Data Update: ${notification.data?.datasource || 'unknown'}`);
+                        }
+                    });
+                }
+
+                updateConnectionStatus(true);
+                logToConsole('✅ Annie Framework initialized successfully');
+                logToConsole(`🔗 Mode: ${enableSignalR ? `SignalR (${signalRMode})` : 'Polling only'}`);
+
+                // Initialize state display
+                updateStateDisplay();
+
+            } catch (error) {
+                logToConsole(`❌ Initialization failed: ${error.message}`);
+                updateConnectionStatus(false);
+            }
+        };
+
+        window.sendTestNotification = async function() {
+            if (!window.annie) {
+                logToConsole('❌ Please initialize Annie Framework first');
+                return;
+            }
+
+            const title = document.getElementById('notification-title').value;
+            const message = document.getElementById('notification-message').value;
+            const priority = document.getElementById('notification-priority').value;
+
+            const notificationManager = window.annie.getNotificationManager();
+            if (notificationManager) {
+                try {
+                    await notificationManager.sendNotification({
+                        type: 'user',
+                        title: title,
+                        message: message,
+                        priority: priority
+                    });
+                    logToConsole(`📤 Sent: ${title} [${priority}]`);
+                } catch (error) {
+                    logToConsole(`❌ Failed to send notification: ${error.message}`);
+                }
+            }
+        };
+
+        window.simulateDataUpdate = function() {
+            if (!window.annie) {
+                logToConsole('❌ Please initialize Annie Framework first');
+                return;
+            }
+
+            // Simulate data update in the data store
+            const dataStore = window.annie.getDataStore();
+            const sampleData = [
+                { id: 1, name: 'Updated Record', timestamp: new Date().toISOString() }
+            ];
+            
+            dataStore.setDataset('sample-dataset', sampleData);
+            logToConsole('📊 Simulated data update for sample-dataset');
+        };
+
+        window.simulateSystemAlert = function() {
+            if (!window.annie) return;
+            
+            const notificationManager = window.annie.getNotificationManager();
+            if (notificationManager) {
+                notificationManager.sendNotification({
+                    type: 'system',
+                    title: 'System Alert',
+                    message: 'Server maintenance will begin in 15 minutes',
+                    priority: 'high'
+                });
+            }
+        };
+
+        window.simulateUrgentNotification = function() {
+            if (!window.annie) return;
+            
+            const notificationManager = window.annie.getNotificationManager();
+            if (notificationManager) {
+                notificationManager.sendNotification({
+                    type: 'alert',
+                    title: 'URGENT: Security Alert',
+                    message: 'Suspicious activity detected on your account',
+                    priority: 'urgent'
+                });
+            }
+        };
+
+        window.clearNotifications = function() {
+            if (!window.annie) return;
+            
+            const notificationManager = window.annie.getNotificationManager();
+            if (notificationManager) {
+                notificationManager.clearNotifications();
+                logToConsole('🗑️ Cleared all notifications');
+            }
+        };
+
+        window.requestNotificationPermission = async function() {
+            if (!window.annie) return;
+            
+            const notificationManager = window.annie.getNotificationManager();
+            if (notificationManager) {
+                const granted = await notificationManager.requestPermission();
+                logToConsole(`🔔 Browser notification permission: ${granted ? 'Granted' : 'Denied'}`);
+            }
+        };
+
+        window.testPollingFallback = function() {
+            logToConsole('🔄 Testing polling fallback...');
+            logToConsole('ℹ️ This would typically happen when SignalR connection fails');
+            logToConsole('ℹ️ Framework automatically falls back to polling mode');
+        };
+
+        window.updateConnectionStatus = function(connected) {
+            const statusEl = document.getElementById('connection-status');
+            if (connected) {
+                statusEl.textContent = 'Connected (SignalR)';
+                statusEl.setAttribute('data-status', 'connected');
+            } else {
+                statusEl.textContent = 'Disconnected';
+                statusEl.setAttribute('data-status', 'disconnected');
+            }
+        };
+
+        window.logToConsole = function(message) {
+            const logEl = document.getElementById('log-output');
+            const timestamp = new Date().toLocaleTimeString();
+            logEl.textContent += `\n[${timestamp}] ${message}`;
+            logEl.scrollTop = logEl.scrollHeight;
+        };
+
+        window.clearLog = function() {
+            document.getElementById('log-output').textContent = 'Annie Framework Notification Demo - Ready';
+        };
+
+        // State Manager Demo Functions
+        window.setState = function() {
+            if (!window.annie) {
+                logToConsole('❌ Please initialize Annie Framework first');
+                return;
+            }
+
+            const key = document.getElementById('state-key').value;
+            const value = document.getElementById('state-value').value;
+            
+            if (!key) {
+                logToConsole('❌ Please enter a state key');
+                return;
+            }
+
+            const stateManager = window.annie.getStateManager();
+            
+            // Try to parse value as JSON, fall back to string
+            let parsedValue;
+            try {
+                parsedValue = JSON.parse(value);
+            } catch {
+                parsedValue = value;
+            }
+
+            stateManager.setState(key, parsedValue, 'demo-ui');
+            logToConsole(`✅ State set: ${key} = ${JSON.stringify(parsedValue)}`);
+            updateStateDisplay();
+        };
+
+        window.getState = function() {
+            if (!window.annie) {
+                logToConsole('❌ Please initialize Annie Framework first');
+                return;
+            }
+
+            const key = document.getElementById('state-key').value;
+            if (!key) {
+                logToConsole('❌ Please enter a state key');
+                return;
+            }
+
+            const stateManager = window.annie.getStateManager();
+            const value = stateManager.getState(key);
+            
+            if (value !== undefined) {
+                logToConsole(`📊 State value for "${key}": ${JSON.stringify(value)}`);
+            } else {
+                logToConsole(`❌ No state found for key: ${key}`);
+            }
+        };
+
+        window.subscribeToState = function() {
+            if (!window.annie) {
+                logToConsole('❌ Please initialize Annie Framework first');
+                return;
+            }
+
+            const stateManager = window.annie.getStateManager();
+            
+            // Subscribe to all state changes
+            const subscriptionId = stateManager.subscribe((change) => {
+                const timestamp = new Date().toLocaleTimeString();
+                const changesLog = document.getElementById('state-changes');
+                changesLog.textContent += `\n[${timestamp}] ${change.key}: ${JSON.stringify(change.oldValue)} → ${JSON.stringify(change.newValue)}`;
+                changesLog.scrollTop = changesLog.scrollHeight;
+            });
+
+            logToConsole(`👁️ Subscribed to state changes: ${subscriptionId}`);
+        };
+
+        window.batchUpdateState = function() {
+            if (!window.annie) {
+                logToConsole('❌ Please initialize Annie Framework first');
+                return;
+            }
+
+            const stateManager = window.annie.getStateManager();
+            
+            const updates = {
+                'demo.counter': Math.floor(Math.random() * 100),
+                'demo.timestamp': new Date().toISOString(),
+                'demo.randomValue': Math.random().toString(36).substring(7),
+                'demo.booleanFlag': Math.random() > 0.5
+            };
+
+            stateManager.batchUpdate(updates, 'demo-batch');
+            logToConsole(`📦 Batch updated ${Object.keys(updates).length} state values`);
+            updateStateDisplay();
+        };
+
+        window.clearAllState = function() {
+            if (!window.annie) {
+                logToConsole('❌ Please initialize Annie Framework first');
+                return;
+            }
+
+            const stateManager = window.annie.getStateManager();
+            stateManager.clearState('demo-clear');
+            logToConsole('🗑️ All state cleared');
+            updateStateDisplay();
+        };
+
+        window.createSnapshot = function() {
+            if (!window.annie) {
+                logToConsole('❌ Please initialize Annie Framework first');
+                return;
+            }
+
+            const stateManager = window.annie.getStateManager();
+            const snapshot = stateManager.createSnapshot('demo-snapshot');
+            
+            logToConsole(`📸 Snapshot created with ${Object.keys(snapshot.state).length} state values`);
+            console.log('Snapshot:', snapshot);
+        };
+
+        window.showDebugInfo = function() {
+            if (!window.annie) {
+                logToConsole('❌ Please initialize Annie Framework first');
+                return;
+            }
+
+            const stateManager = window.annie.getStateManager();
+            const debugInfo = stateManager.getDebugInfo();
+            
+            logToConsole(`🔍 Debug Info - States: ${debugInfo.stateCount}, Subscriptions: ${debugInfo.subscriptionCount}, History: ${debugInfo.historySize}`);
+        };
+
+        function updateStateDisplay() {
+            if (!window.annie) return;
+
+            const stateManager = window.annie.getStateManager();
+            const allState = stateManager.getAllState();
+            const stateDisplay = document.getElementById('state-display');
+            
+            if (Object.keys(allState).length === 0) {
+                stateDisplay.textContent = 'No state to display';
+            } else {
+                stateDisplay.textContent = JSON.stringify(allState, null, 2);
+            }
+        }
+
+    </script>
+</body>
+</html>

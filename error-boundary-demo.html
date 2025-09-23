@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework Error Boundary Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .error-demo {
+            padding: 15px;
+            border: 2px solid #e74c3c;
+            border-radius: 5px;
+            margin: 10px 0;
+            background-color: #fdf2f2;
+        }
+        
+        .success-demo {
+            padding: 15px;
+            border: 2px solid #27ae60;
+            border-radius: 5px;
+            margin: 10px 0;
+            background-color: #f2fdf5;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .error-button {
+            background-color: #e74c3c;
+        }
+        
+        .error-button:hover {
+            background-color: #c0392b;
+        }
+        
+        .logs {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .error-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .error-fallback {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Annie Framework Error Boundary Demo</h1>
+    
+    <div class="container">
+        <h2>🛡️ Error Boundary Protection</h2>
+        <p>This demo shows how the Annie Framework's Error Boundary system handles various types of errors gracefully.</p>
+        
+        <div class="error-stats" id="errorStats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalErrors">0</div>
+                <div>Total Errors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="recoveredErrors">0</div>
+                <div>Recovered</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="retryAttempts">0</div>
+                <div>Retry Attempts</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h3>🚨 Trigger Different Error Types</h3>
+        
+        <button onclick="triggerSyncError()">Sync Error</button>
+        <button onclick="triggerAsyncError()" class="error-button">Async Error</button>
+        <button onclick="triggerNetworkError()" class="error-button">Network Error</button>
+        <button onclick="triggerDOMError()" class="error-button">DOM Error</button>
+        <button onclick="triggerUnhandledPromise()" class="error-button">Unhandled Promise</button>
+        <button onclick="triggerRecoverableError()">Recoverable Error</button>
+        
+        <div id="errorDemo" class="error-demo" style="display: none;">
+            <h4>Error Triggered!</h4>
+            <p id="errorMessage"></p>
+        </div>
+        
+        <div id="successDemo" class="success-demo" style="display: none;">
+            <h4>✅ Operation Successful!</h4>
+            <p id="successMessage"></p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h3>🎯 Component Error Boundary Test</h3>
+        <div id="componentTest" class="error-demo">
+            <h4>Test Component</h4>
+            <p>This component is protected by an error boundary.</p>
+            <button onclick="triggerComponentError()">Break This Component</button>
+            <button onclick="recoverComponent()">Recover Component</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h3>📊 Error Analytics</h3>
+        <button onclick="updateAnalytics()">Refresh Analytics</button>
+        <button onclick="clearErrorHistory()">Clear History</button>
+        
+        <div id="analyticsDisplay" style="margin-top: 15px;"></div>
+    </div>
+
+    <div class="container">
+        <h3>📝 Error Logs</h3>
+        <div id="errorLogs" class="logs">Error Boundary initialized. Ready for testing...\n</div>
+    </div>
+
+    <script type="module">
+        import { AnnieFramework } from './bolt.js'; // Using the built version
+
+        // Initialize Annie Framework with Error Boundary
+        const annie = new AnnieFramework({
+            apiConfig: {
+                baseUrl: '/api'
+            },
+            errorBoundaryConfig: {
+                enableGlobalHandlers: true,
+                enableErrorReporting: false, // Disable for demo
+                enableUserNotifications: false, // We'll handle notifications manually
+                enableRecovery: true,
+                maxRetries: 3,
+                retryDelay: 1000,
+                enableDebugMode: true
+            }
+        });
+
+        await annie.initialize();
+        const errorBoundary = annie.getErrorBoundary();
+
+        // Demo state
+        let errorCount = 0;
+        let recoveredCount = 0;
+        let retryCount = 0;
+
+        // Logging function
+        function addLog(message, type = 'info') {
+            const logs = document.getElementById('errorLogs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            logs.textContent += logEntry;
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        // Add custom recovery strategy for demo
+        errorBoundary.addRecoveryStrategy({
+            name: 'demo-recovery',
+            condition: (error) => error.message.includes('recoverable'),
+            recover: async (error, context) => {
+                addLog(`Attempting recovery for: ${error.message}`, 'info');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                recoveredCount++;
+                updateStats();
+                return true;
+            },
+            priority: 1
+        });
+
+        // Setup component error boundary
+        const componentTest = document.getElementById('componentTest');
+        errorBoundary.wrapComponent(componentTest, {
+            componentName: 'test-component',
+            enableRetry: true,
+            retryLimit: 2,
+            fallbackContent: `
+                <div class="error-fallback">
+                    <h4>⚠️ Component Error</h4>
+                    <p>This component encountered an error and is showing fallback content.</p>
+                    <button onclick="recoverComponent()">Recover Component</button>
+                </div>
+            `,
+            onError: (error, info) => {
+                addLog(`Component error: ${error.message}`, 'error');
+                errorCount++;
+                updateStats();
+            },
+            onRecover: (error, attempt) => {
+                addLog(`Component recovery attempt ${attempt}`, 'info');
+                retryCount++;
+                updateStats();
+            }
+        });
+
+        // Error trigger functions
+        window.triggerSyncError = function() {
+            try {
+                errorBoundary.wrapSync(() => {
+                    throw new Error('Synchronous error for testing');
+                }, 'sync-error-test');
+            } catch (error) {
+                showError(error.message);
+                errorCount++;
+                updateStats();
+            }
+        };
+
+        window.triggerAsyncError = async function() {
+            try {
+                await errorBoundary.wrapAsync(async () => {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    throw new Error('Async error for testing');
+                }, 'async-error-test');
+            } catch (error) {
+                showError(error.message);
+                errorCount++;
+                updateStats();
+            }
+        };
+
+        window.triggerNetworkError = async function() {
+            try {
+                await errorBoundary.wrapAsync(async () => {
+                    const response = await fetch('/nonexistent-endpoint');
+                    if (!response.ok) {
+                        throw new Error(`Network error: ${response.status}`);
+                    }
+                }, 'network-error-test');
+            } catch (error) {
+                showError(error.message);
+                errorCount++;
+                updateStats();
+            }
+        };
+
+        window.triggerDOMError = function() {
+            try {
+                errorBoundary.wrapSync(() => {
+                    const element = document.getElementById('nonexistent');
+                    element.innerHTML = 'This will fail';
+                }, 'dom-error-test');
+            } catch (error) {
+                showError(error.message);
+                errorCount++;
+                updateStats();
+            }
+        };
+
+        window.triggerUnhandledPromise = function() {
+            // This will be caught by the global error handlers
+            Promise.reject(new Error('Unhandled promise rejection for testing'));
+            setTimeout(() => {
+                errorCount++;
+                updateStats();
+                showError('Unhandled promise rejection triggered');
+            }, 100);
+        };
+
+        window.triggerRecoverableError = async function() {
+            try {
+                await errorBoundary.wrapAsync(async () => {
+                    throw new Error('This is a recoverable error for testing');
+                }, 'recoverable-error-test');
+            } catch (error) {
+                showSuccess('Error was handled and recovered!');
+                errorCount++;
+                updateStats();
+            }
+        };
+
+        window.triggerComponentError = function() {
+            // Simulate component error
+            const component = document.getElementById('componentTest');
+            const button = component.querySelector('button');
+            button.click(); // This will trigger the component error boundary
+            
+            // Manually trigger error for demo
+            setTimeout(() => {
+                component.innerHTML = '<div class="error-fallback"><h4>⚠️ Component Error</h4><p>This component encountered an error.</p><button onclick="recoverComponent()">Recover</button></div>';
+            }, 100);
+        };
+
+        window.recoverComponent = function() {
+            const component = document.getElementById('componentTest');
+            component.innerHTML = `
+                <h4>✅ Test Component (Recovered)</h4>
+                <p>This component has been recovered and is working normally.</p>
+                <button onclick="triggerComponentError()">Break This Component</button>
+                <button onclick="recoverComponent()">Recover Component</button>
+            `;
+            addLog('Component recovered successfully', 'success');
+        };
+
+        window.updateAnalytics = function() {
+            const errorHistory = errorBoundary.getErrorHistory();
+            const retryAttempts = errorBoundary.getRetryAttempts();
+            
+            const analytics = {
+                totalErrors: errorHistory.length,
+                recentErrors: errorHistory.slice(0, 5),
+                errorsByContext: {},
+                retryStats: Array.from(retryAttempts.entries())
+            };
+
+            // Group errors by context
+            errorHistory.forEach(error => {
+                analytics.errorsByContext[error.context] = 
+                    (analytics.errorsByContext[error.context] || 0) + 1;
+            });
+
+            const display = document.getElementById('analyticsDisplay');
+            display.innerHTML = `
+                <h4>Error Analytics</h4>
+                <p><strong>Total Errors:</strong> ${analytics.totalErrors}</p>
+                <p><strong>Errors by Context:</strong></p>
+                <pre>${JSON.stringify(analytics.errorsByContext, null, 2)}</pre>
+                <p><strong>Recent Errors:</strong></p>
+                <pre>${JSON.stringify(analytics.recentErrors.map(e => ({
+                    message: e.error.message,
+                    context: e.context,
+                    timestamp: new Date(e.timestamp).toLocaleString()
+                })), null, 2)}</pre>
+            `;
+
+            addLog('Analytics updated', 'info');
+        };
+
+        window.clearErrorHistory = function() {
+            errorBoundary.clearErrorHistory();
+            errorCount = 0;
+            recoveredCount = 0;
+            retryCount = 0;
+            updateStats();
+            document.getElementById('analyticsDisplay').innerHTML = '';
+            addLog('Error history cleared', 'info');
+        };
+
+        function updateStats() {
+            document.getElementById('totalErrors').textContent = errorCount;
+            document.getElementById('recoveredErrors').textContent = recoveredCount;
+            document.getElementById('retryAttempts').textContent = retryCount;
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorDemo');
+            const messageDiv = document.getElementById('errorMessage');
+            messageDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('successDemo').style.display = 'none';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 3000);
+            
+            addLog(message, 'error');
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successDemo');
+            const messageDiv = document.getElementById('successMessage');
+            messageDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('errorDemo').style.display = 'none';
+            
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+            
+            addLog(message, 'success');
+        }
+
+        // Initialize display
+        updateStats();
+        addLog('Annie Framework Error Boundary Demo initialized', 'success');
+        
+        // Test global error handling
+        window.addEventListener('error', (event) => {
+            addLog(`Global error caught: ${event.message}`, 'error');
+        });
+        
+        window.addEventListener('unhandledrejection', (event) => {
+            addLog(`Unhandled rejection caught: ${event.reason}`, 'error');
+        });
+    </script>
+</body>
+</html>

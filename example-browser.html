@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Browser Compatible</title>
+</head>
+<body>
+    <h1>Annie Framework Test</h1>
+    <div id="status">Loading...</div>
+    
+    <script>
+        // Global configuration for Annie (using your preferred variable name)
+        window._datasets = {
+            load: ['staff-list-get-v2', 'set-mode', 'get-notification-short-list', 'sum-pending-shift-requests', 'persistent-data'],
+            lazyload: ['bookmark-page']
+        };
+        
+        window._requestparams = {
+            userId: 123,
+            theme: 'dark'
+        };
+        
+        // Define callbacks before Annie loads
+        window.pageinit = function() {
+            console.log('🚀 Annie Framework initialized');
+            document.getElementById('status').textContent = 'Framework Ready';
+            
+            // Your initialization code here
+            if (window.annie) {
+                console.log('Data store:', window.annie.getDataStore().all());
+            }
+        };
+        
+        window.pageloaded = function() {
+            console.log('📊 Data loaded and ready');
+            document.getElementById('status').textContent = 'Data Loaded';
+            
+            // Your post-data-load code here
+            if (window.annie) {
+                const data = window.annie.getData('users');
+                console.log('Users data:', data);
+            }
+        };
+    </script>
+    
+    <!-- Load Annie as ES6 module -->
+    <script type="module">
+        // Import the pre-configured annie instance
+        import { annie } from './dist/index.js';
+        
+        // Annie is already initialized and available globally as window.annie
+        // You can also import individual components if needed:
+        // import { AnnieFramework, DataStore, Logger } from './dist/index.js';
+        
+        console.log('Annie loaded:', annie);
+    </script>
+</body>
+</html>

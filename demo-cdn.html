@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - CDN TypeScript</title>
+    <!-- Load TypeScript compiler from CDN -->
+    <script src="https://unpkg.com/typescript@latest/lib/typescript.js"></script>
+</head>
+<body>
+    <h1>Annie Framework with CDN TypeScript</h1>
+    
+    <div id="output"></div>
+    
+    <script>
+        // You can compile TypeScript in the browser using the CDN
+        const tsCode = `
+        interface User {
+            name: string;
+            age: number;
+        }
+        
+        const user: User = {
+            name: "Annie User",
+            age: 25
+        };
+        
+        console.log("TypeScript working:", user);
+        `;
+        
+        // Compile TypeScript to JavaScript
+        const result = ts.transpile(tsCode, {
+            compilerOptions: { module: ts.ModuleKind.None }
+        });
+        
+        // Execute the compiled JavaScript
+        eval(result);
+        
+        document.getElementById('output').innerHTML = 
+            '<p>TypeScript compiled and executed successfully! Check console.</p>';
+    </script>
+</body>
+</html>

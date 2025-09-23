@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Annie Framework - Business Application</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  
+  <style>
+    :root {
+      --annie-primary: #0085fa;
+      --annie-secondary: #0068c4;
+      --annie-success: #5cb85c;
+      --annie-warning: #f0ad4e;
+      --annie-danger: #d9534f;
+      --annie-info: #5bc0de;
+    }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    /* Annie Framework Views */
+    view {
+      display: none;
+      background: white;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      margin: 20px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    view.active {
+      display: block;
+    }
+
+    /* Navigation Buttons */
+    .btn-spa-nav {
+      height: 75px;
+      margin: 5px auto;
+      width: 300px;
+      text-align: center;
+      opacity: 0.9;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .btn-spa-nav:hover {
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      transform: translateY(-2px);
+      opacity: 1;
+    }
+
+    .btn-spa-nav-active {
+      background: linear-gradient(135deg, var(--annie-success) 0%, #419641 100%);
+      box-shadow: 0 3px 10px rgba(92, 184, 92, 0.3);
+    }
+
+    .btn-spa-nav-enabled {
+      background: linear-gradient(135deg, var(--annie-primary) 0%, var(--annie-secondary) 100%);
+    }
+
+    .btn-spa-nav-enabled:hover {
+      background: linear-gradient(135deg, #0068c4 0%, #004c9a 100%);
+    }
+
+    .btn-spa-nav-disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .btn-spa-nav-visited {
+      background: linear-gradient(135deg, #f96b07 0%, #e55a00 100%);
+    }
+
+    .btn-spa-nav-danger {
+      background: linear-gradient(135deg, var(--annie-danger) 0%, #c12e2a 100%);
+    }
+
+    /* Navigation layout */
+    .annie-navigation {
+      background: white;
+      padding: 20px;
+      margin: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 10px;
+      justify-items: center;
+    }
+
+    /* Business Cards */
+    .business-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 10px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
+
+    .business-card:hover {
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+
+    .business-card-header {
+      border-bottom: 2px solid var(--annie-primary);
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+      font-weight: bold;
+      color: var(--annie-primary);
+    }
+
+    /* Form styles */
+    .annie-form-section {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 15px 0;
+      border-left: 4px solid var(--annie-primary);
+    }
+
+    .annie-form-section h4 {
+      color: var(--annie-primary);
+      margin-bottom: 15px;
+    }
+
+    /* Data tables */
+    .annie-data-table {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .annie-data-table .table {
+      margin-bottom: 0;
+    }
+
+    .annie-data-table .table th {
+      background: var(--annie-primary);
+      color: white;
+      border: none;
+      font-weight: 500;
+    }
+
+    /* Status badges */
+    .status-active { background-color: var(--annie-success) !important; }
+    .status-pending { background-color: var(--annie-warning) !important; }
+    .status-inactive { background-color: var(--annie-danger) !important; }
+    .status-maintenance { background-color: var(--annie-info) !important; }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .nav-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .btn-spa-nav {
+        width: 100%;
+        height: 60px;
+      }
+      
+      view {
+        margin: 10px;
+        padding: 15px;
+      }
+    }
+
+    /* Loading states */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--annie-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Data binding indicators */
+    [data-annie-bind] {
+      position: relative;
+    }
+
+    [data-annie-bind]:after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border: 2px dashed transparent;
+      border-radius: 4px;
+      transition: border-color 0.3s ease;
+      pointer-events: none;
+    }
+
+    [data-annie-bind]:hover:after {
+      border-color: var(--annie-primary);
+    }
+  </style>
+
+  <script>
+    // Configuration
+    var loglevel = "INFO";
+    
+    // Simulated server-provided request parameters
+    var _requestparams = {
+      "idempotentstamp": Date.now(),
+      "accountguid": "business-account-456",
+      "organizationName": "Acme Corporation",
+      "userFirst": "Jane",
+      "userLast": "Smith",
+      "userEmail": "jane.smith@acme.com",
+      "userRole": "Manager",
+      "department": "Operations",
+      "location": "New York"
+    };
+
+    // Dataset initialization for business application
+    var _datasetsinit = {
+      "load": [
+        "organization-details",
+        "staff-directory",
+        "client-profiles",
+        "service-catalog",
+        "location-data",
+        "recent-transactions"
+      ],
+      "lazyload": [
+        "detailed-analytics",
+        "audit-trail",
+        "advanced-reports",
+        "system-logs"
+      ],
+      "remote": [
+        {
+          "url": "https://jsonplaceholder.typicode.com/users",
+          "dataset": "external-contacts",
+          "method": "GET"
+        },
+        {
+          "url": "https://jsonplaceholder.typicode.com/todos",
+          "dataset": "external-tasks",
+          "method": "GET"
+        }
+      ]
+    };
+
+    // Persistent data configuration
+    var _persistent = ["accountguid", "organizationName", "userFirst", "userLast"];
+  </script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="bg-primary text-white py-3">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h1 class="h3 mb-0">
+            <i class="fas fa-building"></i>
+            <span data-annie-bind="store.0.organizationName">Business Portal</span>
+          </h1>
+          <small class="opacity-75">
+            Welcome, <span data-annie-bind="store.0.userFirst">User</span> 
+            <span data-annie-bind="store.0.userLast"></span>
+          </small>
+        </div>
+        <div class="col-md-4 text-end">
+          <small class="d-block">Account: <span data-annie-bind="store.0.accountguid">Loading...</span></small>
+          <small class="d-block">Department: <span data-annie-bind="store.0.department">Loading...</span></small>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <nav class="annie-navigation">
+    <div class="container">
+      <div class="nav-grid">
+        <button class="btn-spa-nav btn-spa-nav-active" data-annie-nav="dashboard">
+          <i class="fas fa-tachometer-alt fa-lg mb-1"></i>
+          <span class="divbtn-text">Dashboard</span>
+        </button>
+        
+        <button class="btn-spa-nav btn-spa-nav-enabled" data-annie-nav="organization">
+          <i class="fas fa-building fa-lg mb-1"></i>
+          <span class="divbtn-text">Organization</span>
+        </button>
+        
+        <button class="btn-spa-nav btn-spa-nav-enabled" data-annie-nav="staff">
+          <i class="fas fa-users fa-lg mb-1"></i>
+          <span class="divbtn-text">Staff Directory</span>
+        </button>
+        
+        <button class="btn-spa-nav btn-spa-nav-enabled" data-annie-nav="clients">
+          <i class="fas fa-handshake fa-lg mb-1"></i>
+          <span class="divbtn-text">Client Profiles</span>
+        </button>
+        
+        <button class="btn-spa-nav btn-spa-nav-enabled" data-annie-nav="services">
+          <i class="fas fa-cogs fa-lg mb-1"></i>
+          <span class="divbtn-text">Services</span>
+        </button>
+        
+        <button class="btn-spa-nav btn-spa-nav-enabled" data-annie-nav="analytics">
+          <i class="fas fa-chart-line fa-lg mb-1"></i>
+          <span class="divbtn-text">Analytics</span>
+        </button>
+        
+        <button class="btn-spa-nav btn-spa-nav-enabled" data-annie-nav="reports">
+          <i class="fas fa-file-alt fa-lg mb-1"></i>
+          <span class="divbtn-text">Reports</span>
+        </button>
+        
+        <button class="btn-spa-nav btn-spa-nav-enabled" data-annie-nav="settings">
+          <i class="fas fa-sliders-h fa-lg mb-1"></i>
+          <span class="divbtn-text">Settings</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Dashboard View -->
+  <view id="dashboard" class="active">
+    <div class="container">
+      <h2 class="mb-4"><i class="fas fa-tachometer-alt text-primary"></i> Business Dashboard</h2>
+      
+      <!-- Key Metrics -->
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="business-card text-center">
+            <h3 class="text-primary" data-annie-bind="staff-directory.length">0</h3>
+            <p class="mb-0">Staff Members</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="business-card text-center">
+            <h3 class="text-success" data-annie-bind="client-profiles.length">0</h3>
+            <p class="mb-0">Active Clients</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="business-card text-center">
+            <h3 class="text-warning" data-annie-bind="service-catalog.length">0</h3>
+            <p class="mb-0">Services Offered</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="business-card text-center">
+            <h3 class="text-info" id="framework-health">Checking...</h3>
+            <p class="mb-0">Framework Health</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="row">
+        <div class="col-md-8">
+          <div class="business-card">
+            <div class="business-card-header">
+              <i class="fas fa-clock"></i> Recent Transactions
+            </div>
+            <div id="recent-transactions">
+              <div class="text-center py-4">
+                <div class="loading-spinner"></div>
+                <p class="mt-2 text-muted">Loading recent transactions...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="business-card">
+            <div class="business-card-header">
+              <i class="fas fa-tasks"></i> Quick Actions
+            </div>
+            <div class="d-grid gap-2">
+              <button class="btn btn-primary" onclick="app.addNewClient()">
+                <i class="fas fa-user-plus"></i> Add New Client
+              </button>
+              <button class="btn btn-success" onclick="app.createReport()">
+                <i class="fas fa-chart-bar"></i> Generate Report
+              </button>
+              <button class="btn btn-info" onclick="app.refreshData()">
+                <i class="fas fa-sync"></i> Refresh Data
+              </button>
+              <button class="btn btn-warning" onclick="app.exportData()">
+                <i class="fas fa-download"></i> Export Data
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </view>
+
+  <!-- Organization View -->
+  <view id="organization">
+    <div class="container">
+      <h2 class="mb-4"><i class="fas fa-building text-primary"></i> Organization Details</h2>
+      
+      <div class="row">
+        <div class="col-md-8">
+          <div class="annie-form-section">
+            <h4>Organization Information</h4>
+            <form id="org-form">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Organization Name</label>
+                  <input type="text" class="form-control" 
+                         data-annie-bind="store.0.organizationName"
+                         data-annie-field="organizationName">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Account GUID</label>
+                  <input type="text" class="form-control" readonly
+                         data-annie-bind="store.0.accountguid">
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Location</label>
+                  <input type="text" class="form-control"
+                         data-annie-bind="store.0.location"
+                         data-annie-field="location">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Department</label>
+                  <input type="text" class="form-control"
+                         data-annie-bind="store.0.department"
+                         data-annie-field="department">
+                </div>
+              </div>
+              
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Save Changes
+              </button>
+            </form>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="business-card">
+            <div class="business-card-header">Organization Stats</div>
+            <div class="row text-center">
+              <div class="col-6">
+                <h4 class="text-primary" data-annie-bind="organization-details.length">0</h4>
+                <small>Locations</small>
+              </div>
+              <div class="col-6">
+                <h4 class="text-success" id="total-staff">0</h4>
+                <small>Total Staff</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </view>
+
+  <!-- Staff Directory View -->
+  <view id="staff">
+    <div class="container">
+      <h2 class="mb-4"><i class="fas fa-users text-primary"></i> Staff Directory</h2>
+      
+      <div class="business-card">
+        <div class="business-card-header">Staff Members</div>
+        <div class="annie-data-table">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Role</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="staff-table-body">
+              <tr>
+                <td colspan="6" class="text-center py-4">
+                  <div class="loading-spinner"></div>
+                  <span class="ms-2">Loading staff directory...</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </view>
+
+  <!-- Client Profiles View -->
+  <view id="clients">
+    <div class="container">
+      <h2 class="mb-4"><i class="fas fa-handshake text-primary"></i> Client Profiles</h2>
+      
+      <div class="business-card">
+        <div class="business-card-header">Active Clients</div>
+        <div id="clients-grid" class="row">
+          <div class="col-12 text-center py-4">
+            <div class="loading-spinner"></div>
+            <p class="mt-2 text-muted">Loading client profiles...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </view>
+
+  <!-- Services View -->
+  <view id="services">
+    <div class="container">
+      <h2 class="mb-4"><i class="fas fa-cogs text-primary"></i> Service Catalog</h2>
+      
+      <div class="business-card">
+        <div class="business-card-header">Available Services</div>
+        <div id="services-list">
+          <div class="text-center py-4">
+            <div class="loading-spinner"></div>
+            <p class="mt-2 text-muted">Loading service catalog...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </view>
+
+  <!-- Analytics View -->
+  <view id="analytics">
+    <div class="container">
+      <h2 class="mb-4"><i class="fas fa-chart-line text-primary"></i> Analytics Dashboard</h2>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="business-card">
+            <div class="business-card-header">Framework Validation</div>
+            <div id="validation-results">
+              <button class="btn btn-primary" onclick="app.runValidation()">
+                <i class="fas fa-check-circle"></i> Run Validation
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="business-card">
+            <div class="business-card-header">Memory Usage</div>
+            <div id="memory-analytics">
+              <button class="btn btn-info" onclick="app.analyzeMemory()">
+                <i class="fas fa-memory"></i> Analyze Memory
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </view>
+
+  <!-- Reports View -->
+  <view id="reports">
+    <div class="container">
+      <h2 class="mb-4"><i class="fas fa-file-alt text-primary"></i> Reports</h2>
+      
+      <div class="business-card">
+        <div class="business-card-header">Generate Reports</div>
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <button class="btn btn-outline-primary w-100 h-100" onclick="app.generateReport('staff')">
+              <i class="fas fa-users fa-2x d-block mb-2"></i>
+              Staff Report
+            </button>
+          </div>
+          <div class="col-md-4 mb-3">
+            <button class="btn btn-outline-success w-100 h-100" onclick="app.generateReport('clients')">
+              <i class="fas fa-handshake fa-2x d-block mb-2"></i>
+              Client Report
+            </button>
+          </div>
+          <div class="col-md-4 mb-3">
+            <button class="btn btn-outline-info w-100 h-100" onclick="app.generateReport('services')">
+              <i class="fas fa-cogs fa-2x d-block mb-2"></i>
+              Services Report
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </view>
+
+  <!-- Settings View -->
+  <view id="settings">
+    <div class="container">
+      <h2 class="mb-4"><i class="fas fa-sliders-h text-primary"></i> Application Settings</h2>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="annie-form-section">
+            <h4>Framework Configuration</h4>
+            <div class="mb-3">
+              <label class="form-label">Log Level</label>
+              <select class="form-control" id="log-level">
+                <option value="DEBUG">Debug</option>
+                <option value="INFO" selected>Info</option>
+                <option value="WARN">Warning</option>
+                <option value="ERROR">Error</option>
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="memory-monitoring" checked>
+                <label class="form-check-label">Enable Memory Monitoring</label>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="auto-validation" checked>
+                <label class="form-check-label">Auto Validation</label>
+              </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="app.applySettings()">
+              <i class="fas fa-check"></i> Apply Settings
+            </button>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="annie-form-section">
+            <h4>Data Management</h4>
+            <div class="d-grid gap-2">
+              <button class="btn btn-outline-primary" onclick="app.refreshAllData()">
+                <i class="fas fa-sync"></i> Refresh All Data
+              </button>
+              <button class="btn btn-outline-warning" onclick="app.clearCache()">
+                <i class="fas fa-trash"></i> Clear Cache
+              </button>
+              <button class="btn btn-outline-success" onclick="app.exportAllData()">
+                <i class="fas fa-download"></i> Export All Data
+              </button>
+              <button class="btn btn-outline-danger" onclick="app.resetFramework()">
+                <i class="fas fa-redo"></i> Reset Framework
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </view>
+
+  <!-- Annie Framework -->
+  <script type="module">
+    import { AnnieFramework } from './src/annie.js';
+
+    // Initialize Annie Framework
+    window.annie = new AnnieFramework({
+      apiConfig: {
+        baseUrl: '/api'
+      },
+      logLevel: loglevel,
+      autoInitialize: false
+    });
+
+    // Business Application Logic
+    class BusinessApplication {
+      constructor() {
+        this.currentView = 'dashboard';
+        this.init();
+      }
+
+      async init() {
+        try {
+          // Initialize Annie Framework
+          await window.annie.initialize();
+          
+          // Start monitoring
+          window.annie.startMemoryMonitoring(15000);
+          
+          // Setup navigation
+          this.setupNavigation();
+          
+          // Load business data
+          this.loadBusinessData();
+          
+          // Setup forms
+          this.setupForms();
+          
+          // Start periodic updates
+          this.startPeriodicUpdates();
+          
+          console.log('Business application initialized successfully');
+          
+        } catch (error) {
+          console.error('Application initialization failed:', error);
+        }
+      }
+
+      setupNavigation() {
+        document.querySelectorAll('[data-annie-nav]').forEach(button => {
+          button.addEventListener('click', (e) => {
+            const view = e.currentTarget.dataset.annieNav;
+            this.navigateToView(view);
+          });
+        });
+      }
+
+      navigateToView(viewName) {
+        // Update navigation buttons
+        document.querySelectorAll('[data-annie-nav]').forEach(btn => {
+          btn.className = btn.className.replace(/btn-spa-nav-(active|visited)/, 'btn-spa-nav-enabled');
+        });
+        
+        const activeBtn = document.querySelector(`[data-annie-nav="${viewName}"]`);
+        if (activeBtn) {
+          activeBtn.className = activeBtn.className.replace('btn-spa-nav-enabled', 'btn-spa-nav-active');
+        }
+
+        // Show/hide views
+        document.querySelectorAll('view').forEach(view => {
+          view.classList.remove('active');
+        });
+        
+        const targetView = document.getElementById(viewName);
+        if (targetView) {
+          targetView.classList.add('active');
+          this.currentView = viewName;
+        }
+
+        // Use Annie's router
+        window.annie.navigateTo(viewName);
+      }
+
+      loadBusinessData() {
+        // Simulate business data loading
+        setTimeout(() => {
+          // Staff directory
+          const staffData = [
+            { name: 'John Smith', department: 'Sales', role: 'Manager', location: 'New York', status: 'active' },
+            { name: 'Sarah Johnson', department: 'Marketing', role: 'Specialist', location: 'Chicago', status: 'active' },
+            { name: 'Mike Brown', department: 'IT', role: 'Developer', location: 'San Francisco', status: 'active' },
+            { name: 'Lisa Davis', department: 'HR', role: 'Coordinator', location: 'New York', status: 'pending' }
+          ];
+          
+          // Client profiles
+          const clientData = [
+            { name: 'Tech Corp', industry: 'Technology', contact: 'John Tech', status: 'active', value: '$50,000' },
+            { name: 'Health Inc', industry: 'Healthcare', contact: 'Mary Health', status: 'active', value: '$75,000' },
+            { name: 'Finance Ltd', industry: 'Finance', contact: 'Bob Finance', status: 'pending', value: '$100,000' }
+          ];
+          
+          // Service catalog
+          const serviceData = [
+            { name: 'Consulting', category: 'Professional Services', price: '$150/hr', status: 'active' },
+            { name: 'Development', category: 'Technology', price: '$100/hr', status: 'active' },
+            { name: 'Support', category: 'Maintenance', price: '$75/hr', status: 'active' },
+            { name: 'Training', category: 'Education', price: '$200/day', status: 'maintenance' }
+          ];
+          
+          // Organization details
+          const orgData = [
+            { location: 'New York HQ', address: '123 Business St', staff: 15 },
+            { location: 'Chicago Office', address: '456 Commerce Ave', staff: 8 },
+            { location: 'San Francisco Office', address: '789 Tech Blvd', staff: 12 }
+          ];
+
+          // Set data in Annie's data store
+          window.annie.getDataStore().setDataset('staff-directory', staffData);
+          window.annie.getDataStore().setDataset('client-profiles', clientData);
+          window.annie.getDataStore().setDataset('service-catalog', serviceData);
+          window.annie.getDataStore().setDataset('organization-details', orgData);
+          
+          // Update UI
+          this.updateStaffTable();
+          this.updateClientsGrid();
+          this.updateServicesList();
+          
+        }, 1000);
+      }
+
+      updateStaffTable() {
+        const staffData = window.annie.getData('staff-directory');
+        if (!staffData) return;
+
+        const tbody = document.getElementById('staff-table-body');
+        tbody.innerHTML = staffData.map(staff => `
+          <tr>
+            <td>${staff.name}</td>
+            <td>${staff.department}</td>
+            <td>${staff.role}</td>
+            <td>${staff.location}</td>
+            <td><span class="badge status-${staff.status}">${staff.status}</span></td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary" onclick="app.editStaff('${staff.name}')">
+                <i class="fas fa-edit"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+
+        document.getElementById('total-staff').textContent = staffData.length;
+      }
+
+      updateClientsGrid() {
+        const clientData = window.annie.getData('client-profiles');
+        if (!clientData) return;
+
+        const grid = document.getElementById('clients-grid');
+        grid.innerHTML = clientData.map(client => `
+          <div class="col-md-4 mb-3">
+            <div class="business-card">
+              <h5>${client.name}</h5>
+              <p class="mb-1"><strong>Industry:</strong> ${client.industry}</p>
+              <p class="mb-1"><strong>Contact:</strong> ${client.contact}</p>
+              <p class="mb-1"><strong>Value:</strong> ${client.value}</p>
+              <span class="badge status-${client.status}">${client.status}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      updateServicesList() {
+        const serviceData = window.annie.getData('service-catalog');
+        if (!serviceData) return;
+
+        const list = document.getElementById('services-list');
+        list.innerHTML = serviceData.map(service => `
+          <div class="business-card mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h5>${service.name}</h5>
+                <p class="mb-1">${service.category}</p>
+                <strong>${service.price}</strong>
+              </div>
+              <span class="badge status-${service.status}">${service.status}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      setupForms() {
+        // Organization form
+        const orgForm = document.getElementById('org-form');
+        if (orgForm) {
+          orgForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.saveOrganizationData();
+          });
+        }
+      }
+
+      saveOrganizationData() {
+        // Update data using Annie's updateField method
+        const formData = new FormData(document.getElementById('org-form'));
+        
+        // Update each field
+        document.querySelectorAll('#org-form [data-annie-field]').forEach(input => {
+          const field = input.dataset.annieField;
+          const value = input.value;
+          window.annie.updateField('store', field, value, 0);
+        });
+
+        alert('Organization data saved successfully!');
+      }
+
+      startPeriodicUpdates() {
+        // Update framework health
+        const updateHealth = () => {
+          const validation = window.annie.validateFramework();
+          const healthEl = document.getElementById('framework-health');
+          if (healthEl) {
+            healthEl.textContent = validation.isValid ? 'Healthy' : 'Issues';
+            healthEl.className = validation.isValid ? 'text-success' : 'text-warning';
+          }
+        };
+
+        setTimeout(updateHealth, 2000);
+        setInterval(updateHealth, 30000);
+
+        // Update recent transactions (simulated)
+        setTimeout(() => {
+          const transactionsEl = document.getElementById('recent-transactions');
+          if (transactionsEl) {
+            transactionsEl.innerHTML = `
+              <div class="list-group">
+                <div class="list-group-item">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">Client Payment Received</h6>
+                    <small>5 mins ago</small>
+                  </div>
+                  <p class="mb-1">Tech Corp - $5,000</p>
+                </div>
+                <div class="list-group-item">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">New Service Request</h6>
+                    <small>1 hour ago</small>
+                  </div>
+                  <p class="mb-1">Health Inc - Consulting Service</p>
+                </div>
+                <div class="list-group-item">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">Staff Update</h6>
+                    <small>2 hours ago</small>
+                  </div>
+                  <p class="mb-1">Lisa Davis status changed to active</p>
+                </div>
+              </div>
+            `;
+          }
+        }, 1500);
+      }
+
+      // Business actions
+      addNewClient() {
+        const name = prompt('Enter client name:');
+        if (name) {
+          const clientData = window.annie.getData('client-profiles') || [];
+          clientData.push({
+            name: name,
+            industry: 'New Industry',
+            contact: 'New Contact',
+            status: 'pending',
+            value: '$0'
+          });
+          window.annie.getDataStore().setDataset('client-profiles', clientData);
+          this.updateClientsGrid();
+          alert('New client added successfully!');
+        }
+      }
+
+      createReport() {
+        alert('Report generation feature - coming soon!');
+      }
+
+      refreshData() {
+        this.loadBusinessData();
+        alert('Data refreshed successfully!');
+      }
+
+      exportData() {
+        const allData = window.annie.getDataStore().all();
+        const dataStr = JSON.stringify(allData, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(dataBlob);
+        link.download = `business-data-${Date.now()}.json`;
+        link.click();
+      }
+
+      runValidation() {
+        const result = window.annie.validateFramework();
+        document.getElementById('validation-results').innerHTML = `
+          <div class="alert alert-${result.isValid ? 'success' : 'warning'}">
+            <strong>Framework Status:</strong> ${result.isValid ? 'Valid' : 'Issues Detected'}<br>
+            <strong>Errors:</strong> ${result.errors.length}<br>
+            <strong>Warnings:</strong> ${result.warnings.length}
+          </div>
+        `;
+      }
+
+      analyzeMemory() {
+        const memInfo = window.annie.getMemoryInfo();
+        document.getElementById('memory-analytics').innerHTML = `
+          <div class="alert alert-info">
+            <strong>Memory Usage:</strong> ${(memInfo.memoryUsage / 1024 / 1024).toFixed(2)} MB<br>
+            <strong>Memory Leak:</strong> ${memInfo.hasMemoryLeak ? 'Detected' : 'None'}<br>
+            <strong>Collections:</strong> ${memInfo.garbageCollections || 0}
+          </div>
+        `;
+      }
+
+      generateReport(type) {
+        const data = window.annie.getData(type === 'staff' ? 'staff-directory' : 
+                                        type === 'clients' ? 'client-profiles' : 'service-catalog');
+        if (data) {
+          const csv = this.convertToCSV(data);
+          const blob = new Blob([csv], { type: 'text/csv' });
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = `${type}-report-${Date.now()}.csv`;
+          link.click();
+        }
+      }
+
+      convertToCSV(data) {
+        if (!data.length) return '';
+        const headers = Object.keys(data[0]);
+        const rows = data.map(obj => headers.map(header => obj[header]).join(','));
+        return [headers.join(','), ...rows].join('\n');
+      }
+
+      applySettings() {
+        const logLevel = document.getElementById('log-level').value;
+        const memoryMonitoring = document.getElementById('memory-monitoring').checked;
+        
+        if (memoryMonitoring) {
+          window.annie.startMemoryMonitoring(15000);
+        } else {
+          window.annie.stopMemoryMonitoring();
+        }
+        
+        alert('Settings applied successfully!');
+      }
+
+      refreshAllData() {
+        this.loadBusinessData();
+        alert('All data refreshed!');
+      }
+
+      clearCache() {
+        // Clear non-essential datasets
+        const datasets = window.annie.getDataStore().all();
+        Object.keys(datasets).forEach(key => {
+          if (key !== 'store') {
+            window.annie.getDataStore().setDataset(key, []);
+          }
+        });
+        alert('Cache cleared!');
+      }
+
+      exportAllData() {
+        this.exportData();
+      }
+
+      resetFramework() {
+        if (confirm('Are you sure you want to reset the framework? This will clear all data.')) {
+          window.annie.resetComponent('datastore');
+          window.annie.resetComponent('state');
+          alert('Framework reset successfully!');
+          location.reload();
+        }
+      }
+
+      editStaff(name) {
+        alert(`Edit staff member: ${name}\n(Edit functionality would open a modal or form)`);
+      }
+    }
+
+    // Initialize the business application
+    window.app = new BusinessApplication();
+
+    // Global callbacks for Annie compatibility
+    window.pageinit = function() {
+      console.log('Business application page initialized');
+    };
+
+    window.pageloaded = function() {
+      console.log('Business application page loaded');
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Parameter Passing Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .test-row {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .test-row:hover {
+            background-color: #e9e9e9;
+        }
+        .staff-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .staff-table th, .staff-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .staff-table th {
+            background-color: #f2f2f2;
+        }
+        .staff-row {
+            cursor: pointer;
+        }
+        .staff-row:hover {
+            background-color: #f5f5f5;
+        }
+        .form-section {
+            background: #f9f9f9;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Annie Framework - Parameter Passing Test</h1>
+    
+    <div class="form-section">
+        <h2>Test Form (for form data passing)</h2>
+        <form id="testForm">
+            <label>Department: <input type="text" name="department" value="Engineering"></label><br><br>
+            <label>Location: <input type="text" name="location" value="San Francisco"></label><br><br>
+            <label>Active: <input type="checkbox" name="active" checked></label><br><br>
+        </form>
+    </div>
+
+    <h2>Test 1: API Trigger with Params Array (POST with Parameters)</h2>
+    <div class="test-row" 
+         data-trigger='{"type": "api", "method": "post", "action": "/staff-overview", "params": [{"accountguid": "12345", "role": "admin"}]}'>
+        Click me - Staff Member: John Doe (Admin) - GUID: 12345 (API POST)
+    </div>
+
+    <div class="test-row" 
+         data-trigger='{"type": "api", "method": "post", "action": "/staff-overview", "params": [{"accountguid": "67890", "role": "user"}]}'>
+        Click me - Staff Member: Jane Smith (User) - GUID: 67890 (API POST)
+    </div>
+
+    <h2>Test 2: Click Trigger for Navigation</h2>
+    <div class="test-row" 
+         data-trigger='{"type": "click", "action": "/staff-profile-page"}'>
+        Click me - Navigate to Staff Profile Page
+    </div>
+
+    <div class="test-row" 
+         data-trigger='{"type": "click", "action": "https://www.example.com"}'>
+        Click me - Navigate to External Site
+    </div>
+
+    <h2>Test 3: API Trigger with Form Data + Params</h2>
+    <div class="test-row" 
+         data-trigger='{"type": "api", "method": "post", "action": "/staff-details", "params": [{"staffid": "999"}], "form": ["testForm"]}'>
+        Click me - Will include form data + staffid: 999 (API POST)
+    </div>
+
+    <h2>Test 4: API Trigger with Data Attribute Parameters (Legacy Support)</h2>
+    <div class="test-row" 
+         data-trigger='{"type": "api", "method": "post", "action": "/staff-profile"}'
+         data-accountguid="11111"
+         data-department="HR"
+         data-level="senior">
+        Click me - Uses data attributes for parameters (API POST)
+    </div>
+
+    <h2>Test 5: DataTable Simulation (API Triggers for POST)</h2>
+    <table class="staff-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Role</th>
+                <th>GUID</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="staff-row" 
+                data-trigger='{"type": "api", "method": "post", "action": "/staff-overview", "params": [{"accountguid": "staff-001", "name": "Alice Johnson", "dept": "Marketing"}]}'>
+                <td>Alice Johnson</td>
+                <td>Marketing</td>
+                <td>Manager</td>
+                <td>staff-001</td>
+            </tr>
+            <tr class="staff-row" 
+                data-trigger='{"type": "api", "method": "post", "action": "/staff-overview", "params": [{"accountguid": "staff-002", "name": "Bob Wilson", "dept": "Sales"}]}'>
+                <td>Bob Wilson</td>
+                <td>Sales</td>
+                <td>Representative</td>
+                <td>staff-002</td>
+            </tr>
+            <tr class="staff-row" 
+                data-trigger='{"type": "api", "method": "post", "action": "/staff-overview", "params": [{"accountguid": "staff-003", "name": "Carol Davis", "dept": "Engineering"}]}'>
+                <td>Carol Davis</td>
+                <td>Engineering</td>
+                <td>Developer</td>
+                <td>staff-003</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Test 6: Multiple Parameters (API)</h2>
+    <div class="test-row" 
+         data-trigger='{"type": "api", "method": "post", "action": "/complex-action", "params": [{"id": "123"}, {"category": "premium"}, {"source": "web"}]}'>
+        Click me - Multiple parameter objects (API POST)
+    </div>
+
+    <h2>Test 7: Dynamic Triggers (Added After Page Load)</h2>
+    <div id="dynamic-container">
+        <!-- Dynamic content will be added here -->
+    </div>
+    <button onclick="addDynamicTrigger()">Add Dynamic Trigger</button>
+    <button onclick="addDataTableRow()">Simulate DataTable Row</button>
+    <button onclick="manualReinitialize()">Manual Reinitialize</button>
+
+    <div id="debug-output" style="margin-top: 30px; padding: 20px; background: #f0f0f0; border-radius: 5px;">
+        <h3>Debug Output</h3>
+        <p>Open browser DevTools Console to see detailed debug logs.</p>
+        <p>Open browser DevTools Network tab to see the POST requests being made with parameters.</p>
+        <div id="debug-info"></div>
+    </div>
+
+    <!-- Initialize global variables -->
+    <script>
+        // Set up global variables that Annie expects
+        window._requestparams = { 
+            userid: "testuser",
+            sessionid: "session123"
+        };
+        
+        window._datasetsinit = {
+            load: [],
+            remote: [],
+            lazyload: []
+        };
+        
+        window.loglevel = "Debug";
+        
+        let dynamicCounter = 0;
+        
+        // Function to add a dynamic trigger (simulates your DataTable scenario)
+        function addDynamicTrigger() {
+            dynamicCounter++;
+            const container = document.getElementById('dynamic-container');
+            const newElement = document.createElement('div');
+            newElement.className = 'test-row';
+            newElement.innerHTML = `Dynamic Element ${dynamicCounter} - Click me!`;
+            
+            // This simulates your DataTable createdRow callback
+            newElement.setAttribute('data-trigger', JSON.stringify({
+                "type": "api", 
+                "method": "post", 
+                "action": "/dynamic-endpoint", 
+                "params": [{"dynamicId": `dyn-${dynamicCounter}`, "source": "dynamic"}]
+            }));
+            
+            container.appendChild(newElement);
+            console.log(`Added dynamic API trigger ${dynamicCounter}`);
+        }
+        
+        // Function to simulate adding a DataTable row
+        function addDataTableRow() {
+            dynamicCounter++;
+            const tableBody = document.querySelector('.staff-table tbody');
+            const newRow = document.createElement('tr');
+            newRow.className = 'staff-row';
+            
+            // Simulate the exact DataTable createdRow scenario
+            newRow.setAttribute('data-trigger', JSON.stringify({
+                "type": "api", 
+                "method": "post", 
+                "action": "/staff-overview", 
+                "params": [{"accountguid": `staff-dyn-${dynamicCounter}`, "name": `Dynamic Staff ${dynamicCounter}`, "dept": "IT"}]
+            }));
+            
+            newRow.innerHTML = `
+                <td>Dynamic Staff ${dynamicCounter}</td>
+                <td>IT</td>
+                <td>Dynamic</td>
+                <td>staff-dyn-${dynamicCounter}</td>
+            `;
+            
+            tableBody.appendChild(newRow);
+            console.log(`Added dynamic DataTable row ${dynamicCounter}`);
+        }
+        
+        // Function to manually reinitialize triggers (if MutationObserver fails)
+        function manualReinitialize() {
+            if (window.annie) {
+                annie.reinitializeTriggers();
+                console.log('Manually reinitialized triggers');
+            }
+        }
+        
+        // Mock API endpoint for testing
+        function mockServerResponse() {
+            console.log("=== MOCK SERVER RESPONSE ===");
+            console.log("In a real application, this would be your server endpoint");
+            console.log("The parameters would be processed and a response returned");
+            console.log("=============================");
+        }
+
+        // Override fetch to intercept and log API calls for testing
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options) {
+            console.log("=== API CALL INTERCEPTED ===");
+            console.log("URL:", url);
+            console.log("Method:", options?.method);
+            console.log("Headers:", options?.headers);
+            console.log("Body:", options?.body);
+            
+            if (options?.body) {
+                try {
+                    const bodyData = JSON.parse(options.body);
+                    console.log("Parsed Body Data:", bodyData);
+                    
+                    // Display in UI
+                    const debugDiv = document.getElementById('debug-info');
+                    debugDiv.innerHTML += `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid #ccc; border-radius: 3px;">
+                            <strong>API Call:</strong> ${options?.method || 'GET'} ${url}<br>
+                            <strong>Parameters:</strong> ${JSON.stringify(bodyData, null, 2)}
+                        </div>
+                    `;
+                } catch (e) {
+                    console.log("Body (raw):", options.body);
+                }
+            }
+            console.log("============================");
+            
+            // Return a mock response instead of making real call
+            return Promise.resolve(new Response('{"success": true, "message": "Mock response"}', {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' }
+            }));
+        };
+        
+        // Page initialization callback
+        window.pageinit = function() {
+            console.log("Page initialized - Annie Framework ready");
+            console.log("Click any test element to see parameter passing in action");
+        };
+    </script>
+
+    <!-- Load the compiled Annie Framework -->
+    <script type="module" src="./dist/index.js"></script>
+</body>
+</html>

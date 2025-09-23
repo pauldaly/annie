@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Annie Framework - Type Guards & Validation Demo</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      padding: 30px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #4a5568;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #2d3748;
+      border-left: 4px solid #667eea;
+      padding-left: 15px;
+      margin-top: 30px;
+      margin-bottom: 20px;
+    }
+
+    .demo-section {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 15px 0;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button.danger {
+      background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+    }
+
+    button.success {
+      background: linear-gradient(135deg, #68d391 0%, #48bb78 100%);
+    }
+
+    button.warning {
+      background: linear-gradient(135deg, #fbb6ce 0%, #ed64a6 100%);
+    }
+
+    .output {
+      background: #1a202c;
+      color: #e2e8f0;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 2px solid #4a5568;
+    }
+
+    .validation-result {
+      padding: 15px;
+      border-radius: 6px;
+      margin: 10px 0;
+      border-left: 4px solid;
+    }
+
+    .validation-result.valid {
+      background: #f0fff4;
+      border-left-color: #48bb78;
+      color: #22543d;
+    }
+
+    .validation-result.invalid {
+      background: #fed7d7;
+      border-left-color: #f56565;
+      color: #742a2a;
+    }
+
+    .validation-result.warning {
+      background: #fffbeb;
+      border-left-color: #ed8936;
+      color: #744210;
+    }
+
+    .input-group {
+      margin: 15px 0;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #4a5568;
+    }
+
+    .input-group input, .input-group textarea, .input-group select {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .stat-value {
+      font-size: 2em;
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .stat-label {
+      color: #718096;
+      font-size: 0.9em;
+      margin-top: 5px;
+    }
+
+    .type-guard-demo {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .validation-demo {
+      margin: 20px 0;
+    }
+
+    @media (max-width: 768px) {
+      .type-guard-demo {
+        grid-template-columns: 1fr;
+      }
+      
+      .controls {
+        flex-direction: column;
+      }
+      
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🛡️ Type Guards & Validation Demo</h1>
+    
+    <div class="demo-section">
+      <h2>🔍 Basic Type Guards</h2>
+      <div class="type-guard-demo">
+        <div>
+          <div class="input-group">
+            <label for="test-value">Test Value:</label>
+            <input type="text" id="test-value" placeholder="Enter any value..." value="42">
+          </div>
+          <div class="controls">
+            <button onclick="testTypeGuards()" class="success">Test Type Guards</button>
+            <button onclick="clearTypeGuardResults()">Clear Results</button>
+          </div>
+        </div>
+        <div>
+          <div class="output" id="type-guard-output">Type guard results will appear here...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>📝 Data Validation</h2>
+      <div class="validation-demo">
+        <div class="input-group">
+          <label for="validation-type">Validation Type:</label>
+          <select id="validation-type">
+            <option value="string">String</option>
+            <option value="number">Number</option>
+            <option value="email">Email</option>
+            <option value="url">URL</option>
+            <option value="array">Array</option>
+            <option value="object">Object</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label for="validation-value">Value to Validate:</label>
+          <input type="text" id="validation-value" placeholder="Enter value to validate..." value="hello@example.com">
+        </div>
+        
+        <div class="input-group">
+          <label for="validation-options">Validation Options (JSON):</label>
+          <textarea id="validation-options" rows="3" placeholder='{"minLength": 5, "maxLength": 50}'>{}</textarea>
+        </div>
+        
+        <div class="controls">
+          <button onclick="testValidation()" class="success">Validate</button>
+          <button onclick="testFrameworkValidation()" class="warning">Validate Framework</button>
+          <button onclick="clearValidationResults()">Clear Results</button>
+        </div>
+        
+        <div id="validation-results">
+          <!-- Validation results will appear here -->
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>📊 Dataset Validation</h2>
+      <div class="controls">
+        <button onclick="createValidDataset()" class="success">Create Valid Dataset</button>
+        <button onclick="createInvalidDataset()" class="danger">Create Invalid Dataset</button>
+        <button onclick="validateAllDatasets()">Validate All Datasets</button>
+        <button onclick="sanitizeDataset()" class="warning">Sanitize & Set Dataset</button>
+      </div>
+      <div class="output" id="dataset-output">Dataset validation results will appear here...</div>
+    </div>
+
+    <div class="demo-section">
+      <h2>🏥 Framework Health Check</h2>
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-value" id="validation-errors-count">0</div>
+          <div class="stat-label">Validation Errors</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="validation-warnings-count">0</div>
+          <div class="stat-label">Validation Warnings</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="datasets-count">0</div>
+          <div class="stat-label">Active Datasets</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="framework-status">Unknown</div>
+          <div class="stat-label">Framework Status</div>
+        </div>
+      </div>
+      
+      <div class="controls">
+        <button onclick="performHealthCheck()" class="success">Health Check</button>
+        <button onclick="showValidationErrors()" class="warning">Show All Errors</button>
+        <button onclick="clearAllValidationErrors()">Clear Errors</button>
+      </div>
+      
+      <div class="output" id="health-output">Health check results will appear here...</div>
+    </div>
+
+    <div class="demo-section">
+      <h2>🧪 Advanced Type Guard Tests</h2>
+      <div class="controls">
+        <button onclick="testComplexObjects()" class="success">Test Complex Objects</button>
+        <button onclick="testDataRecords()" class="warning">Test Data Records</button>
+        <button onclick="testFrameworkTypes()">Test Framework Types</button>
+      </div>
+      <div class="output" id="advanced-output">Advanced type guard results will appear here...</div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Import Annie Framework
+    import { AnnieFramework } from './src/annie.js';
+    import { 
+      isString, isNumber, isBoolean, isArray, isObject, isValidEmail, isValidUrl,
+      isDataRecord, isDataset, validate, ValidationManager 
+    } from './src/utils/type-guards.js';
+
+    // Initialize Annie Framework
+    window.annie = new AnnieFramework({
+      apiConfig: {
+        baseUrl: '/api'
+      },
+      autoInitialize: true
+    });
+
+    // Global test functions
+    window.testTypeGuards = function() {
+      const value = document.getElementById('test-value').value;
+      const output = document.getElementById('type-guard-output');
+      
+      let testValue;
+      try {
+        // Try to parse as JSON first
+        testValue = JSON.parse(value);
+      } catch {
+        // If not JSON, use as string
+        testValue = value;
+      }
+      
+      const results = {
+        'Original Value': value,
+        'Parsed Value': testValue,
+        'typeof': typeof testValue,
+        'isString': isString(testValue),
+        'isNumber': isNumber(testValue),
+        'isBoolean': isBoolean(testValue),
+        'isArray': isArray(testValue),
+        'isObject': isObject(testValue),
+        'isValidEmail': isValidEmail(testValue),
+        'isValidUrl': isValidUrl(testValue),
+        'isDataRecord': isDataRecord(testValue)
+      };
+      
+      output.textContent = JSON.stringify(results, null, 2);
+    };
+
+    window.testValidation = function() {
+      const type = document.getElementById('validation-type').value;
+      const value = document.getElementById('validation-value').value;
+      const optionsText = document.getElementById('validation-options').value;
+      
+      let testValue;
+      let options;
+      
+      try {
+        // Parse value based on type
+        switch (type) {
+          case 'number':
+            testValue = Number(value);
+            break;
+          case 'array':
+            testValue = JSON.parse(value);
+            break;
+          case 'object':
+            testValue = JSON.parse(value);
+            break;
+          default:
+            testValue = value;
+        }
+        
+        options = JSON.parse(optionsText || '{}');
+      } catch (error) {
+        showValidationResult('Invalid input format: ' + error.message, false);
+        return;
+      }
+      
+      const result = validate(testValue, type, options);
+      showValidationResult(result);
+    };
+
+    window.testFrameworkValidation = function() {
+      const result = window.annie.validateFramework();
+      showValidationResult(result);
+      updateHealthStats();
+    };
+
+    window.createValidDataset = function() {
+      const validData = [
+        { id: 1, name: "John Doe", email: "john@example.com", active: true },
+        { id: 2, name: "Jane Smith", email: "jane@example.com", active: false },
+        { id: 3, name: "Bob Johnson", email: "bob@example.com", active: true }
+      ];
+      
+      window.annie.getDataStore().setDataset('users', validData, {
+        object: 'false',
+        count: validData.length
+      });
+      
+      const output = document.getElementById('dataset-output');
+      output.textContent = 'Valid dataset "users" created with ' + validData.length + ' records.';
+      
+      updateHealthStats();
+    };
+
+    window.createInvalidDataset = function() {
+      const invalidData = [
+        { id: "invalid", name: null, email: 123 }, // Invalid types
+        "not an object", // Invalid record type
+        { nested: { too: { deep: true } } } // Complex nesting
+      ];
+      
+      try {
+        window.annie.getDataStore().setDataset('invalid', invalidData);
+        const output = document.getElementById('dataset-output');
+        output.textContent = 'Invalid dataset created (framework may have sanitized it).';
+      } catch (error) {
+        const output = document.getElementById('dataset-output');
+        output.textContent = 'Error creating invalid dataset: ' + error.message;
+      }
+      
+      updateHealthStats();
+    };
+
+    window.validateAllDatasets = function() {
+      const result = window.annie.getDataStore().validateAllDatasets();
+      const output = document.getElementById('dataset-output');
+      
+      let resultText = `Dataset Validation Results:\n`;
+      resultText += `Valid: ${result.isValid}\n`;
+      resultText += `Errors: ${result.errors.length}\n`;
+      resultText += `Warnings: ${result.warnings.length}\n\n`;
+      
+      if (result.errors.length > 0) {
+        resultText += `Errors:\n${result.errors.join('\n')}\n\n`;
+      }
+      
+      if (result.warnings.length > 0) {
+        resultText += `Warnings:\n${result.warnings.join('\n')}`;
+      }
+      
+      output.textContent = resultText;
+      updateHealthStats();
+    };
+
+    window.sanitizeDataset = function() {
+      const messyData = [
+        { name: "Valid User", email: "user@example.com", score: 95 },
+        { name: "Messy User", email: null, score: "invalid", extra: { complex: "object" } },
+        "not an object at all",
+        { onlyName: "No Email" }
+      ];
+      
+      const success = window.annie.getDataStore().sanitizeAndSetDataset('sanitized', messyData);
+      const output = document.getElementById('dataset-output');
+      
+      if (success) {
+        const dataset = window.annie.getDataStore().getDataset('sanitized');
+        output.textContent = `Sanitization successful! Created dataset with ${dataset.data.length} records.\n\n` +
+                            `Original data: ${messyData.length} items\n` +
+                            `Sanitized data: ${JSON.stringify(dataset.data, null, 2)}`;
+      } else {
+        output.textContent = 'Sanitization failed!';
+      }
+      
+      updateHealthStats();
+    };
+
+    window.performHealthCheck = function() {
+      const result = window.annie.validateFramework();
+      const configResult = window.annie.validateConfig();
+      const memoryInfo = window.annie.getMemoryInfo();
+      
+      const output = document.getElementById('health-output');
+      
+      let healthReport = `🏥 Framework Health Report\n`;
+      healthReport += `==========================================\n\n`;
+      
+      healthReport += `Overall Status: ${result.isValid ? '✅ HEALTHY' : '❌ ISSUES DETECTED'}\n`;
+      healthReport += `Configuration: ${configResult.isValid ? '✅ Valid' : '❌ Invalid'}\n`;
+      healthReport += `Memory Status: ${memoryInfo.hasMemoryLeak ? '⚠️ Potential Leak' : '✅ Normal'}\n\n`;
+      
+      if (result.errors.length > 0) {
+        healthReport += `❌ Errors (${result.errors.length}):\n`;
+        result.errors.forEach(error => healthReport += `  • ${error}\n`);
+        healthReport += `\n`;
+      }
+      
+      if (result.warnings.length > 0) {
+        healthReport += `⚠️ Warnings (${result.warnings.length}):\n`;
+        result.warnings.forEach(warning => healthReport += `  • ${warning}\n`);
+        healthReport += `\n`;
+      }
+      
+      healthReport += `📊 Statistics:\n`;
+      healthReport += `  • Active Datasets: ${Object.keys(window.annie.getDataStore().all()).length}\n`;
+      healthReport += `  • Memory Usage: ${(memoryInfo.memoryUsage / 1024 / 1024).toFixed(2)} MB\n`;
+      healthReport += `  • Framework Initialized: ${window.annie.initialized ? 'Yes' : 'No'}\n`;
+      
+      output.textContent = healthReport;
+      updateHealthStats();
+    };
+
+    window.showValidationErrors = function() {
+      const errors = window.annie.getAllValidationErrors();
+      const output = document.getElementById('health-output');
+      
+      if (Object.keys(errors).length === 0) {
+        output.textContent = '✅ No validation errors found!';
+        return;
+      }
+      
+      let errorReport = `🔍 All Validation Errors\n`;
+      errorReport += `==============================\n\n`;
+      
+      for (const [component, result] of Object.entries(errors)) {
+        errorReport += `📦 ${component.toUpperCase()}\n`;
+        errorReport += `  Status: ${result.isValid ? '✅ Valid' : '❌ Invalid'}\n`;
+        
+        if (result.errors.length > 0) {
+          errorReport += `  Errors:\n`;
+          result.errors.forEach(error => errorReport += `    • ${error}\n`);
+        }
+        
+        if (result.warnings.length > 0) {
+          errorReport += `  Warnings:\n`;
+          result.warnings.forEach(warning => errorReport += `    • ${warning}\n`);
+        }
+        
+        errorReport += `\n`;
+      }
+      
+      output.textContent = errorReport;
+    };
+
+    window.clearAllValidationErrors = function() {
+      window.annie.getValidationManager().clearValidationErrors();
+      const output = document.getElementById('health-output');
+      output.textContent = '🧹 All validation errors cleared!';
+      updateHealthStats();
+    };
+
+    window.testComplexObjects = function() {
+      const testObjects = [
+        { simple: "object" },
+        { nested: { level: 1, data: "value" } },
+        { array: [1, 2, 3] },
+        { mixed: { array: [{ id: 1 }], string: "test" } },
+        new Date(),
+        /regex/,
+        function() { return "function"; },
+        null,
+        undefined,
+        []
+      ];
+      
+      const output = document.getElementById('advanced-output');
+      let results = `🧪 Complex Object Type Guard Tests\n`;
+      results += `=====================================\n\n`;
+      
+      testObjects.forEach((obj, index) => {
+        results += `Test ${index + 1}: ${JSON.stringify(obj)}\n`;
+        results += `  isObject: ${isObject(obj)}\n`;
+        results += `  isArray: ${isArray(obj)}\n`;
+        results += `  isDataRecord: ${isDataRecord(obj)}\n`;
+        results += `  typeof: ${typeof obj}\n\n`;
+      });
+      
+      output.textContent = results;
+    };
+
+    window.testDataRecords = function() {
+      const testRecords = [
+        { id: 1, name: "Valid Record" },
+        { id: "2", name: "String ID", active: true },
+        { nested: { invalid: "structure" } },
+        { validField: "test", invalidField: function() {} },
+        "not an object",
+        null,
+        { empty: null, undefined: undefined }
+      ];
+      
+      const output = document.getElementById('advanced-output');
+      let results = `📊 Data Record Validation Tests\n`;
+      results += `===============================\n\n`;
+      
+      testRecords.forEach((record, index) => {
+        const isValid = isDataRecord(record);
+        results += `Record ${index + 1}: ${isValid ? '✅' : '❌'}\n`;
+        results += `  Data: ${JSON.stringify(record)}\n`;
+        results += `  isDataRecord: ${isValid}\n\n`;
+      });
+      
+      output.textContent = results;
+    };
+
+    window.testFrameworkTypes = function() {
+      const output = document.getElementById('advanced-output');
+      let results = `🔧 Framework Type Tests\n`;
+      results += `======================\n\n`;
+      
+      // Test framework components
+      const components = {
+        'Annie Framework': window.annie,
+        'Data Store': window.annie.getDataStore(),
+        'Logger': window.annie.getLogger(),
+        'Router': window.annie.getRouter(),
+        'Error Boundary': window.annie.getErrorBoundary()
+      };
+      
+      for (const [name, component] of Object.entries(components)) {
+        results += `${name}:\n`;
+        results += `  isObject: ${isObject(component)}\n`;
+        results += `  hasDispose: ${'dispose' in component && typeof component.dispose === 'function'}\n`;
+        results += `  constructor: ${component.constructor.name}\n\n`;
+      }
+      
+      output.textContent = results;
+    };
+
+    // Helper functions
+    function showValidationResult(result, isResultObject = true) {
+      const container = document.getElementById('validation-results');
+      
+      let resultDiv = document.createElement('div');
+      resultDiv.className = 'validation-result';
+      
+      if (isResultObject && typeof result === 'object') {
+        resultDiv.className += result.isValid ? ' valid' : ' invalid';
+        
+        let content = `<strong>Validation ${result.isValid ? 'Passed' : 'Failed'}</strong><br>`;
+        
+        if (result.errors && result.errors.length > 0) {
+          content += `<br><strong>Errors:</strong><br>`;
+          result.errors.forEach(error => content += `• ${error}<br>`);
+        }
+        
+        if (result.warnings && result.warnings.length > 0) {
+          content += `<br><strong>Warnings:</strong><br>`;
+          result.warnings.forEach(warning => content += `• ${warning}<br>`);
+        }
+        
+        resultDiv.innerHTML = content;
+      } else {
+        resultDiv.className += isResultObject ? ' valid' : ' invalid';
+        resultDiv.textContent = result;
+      }
+      
+      container.appendChild(resultDiv);
+      
+      // Limit number of results shown
+      while (container.children.length > 5) {
+        container.removeChild(container.firstChild);
+      }
+    }
+
+    function updateHealthStats() {
+      const errors = window.annie.getAllValidationErrors();
+      const datasets = window.annie.getDataStore().all();
+      
+      let errorCount = 0;
+      let warningCount = 0;
+      
+      for (const result of Object.values(errors)) {
+        if (result.errors) errorCount += result.errors.length;
+        if (result.warnings) warningCount += result.warnings.length;
+      }
+      
+      document.getElementById('validation-errors-count').textContent = errorCount;
+      document.getElementById('validation-warnings-count').textContent = warningCount;
+      document.getElementById('datasets-count').textContent = Object.keys(datasets).length;
+      document.getElementById('framework-status').textContent = 
+        window.annie.hasValidationErrors() ? 'Issues' : 'Healthy';
+    }
+
+    // Clear functions
+    window.clearTypeGuardResults = function() {
+      document.getElementById('type-guard-output').textContent = 'Type guard results will appear here...';
+    };
+
+    window.clearValidationResults = function() {
+      document.getElementById('validation-results').innerHTML = '';
+    };
+
+    // Initialize health stats
+    setTimeout(updateHealthStats, 1000);
+  </script>
+</body>
+</html>
