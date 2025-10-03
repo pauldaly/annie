@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Forms - Dynamic Table Cell Field Placement</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .demo-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        h1, h2, h3 { color: #333; }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: #007acc;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover { background: #005a9e; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        
+        /* Demo table styles */
+        .demo-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+        
+        .demo-table th,
+        .demo-table td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        
+        .demo-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .demo-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .demo-table .readonly-cell {
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        .demo-table .editable-row {
+            background: #fff9c4;
+        }
+        
+        .demo-table .new-row {
+            background: #e8f5e8;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .scenario {
+            border: 2px solid #007acc;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .scenario h3 {
+            margin-top: 0;
+            color: #007acc;
+        }
+        
+        .log-output {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-new { background: #28a745; }
+        .status-edited { background: #ffc107; }
+        .status-readonly { background: #6c757d; }
+        
+        .table-container {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .table-legend {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📊 Annie Forms - Dynamic Table Cell Field Placement</h1>
+
+    <div class="demo-container">
+        <h2>🎯 Table Cell Targeting Features</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <h3>✅ What You Can Do:</h3>
+                <ul>
+                    <li><strong>Target Specific Cells</strong> - By row ID, selector, or cell index</li>
+                    <li><strong>Create Dynamic Rows</strong> - Add new table rows with form fields</li>
+                    <li><strong>Editable Data Tables</strong> - Turn static tables into forms</li>
+                    <li><strong>Inline Editing</strong> - Edit individual cells or entire rows</li>
+                    <li><strong>Action Buttons</strong> - Save/Cancel controls per row</li>
+                    <li><strong>Data Association</strong> - Link fields to row data</li>
+                    <li><strong>Multi-Cell Workflows</strong> - Coordinated field updates</li>
+                </ul>
+            </div>
+            <div>
+                <h3>📋 API Methods:</h3>
+                <div class="code-block">
+// Target specific table cell
+renderer.addFieldToTableCell(fieldConfig, {
+  rowId: 'row-123',
+  cellIndex: 2
+});
+
+// Create editable row
+renderer.createEditableTableRow(fields, {
+  tableContainer: '#data-table tbody',
+  includeActions: true,
+  onSave: (data) => console.log(data)
+});
+
+// Add multiple fields to row
+renderer.addFieldsToTableRow(fields, {
+  rowSelector: 'tr[data-id="456"]',
+  startCellIndex: 1
+});
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>🎮 Interactive Demos</h2>
+        
+        <div class="controls">
+            <button onclick="createBasicDataTable()">Create Data Table</button>
+            <button onclick="addEditableRow()">Add Editable Row</button>
+            <button onclick="makeRowEditable()">Make Row Editable</button>
+            <button onclick="addFieldToSpecificCell()">Target Specific Cell</button>
+            <button onclick="createInlineForm()">Inline Form Row</button>
+            <button onclick="clearTable()">Clear Table</button>
+        </div>
+
+        <div class="table-legend">
+            <div class="legend-item">
+                <div class="status-indicator status-readonly"></div>
+                <span>Read-only data</span>
+            </div>
+            <div class="legend-item">
+                <div class="status-indicator status-edited"></div>
+                <span>Editable fields</span>
+            </div>
+            <div class="legend-item">
+                <div class="status-indicator status-new"></div>
+                <span>New rows</span>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <div id="table-container">
+                <!-- Dynamic table will be created here -->
+            </div>
+        </div>
+        
+        <div class="log-output" id="action-log"></div>
+    </div>
+
+    <div class="demo-container">
+        <h2>🚀 Common Use Cases</h2>
+        
+        <div class="scenario">
+            <h3>1. DataTable with Inline Editing</h3>
+            <p>Transform a static data table into an editable form where users can click to edit individual cells or rows.</p>
+            <div class="code-block">
+// Add edit field to specific cell when user clicks "Edit"
+renderer.addFieldToTableCell({
+  name: 'edit-name',
+  type: 'text',
+  placeholder: 'Enter name'
+}, {
+  rowId: 'user-123',
+  cellIndex: 1  // Name column
+});
+
+// Replace entire row with editable fields
+const editFields = [
+  { name: 'edit-name', type: 'text', label: 'Name' },
+  { name: 'edit-email', type: 'email', label: 'Email' },
+  { name: 'edit-role', type: 'select', options: roles }
+];
+
+renderer.addFieldsToTableRow(editFields, {
+  rowId: 'user-123',
+  startCellIndex: 1
+});
+            </div>
+        </div>
+        
+        <div class="scenario">
+            <h3>2. Dynamic Data Entry Rows</h3>
+            <p>Add new rows to tables for data entry, like adding items to an invoice or creating new records.</p>
+            <div class="code-block">
+// Create complete editable row with action buttons
+const newRowFields = [
+  { name: 'item-name', type: 'text', placeholder: 'Item name' },
+  { name: 'quantity', type: 'number', placeholder: 'Qty' },
+  { name: 'price', type: 'number', placeholder: 'Price' }
+];
+
+const newRow = renderer.createEditableTableRow(newRowFields, {
+  tableContainer: '#invoice-table tbody',
+  includeActions: true,
+  onSave: (data) => {
+    // Save to database
+    api.createInvoiceItem(data);
+  },
+  onCancel: () => {
+    // Remove the row
+    newRow?.remove();
+  }
+});
+            </div>
+        </div>
+        
+        <div class="scenario">
+            <h3>3. Spreadsheet-Style Editing</h3>
+            <p>Create Excel-like editing experience where users can navigate between cells and edit in place.</p>
+            <div class="code-block">
+// Add field to cell on click/focus
+table.addEventListener('click', (e) => {
+  const cell = e.target.closest('td');
+  const row = e.target.closest('tr');
+  const cellIndex = Array.from(row.children).indexOf(cell);
+  
+  if (cell && !cell.querySelector('.annie-table-cell-field')) {
+    renderer.addFieldToTableCell({
+      name: `cell-${row.id}-${cellIndex}`,
+      type: 'text',
+      placeholder: cell.textContent
+    }, {
+      rowId: row.id,
+      cellIndex: cellIndex
+    });
+    
+    // Focus the new field
+    const input = cell.querySelector('.annie-table-cell-field');
+    input?.focus();
+  }
+});
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>📋 Configuration Examples</h2>
+        
+        <h3>Target by Row ID and Cell Index:</h3>
+        <div class="code-block">
+renderer.addFieldToTableCell({
+  name: 'edit-field',
+  type: 'text',
+  placeholder: 'Edit value'
+}, {
+  rowId: 'row-123',        // Target specific row
+  cellIndex: 2             // Target third column (0-based)
+});
+        </div>
+        
+        <h3>Target by CSS Selector:</h3>
+        <div class="code-block">
+renderer.addFieldToTableCell({
+  name: 'price-edit',
+  type: 'number',
+  placeholder: 'Price'
+}, {
+  rowSelector: 'tr[data-product-id="456"]',  // Find row by data attribute
+  cellSelector: '.price-cell'                // Find cell by class
+});
+        </div>
+        
+        <h3>Create New Row with Data:</h3>
+        <div class="code-block">
+renderer.createEditableTableRow([
+  { name: 'new-name', type: 'text', placeholder: 'Name' },
+  { name: 'new-email', type: 'email', placeholder: 'Email' }
+], {
+  tableContainer: '#users-table tbody',
+  rowData: { 
+    id: 'new-user-' + Date.now(),
+    status: 'pending'
+  },
+  includeActions: true,
+  onSave: async (data) => {
+    const result = await api.createUser(data);
+    if (result.success) {
+      // Replace with read-only row
+      location.reload(); // Or update DOM
+    }
+  }
+});
+        </div>
+        
+        <h3>Layout Integration:</h3>
+        <div class="code-block">
+// You can still use layout config for table cells
+renderer.addFieldToTableCell({
+  name: 'description',
+  type: 'textarea',
+  layout: {
+    tableRowId: 'product-123',
+    tableCellIndex: 3,
+    // These properties work even in table cells:
+    gridArea: 'description-area',  // If the cell uses CSS Grid
+    order: 2,                      // CSS order
+    newRow: false                  // Doesn't apply to table cells
+  }
+});
+        </div>
+    </div>
+
+    <script>
+        // Mock Annie FormRenderer with Table Cell targeting
+        class TableFormRenderer {
+            constructor() {
+                this.fields = new Map();
+                this.rowCounter = 1;
+            }
+            
+            addFieldToTableCell(fieldConfig, options) {
+                let targetCell = null;
+                
+                // Find target cell
+                if (options.rowId && typeof options.cellIndex === 'number') {
+                    const row = document.getElementById(options.rowId);
+                    if (row && row.cells[options.cellIndex]) {
+                        targetCell = row.cells[options.cellIndex];
+                    }
+                } else if (options.rowSelector && options.cellIndex !== undefined) {
+                    const row = document.querySelector(options.rowSelector);
+                    if (row && row.cells[options.cellIndex]) {
+                        targetCell = row.cells[options.cellIndex];
+                    }
+                } else if (options.cellSelector) {
+                    targetCell = document.querySelector(options.cellSelector);
+                }
+                
+                if (!targetCell) {
+                    this.logAction(`❌ Could not find target cell for field "${fieldConfig.name}"`);
+                    return;
+                }
+                
+                // Create field
+                const input = this.createTableCellField(fieldConfig);
+                
+                // Replace cell content
+                targetCell.innerHTML = '';
+                targetCell.appendChild(input);
+                targetCell.classList.add('editable-cell');
+                
+                this.logAction(`✅ Added "${fieldConfig.name}" to cell [${options.rowId || options.rowSelector}][${options.cellIndex}]`);
+            }
+            
+            createTableCellField(config) {
+                const input = document.createElement('input');
+                input.type = config.type || 'text';
+                input.name = config.name;
+                input.placeholder = config.placeholder || '';
+                input.className = 'annie-table-cell-field';
+                input.setAttribute('data-field', config.name);
+                
+                // Add event listeners
+                input.addEventListener('blur', () => {
+                    this.logAction(`📝 Field "${config.name}" value changed to: "${input.value}"`);
+                });
+                
+                return input;
+            }
+            
+            createEditableTableRow(fields, options) {
+                const container = document.querySelector(options.tableContainer);
+                if (!container) {
+                    this.logAction(`❌ Table container not found: ${options.tableContainer}`);
+                    return null;
+                }
+                
+                const row = document.createElement('tr');
+                row.id = options.rowData?.id || `row-${this.rowCounter++}`;
+                row.className = 'editable-row new-row';
+                
+                // Add data attributes
+                if (options.rowData) {
+                    Object.entries(options.rowData).forEach(([key, value]) => {
+                        if (key !== 'id') {
+                            row.setAttribute(`data-${key}`, value);
+                        }
+                    });
+                }
+                
+                // Create cells for each field
+                fields.forEach(fieldConfig => {
+                    const cell = document.createElement('td');
+                    const input = this.createTableCellField(fieldConfig);
+                    cell.appendChild(input);
+                    row.appendChild(cell);
+                });
+                
+                // Add actions cell if requested
+                if (options.includeActions) {
+                    const actionsCell = document.createElement('td');
+                    actionsCell.className = 'annie-table-actions';
+                    
+                    const saveBtn = document.createElement('button');
+                    saveBtn.textContent = 'Save';
+                    saveBtn.className = 'annie-btn annie-btn-primary annie-btn-sm';
+                    saveBtn.onclick = () => {
+                        const data = this.collectRowData(row, fields);
+                        options.onSave?.(data);
+                        this.logAction(`💾 Row saved with data: ${JSON.stringify(data)}`);
+                    };
+                    
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.textContent = 'Cancel';
+                    cancelBtn.className = 'annie-btn annie-btn-secondary annie-btn-sm';
+                    cancelBtn.onclick = () => {
+                        row.remove();
+                        options.onCancel?.();
+                        this.logAction(`🚫 Row creation cancelled`);
+                    };
+                    
+                    actionsCell.appendChild(saveBtn);
+                    actionsCell.appendChild(cancelBtn);
+                    row.appendChild(actionsCell);
+                }
+                
+                container.appendChild(row);
+                this.logAction(`➕ Created new editable row with ${fields.length} fields`);
+                
+                return row;
+            }
+            
+            addFieldsToTableRow(fields, options) {
+                let row = null;
+                
+                if (options.rowId) {
+                    row = document.getElementById(options.rowId);
+                } else if (options.rowSelector) {
+                    row = document.querySelector(options.rowSelector);
+                }
+                
+                if (!row) {
+                    this.logAction(`❌ Could not find target row`);
+                    return;
+                }
+                
+                const startIndex = options.startCellIndex || 0;
+                
+                fields.forEach((fieldConfig, index) => {
+                    this.addFieldToTableCell(fieldConfig, {
+                        rowId: row.id,
+                        cellIndex: startIndex + index
+                    });
+                });
+                
+                this.logAction(`📋 Added ${fields.length} fields to row starting at cell ${startIndex}`);
+            }
+            
+            collectRowData(row, fields) {
+                const data = {};
+                
+                // Collect field values
+                fields.forEach(fieldConfig => {
+                    const input = row.querySelector(`[data-field="${fieldConfig.name}"]`);
+                    if (input) {
+                        data[fieldConfig.name] = input.value;
+                    }
+                });
+                
+                // Collect data attributes
+                for (let i = 0; i < row.attributes.length; i++) {
+                    const attr = row.attributes[i];
+                    if (attr.name.startsWith('data-')) {
+                        const key = attr.name.substring(5);
+                        data[key] = attr.value;
+                    }
+                }
+                
+                return data;
+            }
+            
+            logAction(message) {
+                const log = document.getElementById('action-log');
+                const timestamp = new Date().toLocaleTimeString();
+                log.innerHTML += `[${timestamp}] ${message}\n`;
+                log.scrollTop = log.scrollHeight;
+            }
+        }
+        
+        const renderer = new TableFormRenderer();
+        
+        // Sample data for demos
+        const sampleUsers = [
+            { id: 'user-1', name: 'Alice Johnson', email: 'alice@example.com', role: 'Admin', status: 'Active' },
+            { id: 'user-2', name: 'Bob Smith', email: 'bob@example.com', role: 'User', status: 'Active' },
+            { id: 'user-3', name: 'Carol Davis', email: 'carol@example.com', role: 'Editor', status: 'Pending' }
+        ];
+        
+        // Demo functions
+        function createBasicDataTable() {
+            const container = document.getElementById('table-container');
+            container.innerHTML = `
+                <table class="demo-table" id="users-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sampleUsers.map(user => `
+                            <tr id="${user.id}">
+                                <td class="readonly-cell">${user.id}</td>
+                                <td>${user.name}</td>
+                                <td>${user.email}</td>
+                                <td>${user.role}</td>
+                                <td>${user.status}</td>
+                                <td>
+                                    <button onclick="makeRowEditable('${user.id}')">Edit</button>
+                                    <button onclick="deleteRow('${user.id}')">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            renderer.logAction('🏗️ Created basic data table with sample users');
+        }
+        
+        function addEditableRow() {
+            const fields = [
+                { name: 'new-name', type: 'text', placeholder: 'Enter name' },
+                { name: 'new-email', type: 'email', placeholder: 'Enter email' },
+                { name: 'new-role', type: 'text', placeholder: 'Enter role' },
+                { name: 'new-status', type: 'text', placeholder: 'Status' }
+            ];
+            
+            renderer.createEditableTableRow(fields, {
+                tableContainer: '#users-table tbody',
+                rowData: {
+                    id: 'new-user-' + Date.now(),
+                    type: 'new'
+                },
+                includeActions: true,
+                onSave: (data) => {
+                    renderer.logAction(`💾 New user data collected: ${JSON.stringify(data, null, 2)}`);
+                    // In real app: await api.createUser(data);
+                },
+                onCancel: () => {
+                    renderer.logAction('🚫 New user creation cancelled');
+                }
+            });
+        }
+        
+        function makeRowEditable(userId = null) {
+            if (!userId) {
+                userId = 'user-1'; // Default to first user
+            }
+            
+            const editFields = [
+                { name: 'edit-name', type: 'text', placeholder: 'Name' },
+                { name: 'edit-email', type: 'email', placeholder: 'Email' },
+                { name: 'edit-role', type: 'text', placeholder: 'Role' },
+                { name: 'edit-status', type: 'text', placeholder: 'Status' }
+            ];
+            
+            renderer.addFieldsToTableRow(editFields, {
+                rowId: userId,
+                startCellIndex: 1 // Skip ID column
+            });
+            
+            // Add save/cancel to actions column
+            const row = document.getElementById(userId);
+            const actionsCell = row.cells[5];
+            actionsCell.innerHTML = `
+                <button onclick="saveRowEdits('${userId}')" class="annie-btn annie-btn-primary annie-btn-sm">Save</button>
+                <button onclick="cancelRowEdits('${userId}')" class="annie-btn annie-btn-secondary annie-btn-sm">Cancel</button>
+            `;
+            row.classList.add('editable-row');
+        }
+        
+        function addFieldToSpecificCell() {
+            renderer.addFieldToTableCell({
+                name: 'quick-edit-name',
+                type: 'text',
+                placeholder: 'Quick edit name'
+            }, {
+                rowId: 'user-2',
+                cellIndex: 1  // Name column
+            });
+        }
+        
+        function createInlineForm() {
+            const fields = [
+                { name: 'inline-product', type: 'text', placeholder: 'Product name' },
+                { name: 'inline-qty', type: 'number', placeholder: 'Qty' },
+                { name: 'inline-price', type: 'number', placeholder: 'Price' }
+            ];
+            
+            renderer.createEditableTableRow(fields, {
+                tableContainer: '#users-table tbody',
+                rowData: {
+                    id: 'inline-form-' + Date.now(),
+                    type: 'inline-form'
+                },
+                includeActions: true,
+                onSave: (data) => {
+                    renderer.logAction(`📋 Inline form submitted: ${JSON.stringify(data)}`);
+                }
+            });
+        }
+        
+        function saveRowEdits(userId) {
+            const row = document.getElementById(userId);
+            const data = renderer.collectRowData(row, [
+                { name: 'edit-name' },
+                { name: 'edit-email' },
+                { name: 'edit-role' },
+                { name: 'edit-status' }
+            ]);
+            renderer.logAction(`💾 Saved edits for ${userId}: ${JSON.stringify(data)}`);
+            
+            // In real app: await api.updateUser(userId, data);
+            // Then refresh the row to show updated data
+        }
+        
+        function cancelRowEdits(userId) {
+            renderer.logAction(`🚫 Cancelled edits for ${userId}`);
+            // Restore original row content
+            createBasicDataTable();
+        }
+        
+        function deleteRow(userId) {
+            const row = document.getElementById(userId);
+            if (row) {
+                row.remove();
+                renderer.logAction(`🗑️ Deleted row ${userId}`);
+            }
+        }
+        
+        function clearTable() {
+            document.getElementById('table-container').innerHTML = '<p>Table cleared. Click "Create Data Table" to start over.</p>';
+            renderer.logAction('🧹 Table cleared');
+        }
+        
+        // Initialize with basic table
+        document.addEventListener('DOMContentLoaded', () => {
+            createBasicDataTable();
+        });
+    </script>
+</body>
+</html>

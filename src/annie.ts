@@ -1,8 +1,12 @@
 import { Logger, ILogger } from './core/logger.js';
 import { DataStore } from './core/data-store.js';
 import { ApiClient, ApiConfig } from './core/api-client.js';
+import { EnhancedHttpClient, createEnhancedHttpClient } from './core/enhanced-http-client.js';
+import { UnifiedApiClient, createUnifiedApiClient } from './core/unified-api-client.js';
+// import { AnnieModuleSystem, initializeModuleSystem } from './core/annie-module-system.js';
 import { ApiController } from './core/api-controller.js';
 import { Router } from './core/router.js';
+import { AdvancedRouter } from './core/advanced-router.js';
 import { TriggerHandler } from './ui/trigger-handler.js';
 import { FieldProcessor } from './ui/field-processor.js';
 import { UIObserver } from './ui/observer.js';
@@ -16,6 +20,7 @@ import { DIContainer, ServiceTokens } from './core/di-container.js';
 import { CleanupManager, MemoryLeakDetector, CleanupHelpers } from './utils/cleanup.js';
 import { ValidationManager, ValidationResult, validate } from './utils/type-guards.js';
 import { DataObjectManager, MetadataLoadOptions, ServerObjectMetadata } from './core/data-object-manager.js';
+import { AnnieAnimations, AnimationConfig, AnimationOptions } from './ui/animations.js';
 
 export interface AppConfig {
   logLevel?: string;
@@ -38,6 +43,10 @@ export interface AppConfig {
   stateManagerConfig?: StateManagerConfig;
   errorBoundaryConfig?: ErrorBoundaryConfig;
   metadataOptions?: MetadataLoadOptions;
+  // moduleSystemConfig?: ModuleSystemConfig; // Removed over-engineered module system
+  enableAnimations?: boolean;
+  animationConfig?: AnimationConfig;
+  enableAdvancedRouting?: boolean;
   onDataLoaded?: () => void;
   onDataLoadError?: (error: any) => void;
 }
@@ -51,6 +60,7 @@ export class AnnieFramework {
     private apiClient: ApiClient;
     private apiController: ApiController;
     private router: Router;
+    private advancedRouter?: AdvancedRouter;
     private triggerHandler: TriggerHandler;
     private fieldProcessor: FieldProcessor;
     private dataObjectManager: DataObjectManager;
@@ -64,8 +74,13 @@ export class AnnieFramework {
     private cleanupManager: CleanupManager;
     private memoryLeakDetector: MemoryLeakDetector;
     private validationManager: ValidationManager;
+    private animations?: AnnieAnimations;
+    // private moduleSystem?: ModuleSystem; // Simplified module system
     private initialized: boolean = false;
     private dataLoadingComplete: boolean = false;
+    private lazyloadSetup: boolean = false;
+    private initialDataLoadStarted: boolean = false;
+    private lazyloadTimeoutId: number | null = null;
     private dataLoadingPromise: Promise<void> | null = null;
     private config: AppConfig;
 
@@ -74,6 +89,8 @@ export class AnnieFramework {
     public _r: any;
 
     constructor(config: AppConfig) {
+        console.log('🏗️ NEW AnnieFramework instance created at:', new Date().toISOString());
+        console.trace('AnnieFramework constructor call stack');
         console.log('Constructor called with config:', JSON.stringify(config, null, 2));
         
         // Provide default apiConfig if not specified
@@ -117,6 +134,16 @@ export class AnnieFramework {
         this.memoryLeakDetector = MemoryLeakDetector.getInstance(this.logger);
         this.validationManager = new ValidationManager(this.logger);
 
+        // Initialize animations if enabled
+        if (config.enableAnimations !== false) {
+            this.animations = new AnnieAnimations(config.animationConfig || {});
+        }
+
+        // Initialize advanced routing if enabled
+        if (config.enableAdvancedRouting) {
+            this.advancedRouter = new AdvancedRouter(this.dataStore, this.logger);
+        }
+
         // Register disposable components for cleanup
         this.cleanupManager.register(this.dataStore);
         this.cleanupManager.register(this.apiClient);
@@ -145,7 +172,7 @@ export class AnnieFramework {
         // Initialize global variables
         this.initializeGlobalVariables();
 
-        if (config.autoInitialize !== false) {
+        if (config.autoInitialize === true) {
             // Auto-initialize when DOM is ready
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', () => this.initialize());
@@ -173,6 +200,26 @@ export class AnnieFramework {
                 this.container.resolve(ServiceTokens.Logger)
             )
         );
+
+        // Enhanced HTTP Client - modern replacement for ApiClient
+        this.container.registerSingleton('enhancedHttpClient', () =>
+            createEnhancedHttpClient(
+                this.container,
+                this.config.apiConfig
+            )
+        );
+
+        // Unified API Client - POST-centric approach for maximum compatibility
+        this.container.registerSingleton('unifiedApiClient', () =>
+            createUnifiedApiClient(
+                this.container.resolve<EnhancedHttpClient>('enhancedHttpClient'),
+                '/api/unified'
+            )
+        );
+
+        // Module System - Simplified for AI-first approach
+        // this.moduleSystem = createModuleSystem(this.container, this.logger, this.config.moduleSystemConfig);
+        // this.container.registerSingleton('moduleSystem', () => this.moduleSystem);
 
         this.container.registerSingleton(ServiceTokens.ApiController, () => 
             new ApiController(
@@ -411,8 +458,12 @@ export class AnnieFramework {
     }
 
     public async initialize(): Promise<void> {
+        console.log('🚀 initialize() called at:', new Date().toISOString());
+        console.trace('initialize() call stack');
+        
         if (this.initialized) {
             this.logger.warn('Framework already initialized');
+            console.log('⚠️ Framework already initialized - skipping');
             return;
         }
 
@@ -451,6 +502,12 @@ export class AnnieFramework {
                 await this.notificationManager.initialize();
             }
       
+            // Initialize animations after all other systems are ready
+            if (this.animations) {
+                this.animations.initialize();
+                this.logger.info('Animation system initialized');
+            }
+
             // Load initial data if specified
             this.dataLoadingPromise = this.loadInitialData();
             await this.dataLoadingPromise;
@@ -468,6 +525,17 @@ export class AnnieFramework {
     }
 
     private async loadInitialData(): Promise<void> {
+        if (this.initialDataLoadStarted) {
+            this.logger.warn('⚠️ loadInitialData() already started - skipping duplicate call');
+            console.log('⚠️ loadInitialData() already started - skipping duplicate call');
+            return;
+        }
+        
+        this.initialDataLoadStarted = true;
+        this.logger.debug('🔍 loadInitialData() called - checking for duplicates...');
+        console.log('🔍 loadInitialData() called at:', new Date().toISOString());
+        console.trace('loadInitialData call stack');
+        
         const datasetsInitObj = (window as any)._datasetsinit;
     
         if (datasetsInitObj) {
@@ -475,11 +543,15 @@ export class AnnieFramework {
 
             // Load initial datasets in one call
             if (datasetsInitObj.load && datasetsInitObj.load.length > 0) {
+                this.logger.debug('📤 Making load API call');
+                console.log('📤 Making load API call for:', datasetsInitObj.load);
                 promises.push(this.apiController.start('load'));
             }
 
             // Load remote datasets
             if (datasetsInitObj.remote) {
+                this.logger.debug('📤 Making remote API call');
+                console.log('📤 Making remote API call for:', datasetsInitObj.remote);
                 promises.push(this.apiController.start('remote'));
             }
 
@@ -523,12 +595,22 @@ export class AnnieFramework {
             }
 
             // Load lazy datasets after initial load
-            if (datasetsInitObj.lazyload) {
+            if (datasetsInitObj.lazyload && !this.lazyloadSetup) {
+                this.lazyloadSetup = true;
+                this.logger.debug('⏰ Setting up lazyload timeout');
+                console.log('⏰ Setting up lazyload timeout for:', datasetsInitObj.lazyload);
                 setTimeout(() => {
+                    this.logger.debug('🕒 Lazyload timeout fired - making API calls');
+                    console.log('🕒 Lazyload timeout fired at:', new Date().toISOString());
                     for (let dataset of datasetsInitObj.lazyload) {
+                        this.logger.debug(`📤 Making lazyload API call for: ${dataset}`);
+                        console.log(`📤 Making lazyload API call for: ${dataset}`);
                         this.apiController.start(dataset);
                     }
                 }, 100);
+            } else if (datasetsInitObj.lazyload && this.lazyloadSetup) {
+                this.logger.warn('⚠️ Lazyload timeout already setup - skipping duplicate setup');
+                console.log('⚠️ Lazyload timeout already setup - skipping duplicate setup');
             }
         }
     }
@@ -566,6 +648,10 @@ export class AnnieFramework {
         return this.router;
     }
 
+    public getAdvancedRouter(): AdvancedRouter | undefined {
+        return this.advancedRouter;
+    }
+
     public getLogger(): ILogger {
         return this.logger;
     }
@@ -586,6 +672,22 @@ export class AnnieFramework {
         return this.aiCommandProcessor;
     }
 
+    public getEnhancedHttpClient(): EnhancedHttpClient {
+        return this.container.resolve<EnhancedHttpClient>('enhancedHttpClient');
+    }
+
+    public getUnifiedApiClient(): UnifiedApiClient {
+        return this.container.resolve<UnifiedApiClient>('unifiedApiClient');
+    }
+
+    // public getModuleSystem(): ModuleSystem {
+    //     if (!this.moduleSystem) {
+    //         throw new Error('Module system not initialized');
+    //     }
+    //     return this.moduleSystem;
+    // }
+
+    
     // Convenience methods for voice recognition testing
     public startVoiceRecognition(): void {
         console.log('🎤 startVoiceRecognition() called'); // Always log to console
@@ -701,13 +803,55 @@ export class AnnieFramework {
         this.uiObserver.notifyObservers(datasource);
     }
 
+    public addToStore(params: Record<string, any>): void {
+        const storeData = this.ds('store');
+        const currentStore = (storeData && storeData[0]) || {};
+        const updatedParams = {
+            ...currentStore,
+            ...params
+        };
+        
+        this.dataStore.setDataset('store', [updatedParams], {
+            object: "true",
+            count: Object.keys(updatedParams).length
+        });
+    }
+
     public getData(datasource: string): any[] | undefined {
         const dataset = this.dataStore.getDataset(datasource);
         return dataset?.data;
     }
 
     public navigateTo(view: string): void {
-        this.router.navigateTo(view);
+        // Use advanced router if available, otherwise fall back to basic router
+        if (this.advancedRouter) {
+            this.advancedRouter.navigateTo(view);
+        } else {
+            this.router.navigateTo(view);
+        }
+    }
+
+    public navigateToPath(path: string, options?: {
+        query?: { [key: string]: any };
+        state?: any;
+        history?: 'push' | 'replace' | 'none';
+    }): Promise<void> {
+        if (!this.advancedRouter) {
+            throw new Error('Advanced routing is not enabled. Set enableAdvancedRouting: true in configuration.');
+        }
+        return this.advancedRouter.navigateToPath(path, options);
+    }
+
+    public navigateWithParams(target: string, options?: {
+        params?: { [key: string]: any };
+        query?: { [key: string]: any };
+        state?: any;
+        history?: 'push' | 'replace' | 'none';
+    }): Promise<void> {
+        if (!this.advancedRouter) {
+            throw new Error('Advanced routing is not enabled. Set enableAdvancedRouting: true in configuration.');
+        }
+        return this.advancedRouter.navigateTo(target, options);
     }
 
     public reinitializeTriggers(): void {
@@ -740,6 +884,25 @@ export class AnnieFramework {
 
     public updateDataObject(objectType: string, primaryKeyValue: string | number, updates: any): void {
         this.dataObjectManager.updateObject(objectType, primaryKeyValue, updates);
+    }
+
+    // Animation system access
+    public getAnimations(): AnnieAnimations | undefined {
+        return this.animations;
+    }
+
+    public playAnimation(element: HTMLElement, animationName: string, options?: Partial<AnimationOptions>): Promise<void> {
+        if (!this.animations) {
+            this.logger.warn('Animation system not initialized');
+            return Promise.resolve();
+        }
+
+        const animationOptions = {
+            name: animationName,
+            ...options
+        };
+
+        return this.animations.playAnimation(element, animationOptions);
     }
 
     public waitForData(datasetName: string): Promise<any[]> {
@@ -877,6 +1040,18 @@ export class AnnieFramework {
 
         if (this.notificationManager) {
             this.notificationManager.destroy();
+        }
+
+        // Clean up animation system
+        if (this.animations) {
+            this.animations.destroy();
+            this.animations = undefined;
+        }
+
+        // Clean up advanced router
+        if (this.advancedRouter) {
+            this.advancedRouter.dispose();
+            this.advancedRouter = undefined;
         }
 
         // Register and clean up optional components that implement IDisposable

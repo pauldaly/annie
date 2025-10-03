@@ -12,7 +12,7 @@
 Annie Framework is a modern, modular TypeScript framework designed specifically for enterprise applications. Unlike React, Angular, or Vue, Annie doesn't force you into an opinionated structure. Instead, it provides powerful tools that work together seamlessly while allowing you to build applications your way.
 
 ### Note
-One benefit over previous version is reduction in code. A dataset alias can be referenced using ds('dataset_name_lower_snake_Case') syntax and let code is needed to manage datasets since the API call happens automagically.
+One benefit over previous version is reduction in code. A dataset alias can be referenced using ds('dataset_name_lower_snake_Case') syntax and let code manage datasets since the API call happens automagically.
 
 ###
 TODO: will need to add config options with help to know what is available.

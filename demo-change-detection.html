@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Enhanced Change Detection Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .demo-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .demo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .demo-card h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 8px;
+        }
+
+        .demo-content {
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+            margin: 10px 0;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .control-panel {
+            background: #343a40;
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .control-panel h3 {
+            color: #ffc107;
+            margin-bottom: 15px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #117a8b;
+            transform: translateY(-2px);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .form-control {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .stats-panel {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .config-display {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            white-space: pre-wrap;
+        }
+
+        .indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .indicator.active {
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+
+        .indicator.inactive {
+            background: #dc3545;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .batch-mode {
+            border-left-color: #ffc107 !important;
+        }
+
+        .immediate-mode {
+            border-left-color: #dc3545 !important;
+        }
+
+        .no-diff-mode {
+            border-left-color: #6c757d !important;
+        }
+
+        @media (max-width: 768px) {
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Enhanced Change Detection</h1>
+        <p class="subtitle">Annie Framework - Smart UI Updates with Performance Optimization</p>
+
+        <div class="control-panel">
+            <h3>🎛️ Control Panel</h3>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="updateSingleValue()">Update Single Value</button>
+                <button class="btn btn-success" onclick="updateMultipleValues()">Update Multiple Values</button>
+                <button class="btn btn-warning" onclick="triggerRapidUpdates()">Rapid Updates Test</button>
+                <button class="btn btn-info" onclick="toggleBatchMode()">Toggle Batch Mode</button>
+                <button class="btn btn-primary" onclick="clearAllCaches()">Clear Caches</button>
+                <button class="btn btn-success" onclick="refreshStats()">Refresh Stats</button>
+            </div>
+            
+            <div class="input-group">
+                <label>Custom Value:</label>
+                <input type="text" id="customValue" class="form-control" placeholder="Enter custom value">
+                <button class="btn btn-primary" onclick="setCustomValue()">Set Value</button>
+            </div>
+            
+            <div class="input-group">
+                <label>Update Count:</label>
+                <input type="number" id="updateCount" class="form-control" value="10" min="1" max="1000">
+                <button class="btn btn-warning" onclick="performBenchmark()">Run Benchmark</button>
+            </div>
+        </div>
+
+        <div class="demo-grid">
+            <!-- Batch Update Demo -->
+            <div class="demo-card">
+                <h3>📦 Batch Updates</h3>
+                <div class="demo-content batch-mode" 
+                     data-annie-change-detection="batch"
+                     data-annie-throttle="50ms"
+                     data-observe='[{"type": "html", "field": "message", "datasource": "batch_data"}]'>
+                    <span class="indicator active"></span>Waiting for batch data...
+                </div>
+                <small>Updates are batched and throttled for performance</small>
+            </div>
+
+            <!-- Immediate Update Demo -->
+            <div class="demo-card">
+                <h3>⚡ Immediate Updates</h3>
+                <div class="demo-content immediate-mode"
+                     data-observe='[{"type": "html", "field": "counter", "datasource": "immediate_data"}]'>
+                    <span class="indicator active"></span>Waiting for immediate data...
+                </div>
+                <small>Updates applied immediately without batching</small>
+            </div>
+
+            <!-- Smart Diffing Demo -->
+            <div class="demo-card">
+                <h3>🧠 Smart Diffing</h3>
+                <div class="demo-content"
+                     data-annie-diff-strategy="shallow"
+                     data-observe='[{"type": "html", "field": "status", "datasource": "diff_data"}]'>
+                    <span class="indicator active"></span>Waiting for diff data...
+                </div>
+                <small>Only updates when values actually change</small>
+            </div>
+
+            <!-- No Diffing Demo -->
+            <div class="demo-card">
+                <h3>🔄 No Diffing</h3>
+                <div class="demo-content no-diff-mode"
+                     data-annie-diff-strategy="none"
+                     data-observe='[{"type": "html", "field": "timestamp", "datasource": "nodiff_data"}]'>
+                    <span class="indicator inactive"></span>Waiting for no-diff data...
+                </div>
+                <small>Updates every time, regardless of value changes</small>
+            </div>
+
+            <!-- Performance Monitor -->
+            <div class="demo-card">
+                <h3>📊 Performance Monitor</h3>
+                <div class="demo-content">
+                    <span class="indicator active"></span>
+                    Updates: <span data-observe='[{"type": "html", "field": "updateCount", "datasource": "performance"}]'>0</span> | 
+                    Avg Time: <span data-observe='[{"type": "html", "field": "avgTime", "datasource": "performance"}]'>0ms</span>
+                </div>
+                <small>Real-time performance statistics</small>
+            </div>
+
+            <!-- Configuration Display -->
+            <div class="demo-card">
+                <h3>⚙️ Current Configuration</h3>
+                <div class="config-display" id="configDisplay">Loading configuration...</div>
+                <small>Active change detection settings</small>
+            </div>
+        </div>
+
+        <div class="stats-panel">
+            <h3>📈 Performance Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalUpdates">0</div>
+                    <div class="stat-label">Total Updates</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="averageTime">0ms</div>
+                    <div class="stat-label">Average Update Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="slowUpdates">0</div>
+                    <div class="stat-label">Slow Updates (>16ms)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="batchSize">0</div>
+                    <div class="stat-label">Average Batch Size</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Annie Framework
+        import { AnnieFramework } from './src/annie.js';
+        import { initializeChangeDetection } from './src/ui/change-detection.js';
+
+        // Initialize Annie Framework
+        window.annie = new AnnieFramework({
+            apiConfig: {
+                baseUrl: '/api'
+            },
+            autoInitialize: true
+        });
+
+        // Initialize enhanced change detection
+        const { changeDetector, enhancedObserver } = initializeChangeDetection(
+            window.annie.getDataStore(),
+            window.annie.getLogger(),
+            {
+                batchUpdates: true,
+                throttleMs: 16,
+                diffStrategy: 'shallow',
+                enableProfiling: true,
+                maxBatchSize: 50
+            }
+        );
+
+        // Store references for global access
+        window.changeDetector = changeDetector;
+        window.enhancedObserver = enhancedObserver;
+
+        // Initialize data
+        let counter = 0;
+        let batchModeEnabled = true;
+
+        // Global test functions
+        window.updateSingleValue = function() {
+            counter++;
+            window.annie.getDataStore().setDataset('immediate_data', [
+                { counter: `Update #${counter}` }
+            ]);
+            enhancedObserver.notifyObservers('immediate_data', [{ counter: `Update #${counter}` }]);
+            logActivity(`Single value updated to: Update #${counter}`);
+        };
+
+        window.updateMultipleValues = function() {
+            const timestamp = new Date().toLocaleTimeString();
+            
+            window.annie.getDataStore().setDataset('batch_data', [
+                { message: `Batch update at ${timestamp}` }
+            ]);
+            
+            window.annie.getDataStore().setDataset('diff_data', [
+                { status: `Smart diff: ${Math.random() > 0.5 ? 'Changed' : 'Same'}` }
+            ]);
+            
+            window.annie.getDataStore().setDataset('nodiff_data', [
+                { timestamp: new Date().toISOString() }
+            ]);
+
+            enhancedObserver.notifyObservers('batch_data', [{ message: `Batch update at ${timestamp}` }]);
+            enhancedObserver.notifyObservers('diff_data', [{ status: `Smart diff: ${Math.random() > 0.5 ? 'Changed' : 'Same'}` }]);
+            enhancedObserver.notifyObservers('nodiff_data', [{ timestamp: new Date().toISOString() }]);
+            
+            logActivity('Multiple values updated');
+        };
+
+        window.triggerRapidUpdates = function() {
+            logActivity('Starting rapid updates test...');
+            
+            let updateCount = 0;
+            const rapidInterval = setInterval(() => {
+                updateCount++;
+                
+                window.annie.getDataStore().setDataset('batch_data', [
+                    { message: `Rapid update #${updateCount}` }
+                ]);
+                
+                enhancedObserver.notifyObservers('batch_data', [{ message: `Rapid update #${updateCount}` }]);
+                
+                if (updateCount >= 20) {
+                    clearInterval(rapidInterval);
+                    logActivity('Rapid updates test completed');
+                    refreshStats();
+                }
+            }, 50);
+        };
+
+        window.toggleBatchMode = function() {
+            batchModeEnabled = !batchModeEnabled;
+            
+            changeDetector.updateConfig({
+                batchUpdates: batchModeEnabled
+            });
+            
+            const elements = document.querySelectorAll('[data-annie-change-detection="batch"]');
+            elements.forEach(el => {
+                if (batchModeEnabled) {
+                    el.setAttribute('data-annie-batch-enabled', 'true');
+                } else {
+                    el.removeAttribute('data-annie-batch-enabled');
+                }
+            });
+            
+            logActivity(`Batch mode ${batchModeEnabled ? 'enabled' : 'disabled'}`);
+            displayConfiguration();
+        };
+
+        window.clearAllCaches = function() {
+            changeDetector.clearCache();
+            logActivity('All caches cleared');
+        };
+
+        window.setCustomValue = function() {
+            const customValue = document.getElementById('customValue').value;
+            if (!customValue) return;
+            
+            window.annie.getDataStore().setDataset('batch_data', [
+                { message: customValue }
+            ]);
+            
+            enhancedObserver.notifyObservers('batch_data', [{ message: customValue }]);
+            logActivity(`Custom value set: ${customValue}`);
+            document.getElementById('customValue').value = '';
+        };
+
+        window.performBenchmark = function() {
+            const count = parseInt(document.getElementById('updateCount').value) || 10;
+            
+            logActivity(`Starting benchmark with ${count} updates...`);
+            
+            const startTime = performance.now();
+            
+            for (let i = 0; i < count; i++) {
+                window.annie.getDataStore().setDataset('performance_test', [
+                    { value: `Benchmark update ${i + 1}` }
+                ]);
+                enhancedObserver.notifyObservers('performance_test', [{ value: `Benchmark update ${i + 1}` }]);
+            }
+            
+            // Force flush to get accurate timing
+            changeDetector.flushImmediately();
+            
+            const duration = performance.now() - startTime;
+            logActivity(`Benchmark completed: ${count} updates in ${duration.toFixed(2)}ms`);
+            refreshStats();
+        };
+
+        window.refreshStats = function() {
+            const stats = changeDetector.getPerformanceStats();
+            
+            document.getElementById('totalUpdates').textContent = stats.totalUpdates;
+            document.getElementById('averageTime').textContent = stats.averageUpdateTime.toFixed(2) + 'ms';
+            document.getElementById('slowUpdates').textContent = stats.slowUpdates;
+            document.getElementById('batchSize').textContent = stats.averageBatchSize.toFixed(1);
+            
+            // Update performance data
+            window.annie.getDataStore().setDataset('performance', [
+                {
+                    updateCount: stats.totalUpdates,
+                    avgTime: stats.averageUpdateTime.toFixed(2) + 'ms'
+                }
+            ]);
+            
+            enhancedObserver.notifyObservers('performance', [
+                {
+                    updateCount: stats.totalUpdates,
+                    avgTime: stats.averageUpdateTime.toFixed(2) + 'ms'
+                }
+            ]);
+        };
+
+        function displayConfiguration() {
+            const config = changeDetector.getConfig();
+            const configText = `{
+  "batchUpdates": ${config.batchUpdates},
+  "throttleMs": ${config.throttleMs},
+  "diffStrategy": "${config.diffStrategy}",
+  "enableProfiling": ${config.enableProfiling},
+  "maxBatchSize": ${config.maxBatchSize}
+}`;
+            
+            document.getElementById('configDisplay').textContent = configText;
+        }
+
+        function logActivity(message) {
+            console.log(`[Change Detection] ${new Date().toLocaleTimeString()}: ${message}`);
+        }
+
+        // Initialize display
+        setTimeout(() => {
+            displayConfiguration();
+            refreshStats();
+            
+            // Set initial data
+            window.annie.getDataStore().setDataset('batch_data', [
+                { message: 'Initial batch data loaded' }
+            ]);
+            
+            window.annie.getDataStore().setDataset('immediate_data', [
+                { counter: 'Initial immediate data loaded' }
+            ]);
+            
+            window.annie.getDataStore().setDataset('diff_data', [
+                { status: 'Smart diffing enabled' }
+            ]);
+            
+            window.annie.getDataStore().setDataset('nodiff_data', [
+                { timestamp: new Date().toISOString() }
+            ]);
+
+            // Notify all observers
+            enhancedObserver.notifyObservers('batch_data', [{ message: 'Initial batch data loaded' }]);
+            enhancedObserver.notifyObservers('immediate_data', [{ counter: 'Initial immediate data loaded' }]);
+            enhancedObserver.notifyObservers('diff_data', [{ status: 'Smart diffing enabled' }]);
+            enhancedObserver.notifyObservers('nodiff_data', [{ timestamp: new Date().toISOString() }]);
+            
+            logActivity('Enhanced change detection demo initialized');
+        }, 500);
+
+        // Auto-refresh stats every 5 seconds
+        setInterval(refreshStats, 5000);
+    </script>
+</body>
+</html>

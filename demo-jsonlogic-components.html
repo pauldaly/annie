@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie JsonLogic Component Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .demo-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .user-card {
+            border: 1px solid #ccc;
+            padding: 1rem;
+            border-radius: 8px;
+            background: #f9f9f9;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .user-card.premium {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .user-card.active {
+            border-color: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+        }
+        
+        .user-card.inactive {
+            opacity: 0.6;
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-active { background: #28a745; color: white; }
+        .status-inactive { background: #6c757d; color: white; }
+        .status-premium { background: #ffc107; color: black; }
+        
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+        
+        .controls button {
+            margin: 5px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .code-example {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin: 15px 0;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Annie JsonLogic Components Demo</h1>
+    <p>Demonstrating conditional logic, loops, and dynamic classes using JsonLogic attributes.</p>
+
+    <div class="demo-section">
+        <h2>1. JsonLogic Syntax Examples</h2>
+        
+        <h3>Conditional Visibility (data-annie-if)</h3>
+        <div class="code-example">
+&lt;!-- Simple boolean condition --&gt;
+data-annie-if="true"
+data-annie-if="false"
+
+&lt;!-- Variable reference --&gt;
+data-annie-if="user.isActive"
+
+&lt;!-- JsonLogic comparison --&gt;
+data-annie-if='{"&gt;": [{"var": "user.age"}, 18]}'
+
+&lt;!-- Complex logic --&gt;
+data-annie-if='{"and": [{"var": "user.isActive"}, {"&gt;": [{"var": "user.loginCount"}, 5]}]}'
+        </div>
+
+        <h3>Dynamic Classes (data-annie-class)</h3>
+        <div class="code-example">
+&lt;!-- Object-based conditional classes --&gt;
+data-annie-class='{
+  "active": {"var": "user.isActive"},
+  "premium": {"==": [{"var": "user.plan"}, "premium"]},
+  "new-user": {"&lt;": [{"var": "user.loginCount"}, 3]}
+}'
+        </div>
+
+        <h3>Loops (data-annie-for)</h3>
+        <div class="code-example">
+&lt;!-- Simple loop --&gt;
+data-annie-for="user in users"
+
+&lt;!-- With filtering --&gt;
+data-annie-for="activeUser in activeUsers"
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>2. Live Demo - User Cards with Conditionals</h2>
+        
+        <div class="controls">
+            <button onclick="toggleUserStatus('user1')">Toggle User 1 Status</button>
+            <button onclick="upgradeUser('user2')">Upgrade User 2 to Premium</button>
+            <button onclick="addLoginCount('user3')">Increment User 3 Logins</button>
+            <button onclick="addNewUser()">Add New User</button>
+        </div>
+
+        <!-- User cards with conditional rendering -->
+        <div id="user-cards">
+            <!-- This will be populated by components -->
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>3. Advanced Conditional Logic</h2>
+        
+        <!-- Complex user profile component -->
+        <div data-annie-component="advanced-user-profile" 
+             data-user='{"name":"Sarah Connor","age":35,"plan":"premium","isActive":true,"loginCount":50,"badges":["veteran","premium","active"]}'
+             data-on-upgrade="handleUpgrade">
+        </div>
+    </div>
+
+    <!-- Annie Framework -->
+    <script src="dist/annie.js"></script>
+    <script>
+        // Enhanced component definitions with JsonLogic
+        window.mockComponentAPI = {
+            'conditional-user-card': {
+                id: 'conditional-user-card',
+                name: 'Conditional User Card',
+                version: '1.0.0',
+                template: `
+                    <div class="user-card" 
+                         data-annie-class='{
+                           "active": {"var": "user.isActive"},
+                           "premium": {"==": [{"var": "user.plan"}, "premium"]},
+                           "inactive": {"!": {"var": "user.isActive"}}
+                         }'>
+                        
+                        <h3 data-annie-bind="user.name">{{user.name}}</h3>
+                        
+                        <!-- Conditional status badge -->
+                        <div data-annie-if='{"var": "user.isActive"}'>
+                            <span class="status-badge status-active">Active</span>
+                        </div>
+                        
+                        <div data-annie-if='{"!": {"var": "user.isActive"}}'>
+                            <span class="status-badge status-inactive">Inactive</span>
+                        </div>
+                        
+                        <!-- Premium badge only for premium users -->
+                        <div data-annie-if='{"==": [{"var": "user.plan"}, "premium"]}'>
+                            <span class="status-badge status-premium">Premium</span>
+                        </div>
+                        
+                        <!-- Login count (only show if > 0) -->
+                        <div data-annie-if='{"&gt;": [{"var": "user.loginCount"}, 0]}'>
+                            <p>Login Count: <span data-annie-bind="user.loginCount">{{user.loginCount}}</span></p>
+                        </div>
+                        
+                        <!-- Conditional actions based on plan -->
+                        <div data-annie-if='{"!=": [{"var": "user.plan"}, "premium"]}'>
+                            <button data-annie-event="click:onUpgrade">Upgrade to Premium</button>
+                        </div>
+                        
+                        <div data-annie-if='{"==": [{"var": "user.plan"}, "premium"]}'>
+                            <button data-annie-event="click:onManage">Manage Premium</button>
+                        </div>
+                    </div>
+                `,
+                properties: {
+                    user: {
+                        type: 'object',
+                        required: true
+                    }
+                }
+            },
+
+            'advanced-user-profile': {
+                id: 'advanced-user-profile',
+                name: 'Advanced User Profile',
+                version: '1.0.0',
+                template: `
+                    <div class="user-card premium">
+                        <h2 data-annie-bind="user.name">{{user.name}}</h2>
+                        
+                        <!-- Age-based messaging -->
+                        <div data-annie-if='{"&lt;": [{"var": "user.age"}, 25]}'>
+                            <p>🎉 Young professional!</p>
+                        </div>
+                        
+                        <div data-annie-if='{"and": [{"&gt;=": [{"var": "user.age"}, 25]}, {"&lt;": [{"var": "user.age"}, 50]}]}'>
+                            <p>💼 Experienced professional</p>
+                        </div>
+                        
+                        <div data-annie-if='{"&gt;=": [{"var": "user.age"}, 50]}'>
+                            <p>🏆 Senior expert</p>
+                        </div>
+                        
+                        <!-- Badges loop (if badges exist) -->
+                        <div data-annie-if='{"and": [{"var": "user.badges"}, {"&gt;": [{"var": "user.badges.length"}, 0]}]}'>
+                            <h4>Badges:</h4>
+                            <div data-annie-for="badge in user.badges">
+                                <span class="status-badge" data-annie-bind="badge">{{badge}}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Login milestone messages -->
+                        <div data-annie-if='{"&gt;": [{"var": "user.loginCount"}, 100]}'>
+                            <p>🔥 Super active user! ({{user.loginCount}} logins)</p>
+                        </div>
+                        
+                        <div data-annie-if='{"and": [{"&gt;": [{"var": "user.loginCount"}, 10]}, {"&lt;=": [{"var": "user.loginCount"}, 100]}]}'>
+                            <p>👍 Regular user ({{user.loginCount}} logins)</p>
+                        </div>
+                        
+                        <div data-annie-if='{"&lt;=": [{"var": "user.loginCount"}, 10]}'>
+                            <p>👋 Welcome! Getting started...</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        // Sample user data
+        let users = [
+            {
+                id: 'user1',
+                name: 'John Doe',
+                age: 28,
+                plan: 'basic',
+                isActive: true,
+                loginCount: 15
+            },
+            {
+                id: 'user2', 
+                name: 'Jane Smith',
+                age: 34,
+                plan: 'basic',
+                isActive: true,
+                loginCount: 45
+            },
+            {
+                id: 'user3',
+                name: 'Bob Wilson',
+                age: 42,
+                plan: 'premium',
+                isActive: false,
+                loginCount: 2
+            }
+        ];
+
+        // Initialize Annie
+        const annie = new Annie({
+            apiBaseUrl: '/api',
+            enableDevtools: true
+        });
+
+        annie.components = new ComponentSystem(annie);
+        
+        // Mock API override
+        annie.components.loadComponentDefinition = async function(componentId) {
+            if (this.definitions.has(componentId)) {
+                return this.definitions.get(componentId);
+            }
+            
+            const definition = window.mockComponentAPI[componentId];
+            if (!definition) {
+                throw new Error(`Component ${componentId} not found`);
+            }
+            
+            this.definitions.set(componentId, definition);
+            return definition;
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await annie.initialize();
+            await annie.components.initialize();
+            
+            // Render initial user cards
+            renderUserCards();
+        });
+
+        function renderUserCards() {
+            const container = document.getElementById('user-cards');
+            container.innerHTML = '';
+            
+            users.forEach(user => {
+                annie.components.create('conditional-user-card', { user }, container);
+            });
+        }
+
+        function toggleUserStatus(userId) {
+            const user = users.find(u => u.id === userId);
+            if (user) {
+                user.isActive = !user.isActive;
+                renderUserCards();
+            }
+        }
+
+        function upgradeUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (user) {
+                user.plan = user.plan === 'premium' ? 'basic' : 'premium';
+                renderUserCards();
+            }
+        }
+
+        function addLoginCount(userId) {
+            const user = users.find(u => u.id === userId);
+            if (user) {
+                user.loginCount += 5;
+                renderUserCards();
+            }
+        }
+
+        function addNewUser() {
+            const newUser = {
+                id: `user${users.length + 1}`,
+                name: `New User ${users.length + 1}`,
+                age: Math.floor(Math.random() * 50) + 20,
+                plan: Math.random() > 0.5 ? 'premium' : 'basic',
+                isActive: Math.random() > 0.3,
+                loginCount: Math.floor(Math.random() * 20)
+            };
+            
+            users.push(newUser);
+            renderUserCards();
+        }
+
+        // Event handlers
+        function handleUpgrade(user, event, instance) {
+            alert(`Upgrading ${user.name} to premium!`);
+        }
+
+        // Component event listeners
+        annie.events.on('component:conditional-user-card:onUpgrade', (data) => {
+            console.log('Upgrade clicked:', data);
+            const userId = data.data.user.id;
+            upgradeUser(userId);
+        });
+
+        annie.events.on('component:conditional-user-card:onManage', (data) => {
+            alert(`Managing premium account for ${data.data.user.name}`);
+        });
+    </script>
+</body>
+</html>

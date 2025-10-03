@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Queries FormData Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn.success {
+            background: #27ae60;
+        }
+
+        .log {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .queries-preview {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Annie Framework - Queries FormData Test</h1>
+    
+    <div class="section">
+        <h2>📋 Test Queries Serialization</h2>
+        <p>This test verifies that the <code>queries</code> array is properly serialized as JSON in FormData instead of being flattened.</p>
+        
+        <button class="btn success" onclick="testQueriesFormData()">Test Queries FormData</button>
+        <button class="btn" onclick="testQueriesJSON()">Test Queries JSON</button>
+        <button class="btn" onclick="inspectFormData()">Inspect FormData Structure</button>
+        
+        <h3>Expected Queries Structure:</h3>
+        <div id="queriesPreview" class="queries-preview">Loading...</div>
+    </div>
+
+    <div class="section">
+        <h2>🧪 Custom Test</h2>
+        <div class="form-group">
+            <label for="customEndpoint">Test Endpoint:</label>
+            <input type="text" id="customEndpoint" value="/api/test-queries" placeholder="Enter test endpoint">
+        </div>
+        
+        <button class="btn" onclick="testCustomQueries()">Test Custom Queries</button>
+    </div>
+
+    <div class="section">
+        <h2>📋 Test Log</h2>
+        <div id="testLog" class="log">
+            Initializing test environment...
+        </div>
+    </div>
+
+    <!-- Include Annie Framework -->
+    <script type="module">
+        import { AnnieFramework } from './dist/annie.js';
+
+        // Initialize Annie with FormData enabled
+        const config = {
+            logLevel: 'debug',
+            apiConfig: {
+                baseUrl: '/api',
+                timeout: 30000,
+                useFormData: true
+            },
+            autoInitialize: true
+        };
+
+        console.log('🚀 Initializing Annie Framework for queries test...');
+        
+        let annie;
+        
+        try {
+            annie = new AnnieFramework(config);
+            window.annie = annie;
+            
+            // Set up logging
+            const logElement = document.getElementById('testLog');
+            
+            function addLogMessage(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = `[${timestamp}] ${message}`;
+                
+                if (logElement) {
+                    logElement.textContent += logEntry + '\n';
+                    logElement.scrollTop = logElement.scrollHeight;
+                }
+                
+                console.log(logEntry);
+            }
+
+            // Mock the _datasetsinit global for testing
+            window._datasetsinit = {
+                load: [
+                    'staff-list-get-v2',
+                    'set-mode',
+                    'get-notification-short-list',
+                    'sum-pending-shift-requests',
+                    'persistent-data'
+                ]
+            };
+
+            // Show expected queries structure
+            function showExpectedQueries() {
+                const expectedQueries = [
+                    { query: { name: 'staff-list-get-v2', datasets: [{ dataset: 'staff-list-get-v2' }] } },
+                    { query: { name: 'set-mode', datasets: [{ dataset: 'set-mode' }] } },
+                    { query: { name: 'get-notification-short-list', datasets: [{ dataset: 'get-notification-short-list' }] } },
+                    { query: { name: 'sum-pending-shift-requests', datasets: [{ dataset: 'sum-pending-shift-requests' }] } },
+                    { query: { name: 'persistent-data', datasets: [{ dataset: 'persistent-data' }] } }
+                ];
+
+                document.getElementById('queriesPreview').textContent = JSON.stringify(expectedQueries, null, 2);
+            }
+
+            showExpectedQueries();
+
+            // Test functions
+            window.testQueriesFormData = async function() {
+                const apiClient = annie.getApiClient();
+                if (!apiClient) {
+                    addLogMessage('❌ API Client not available');
+                    return;
+                }
+
+                addLogMessage('🧪 Testing queries serialization with FormData...');
+                
+                try {
+                    // Test with string-based API call (like "load")
+                    addLogMessage('📤 Making API call with "load" parameter');
+                    const result = await apiClient.call("load");
+                    addLogMessage('✅ FormData queries test completed successfully');
+                } catch (error) {
+                    addLogMessage(`❌ FormData test failed: ${error.message}`);
+                }
+            };
+
+            window.testQueriesJSON = async function() {
+                const apiClient = annie.getApiClient();
+                if (!apiClient) {
+                    addLogMessage('❌ API Client not available');
+                    return;
+                }
+
+                addLogMessage('🧪 Testing queries serialization with JSON...');
+                
+                // Temporarily switch to JSON mode
+                const wasFormData = apiClient.isUsingFormData();
+                apiClient.setRequestFormat(false);
+                
+                try {
+                    addLogMessage('📤 Making API call with JSON format');
+                    const result = await apiClient.call("load");
+                    addLogMessage('✅ JSON queries test completed successfully');
+                } catch (error) {
+                    addLogMessage(`❌ JSON test failed: ${error.message}`);
+                } finally {
+                    // Restore original format
+                    apiClient.setRequestFormat(wasFormData);
+                }
+            };
+
+            window.inspectFormData = function() {
+                addLogMessage('🔍 Inspecting FormData structure...');
+                
+                // Create a test FormData to show the structure
+                const testData = {
+                    username: 'testuser',
+                    queries: [
+                        { query: { name: 'test-query', datasets: [{ dataset: 'test-dataset' }] } }
+                    ],
+                    metadata: { timestamp: Date.now() }
+                };
+
+                const apiClient = annie.getApiClient();
+                if (apiClient) {
+                    // Access the private method for testing (normally not recommended)
+                    const formData = apiClient.objToFormData ? apiClient.objToFormData(testData) : null;
+                    
+                    if (formData) {
+                        addLogMessage('📋 FormData contents:');
+                        for (let [key, value] of formData.entries()) {
+                            if (key === 'queries') {
+                                addLogMessage(`  ${key}: ${value} (JSON string)`);
+                                try {
+                                    const parsed = JSON.parse(value);
+                                    addLogMessage(`    Parsed structure: ${JSON.stringify(parsed, null, 2)}`);
+                                } catch (e) {
+                                    addLogMessage(`    Failed to parse as JSON: ${e.message}`);
+                                }
+                            } else {
+                                addLogMessage(`  ${key}: ${value}`);
+                            }
+                        }
+                    } else {
+                        addLogMessage('❌ Could not create FormData for inspection');
+                    }
+                } else {
+                    addLogMessage('❌ API Client not available for inspection');
+                }
+            };
+
+            window.testCustomQueries = async function() {
+                const endpoint = document.getElementById('customEndpoint').value;
+                const apiClient = annie.getApiClient();
+                
+                if (!apiClient) {
+                    addLogMessage('❌ API Client not available');
+                    return;
+                }
+
+                addLogMessage(`🧪 Testing custom queries with endpoint: ${endpoint}`);
+                
+                const customApiObject = {
+                    object: [{
+                        action: endpoint,
+                        method: 'POST',
+                        query: ['custom-dataset-1', 'custom-dataset-2'],
+                        params: [{ customParam: 'testValue' }]
+                    }]
+                };
+
+                try {
+                    const result = await apiClient.call(customApiObject);
+                    addLogMessage('✅ Custom queries test completed');
+                } catch (error) {
+                    addLogMessage(`❌ Custom test failed: ${error.message}`);
+                }
+            };
+
+            addLogMessage('🎉 Test environment initialized successfully!');
+            addLogMessage('🔍 Ready to test queries FormData serialization');
+            addLogMessage('📋 Expected: queries should be a single JSON string, not flattened keys');
+            
+        } catch (error) {
+            console.error('Failed to initialize test environment:', error);
+            document.getElementById('testLog').textContent = `❌ Initialization failed: ${error.message}`;
+        }
+    </script>
+</body>
+</html>

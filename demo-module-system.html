@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module System Demo - Annie Framework</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: #f5f5f5; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            color: #333; 
+            border-bottom: 3px solid #6f42c1; 
+            padding-bottom: 10px; 
+        }
+        .strategy-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 20px; 
+            margin: 20px 0; 
+        }
+        .strategy-card { 
+            padding: 20px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            background: #fafafa; 
+        }
+        .critical { border-left: 4px solid #dc3545; }
+        .progressive { border-left: 4px solid #ffc107; }
+        .lazy { border-left: 4px solid #28a745; }
+        .network-only { border-left: 4px solid #007bff; }
+        
+        .demo-section { 
+            margin: 30px 0; 
+            padding: 25px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            background: #f8f9fa; 
+        }
+        .module-status { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px; 
+            margin: 20px 0; 
+        }
+        .module-card { 
+            padding: 15px; 
+            border-radius: 6px; 
+            text-align: center; 
+            font-weight: bold; 
+        }
+        .status-loading { background: #fff3cd; color: #856404; }
+        .status-loaded { background: #d4edda; color: #155724; }
+        .status-failed { background: #f8d7da; color: #721c24; }
+        .status-registered { background: #e2e3e5; color: #383d41; }
+        
+        button { 
+            background: #6f42c1; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            margin: 8px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 14px; 
+        }
+        button:hover { background: #5a32a3; }
+        button:disabled { 
+            background: #6c757d; 
+            cursor: not-allowed; 
+        }
+        .output { 
+            background: #212529; 
+            color: #28a745; 
+            padding: 15px; 
+            margin: 15px 0; 
+            border-radius: 6px; 
+            font-family: 'Courier New', monospace; 
+            white-space: pre-wrap; 
+            max-height: 400px; 
+            overflow-y: auto; 
+            font-size: 13px; 
+        }
+        .metrics { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+            gap: 15px; 
+            margin: 20px 0; 
+        }
+        .metric { 
+            text-align: center; 
+            padding: 15px; 
+            background: #e9ecef; 
+            border-radius: 6px; 
+        }
+        .metric-value { 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: #6f42c1; 
+        }
+        .offline-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        .online { background: #28a745; color: white; }
+        .offline { background: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+    <div id="connection-status" class="offline-indicator online">🟢 Online</div>
+    
+    <div class="container">
+        <h1>🧩 Module System - Hybrid Lazy Loading Demo</h1>
+        <p>Demonstrates Annie's module system with smart loading strategies and offline support.</p>
+
+        <div class="demo-section">
+            <h2>📋 Loading Strategies</h2>
+            <div class="strategy-grid">
+                <div class="strategy-card critical">
+                    <h3>🔴 Critical</h3>
+                    <p>Load immediately, cache aggressively</p>
+                    <small>Auth, Core API, Navigation</small>
+                </div>
+                <div class="strategy-card progressive">
+                    <h3>🟡 Progressive</h3>
+                    <p>Cache on first use, offline ready</p>
+                    <small>User Settings, Dashboard</small>
+                </div>
+                <div class="strategy-card lazy">
+                    <h3>🟢 Lazy</h3>
+                    <p>Load when route accessed</p>
+                    <small>Admin Panel, Reports</small>
+                </div>
+                <div class="strategy-card network-only">
+                    <h3>🔵 Network Only</h3>
+                    <p>Always fetch fresh, no cache</p>
+                    <small>Live Chat, Notifications</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📊 Module Status</h2>
+            <div id="module-status" class="module-status">
+                <!-- Module cards will be populated by JavaScript -->
+            </div>
+            
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value" id="loaded-count">0</div>
+                    <div>Loaded</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="cached-count">0</div>
+                    <div>Cached</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="total-size">0 KB</div>
+                    <div>Total Size</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="load-time">0ms</div>
+                    <div>Avg Load Time</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎮 Interactive Demo</h2>
+            <p>Simulate different user scenarios to see module loading in action:</p>
+            
+            <div style="margin: 20px 0;">
+                <button onclick="simulateAppStart()">🚀 App Startup</button>
+                <button onclick="simulateUserLogin()">👤 User Login</button>
+                <button onclick="simulateAdminAccess()">🛠️ Admin Access</button>
+                <button onclick="simulateReportsView()">📈 View Reports</button>
+                <button onclick="simulateOfflineMode()">📱 Go Offline</button>
+                <button onclick="simulateOnlineMode()">🌐 Go Online</button>
+            </div>
+            
+            <button onclick="loadModuleByName('user-management')">Load User Module</button>
+            <button onclick="loadModuleByName('analytics')">Load Analytics</button>
+            <button onclick="loadModuleByName('admin-panel')">Load Admin Panel</button>
+            <button onclick="clearAllCaches()">🗑️ Clear Caches</button>
+        </div>
+
+        <div class="demo-section">
+            <h2>📱 Route-Based Loading</h2>
+            <p>Navigate to different routes to trigger module loading:</p>
+            
+            <div style="margin: 20px 0;">
+                <button onclick="navigateToRoute('/dashboard')">📊 Dashboard</button>
+                <button onclick="navigateToRoute('/users')">👥 Users</button>
+                <button onclick="navigateToRoute('/admin')">⚙️ Admin</button>
+                <button onclick="navigateToRoute('/reports/analytics')">📈 Analytics</button>
+                <button onclick="navigateToRoute('/settings')">⚙️ Settings</button>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔧 Module System Configuration</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h4>Offline Strategy:</h4>
+                    <select id="offline-strategy" onchange="changeOfflineStrategy()">
+                        <option value="hybrid">Hybrid (Recommended)</option>
+                        <option value="aggressive">Aggressive Cache</option>
+                        <option value="lazy">Lazy Cache</option>
+                        <option value="none">No Caching</option>
+                    </select>
+                </div>
+                <div>
+                    <h4>Service Worker:</h4>
+                    <button id="sw-toggle" onclick="toggleServiceWorker()">Enable SW</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="output" id="console-output">🧩 Module System Demo Ready
+⚡ Hybrid loading strategy active
+🔧 Service Worker support detected
+📦 0 modules registered
+
+Waiting for user interaction...</div>
+    </div>
+
+    <script type="module">
+        // Simulated Module System for demo purposes
+        class DemoModuleSystem {
+            constructor() {
+                this.modules = new Map();
+                this.loadedModules = new Map();
+                this.isOnline = navigator.onLine;
+                this.serviceWorkerEnabled = 'serviceWorker' in navigator;
+                this.offlineStrategy = 'hybrid';
+                this.totalLoadTime = 0;
+                this.loadCount = 0;
+                
+                this.setupModules();
+                this.setupNetworkMonitoring();
+                this.updateUI();
+                
+                console.log('🧩 Demo Module System initialized');
+            }
+            
+            setupModules() {
+                // Register demo modules
+                this.registerModule({
+                    name: 'core-api',
+                    loadStrategy: 'critical',
+                    size: 45,
+                    routes: ['/']
+                });
+                
+                this.registerModule({
+                    name: 'authentication',
+                    loadStrategy: 'critical',
+                    size: 28,
+                    routes: ['/login', '/signup']
+                });
+                
+                this.registerModule({
+                    name: 'user-management',
+                    loadStrategy: 'progressive',
+                    size: 67,
+                    routes: ['/users', '/profile']
+                });
+                
+                this.registerModule({
+                    name: 'dashboard',
+                    loadStrategy: 'progressive',
+                    size: 89,
+                    routes: ['/dashboard']
+                });
+                
+                this.registerModule({
+                    name: 'analytics',
+                    loadStrategy: 'lazy',
+                    size: 156,
+                    routes: ['/reports/analytics', '/analytics']
+                });
+                
+                this.registerModule({
+                    name: 'admin-panel',
+                    loadStrategy: 'lazy',
+                    size: 234,
+                    routes: ['/admin']
+                });
+                
+                this.registerModule({
+                    name: 'live-chat',
+                    loadStrategy: 'networkOnly',
+                    size: 78,
+                    routes: ['/chat']
+                });
+                
+                this.log(`📦 Registered ${this.modules.size} modules`);
+            }
+            
+            registerModule(config) {
+                config.status = 'registered';
+                config.cached = false;
+                config.loadTime = 0;
+                this.modules.set(config.name, config);
+            }
+            
+            async loadModule(name, fromRoute = false) {
+                const module = this.modules.get(name);
+                if (!module) {
+                    throw new Error(`Module ${name} not found`);
+                }
+                
+                if (this.loadedModules.has(name)) {
+                    this.log(`✅ Module ${name} already loaded`);
+                    return this.loadedModules.get(name);
+                }
+                
+                this.log(`⏳ Loading module: ${name} (${module.loadStrategy})${fromRoute ? ' [route-triggered]' : ''}`);
+                module.status = 'loading';
+                this.updateUI();
+                
+                // Simulate loading time based on strategy and network
+                const loadTime = this.calculateLoadTime(module);
+                await this.delay(loadTime);
+                
+                try {
+                    // Simulate network/cache behavior
+                    const result = await this.simulateModuleLoad(module);
+                    
+                    module.status = 'loaded';
+                    module.cached = result.fromCache;
+                    module.loadTime = loadTime;
+                    this.loadedModules.set(name, module);
+                    
+                    this.totalLoadTime += loadTime;
+                    this.loadCount++;
+                    
+                    this.log(`✅ Module ${name} loaded in ${loadTime}ms ${result.fromCache ? '(cached)' : '(network)'}`);
+                    this.updateUI();
+                    
+                    return module;
+                    
+                } catch (error) {
+                    module.status = 'failed';
+                    this.log(`❌ Failed to load module ${name}: ${error.message}`);
+                    this.updateUI();
+                    throw error;
+                }
+            }
+            
+            async simulateModuleLoad(module) {
+                // Simulate different loading behaviors based on strategy
+                switch (module.loadStrategy) {
+                    case 'critical':
+                        // Always cached after first load
+                        return { fromCache: this.offlineStrategy !== 'none' && Math.random() > 0.3 };
+                        
+                    case 'progressive':
+                        // Cached if offline strategy allows
+                        return { fromCache: this.offlineStrategy === 'aggressive' || (this.offlineStrategy === 'hybrid' && Math.random() > 0.5) };
+                        
+                    case 'lazy':
+                        // Only cached in aggressive mode
+                        return { fromCache: this.offlineStrategy === 'aggressive' && Math.random() > 0.7 };
+                        
+                    case 'networkOnly':
+                        if (!this.isOnline) {
+                            throw new Error('Network required but offline');
+                        }
+                        return { fromCache: false };
+                        
+                    default:
+                        return { fromCache: false };
+                }
+            }
+            
+            calculateLoadTime(module) {
+                const baseTime = module.size * 2; // 2ms per KB
+                const networkMultiplier = this.isOnline ? 1 : 0.1; // Cached is much faster
+                const strategyMultiplier = {
+                    'critical': 0.5,
+                    'progressive': 1,
+                    'lazy': 1.2,
+                    'networkOnly': 1.5
+                }[module.loadStrategy] || 1;
+                
+                return Math.floor(baseTime * networkMultiplier * strategyMultiplier + Math.random() * 200);
+            }
+            
+            async loadModulesForRoute(route) {
+                this.log(`🔗 Loading modules for route: ${route}`);
+                
+                const matchingModules = Array.from(this.modules.values()).filter(module =>
+                    module.routes?.some(r => route.includes(r.replace('/', '')))
+                );
+                
+                if (matchingModules.length === 0) {
+                    this.log(`ℹ️ No modules registered for route: ${route}`);
+                    return [];
+                }
+                
+                // Load modules in parallel
+                const promises = matchingModules.map(module => 
+                    this.loadModule(module.name, true).catch(error => {
+                        console.error(`Failed to load module ${module.name}:`, error);
+                        return null;
+                    })
+                );
+                
+                const results = await Promise.all(promises);
+                const loaded = results.filter(Boolean);
+                
+                this.log(`✅ Loaded ${loaded.length}/${matchingModules.length} modules for route ${route}`);
+                return loaded;
+            }
+            
+            setupNetworkMonitoring() {
+                const updateNetworkStatus = () => {
+                    this.isOnline = navigator.onLine;
+                    const indicator = document.getElementById('connection-status');
+                    
+                    if (this.isOnline) {
+                        indicator.textContent = '🟢 Online';
+                        indicator.className = 'offline-indicator online';
+                        this.log('🌐 Network connection restored');
+                    } else {
+                        indicator.textContent = '🔴 Offline';
+                        indicator.className = 'offline-indicator offline';
+                        this.log('📱 Network connection lost - offline mode active');
+                    }
+                    this.updateUI();
+                };
+                
+                window.addEventListener('online', updateNetworkStatus);
+                window.addEventListener('offline', updateNetworkStatus);
+            }
+            
+            updateUI() {
+                this.updateModuleStatus();
+                this.updateMetrics();
+            }
+            
+            updateModuleStatus() {
+                const container = document.getElementById('module-status');
+                container.innerHTML = '';
+                
+                Array.from(this.modules.values()).forEach(module => {
+                    const card = document.createElement('div');
+                    card.className = `module-card status-${module.status}`;
+                    
+                    let statusIcon = '📦';
+                    if (module.status === 'loading') statusIcon = '⏳';
+                    else if (module.status === 'loaded') statusIcon = '✅';
+                    else if (module.status === 'failed') statusIcon = '❌';
+                    
+                    card.innerHTML = `
+                        <div>${statusIcon} ${module.name}</div>
+                        <small>${module.loadStrategy} • ${module.size}KB</small>
+                        ${module.loadTime > 0 ? `<br><small>${module.loadTime}ms</small>` : ''}
+                        ${module.cached ? '<br><small>📦 Cached</small>' : ''}
+                    `;
+                    
+                    container.appendChild(card);
+                });
+            }
+            
+            updateMetrics() {
+                const loadedCount = Array.from(this.modules.values()).filter(m => m.status === 'loaded').length;
+                const cachedCount = Array.from(this.modules.values()).filter(m => m.cached).length;
+                const totalSize = Array.from(this.modules.values()).reduce((sum, m) => sum + (m.status === 'loaded' ? m.size : 0), 0);
+                const avgLoadTime = this.loadCount > 0 ? Math.floor(this.totalLoadTime / this.loadCount) : 0;
+                
+                document.getElementById('loaded-count').textContent = loadedCount;
+                document.getElementById('cached-count').textContent = cachedCount;
+                document.getElementById('total-size').textContent = `${totalSize} KB`;
+                document.getElementById('load-time').textContent = `${avgLoadTime}ms`;
+            }
+            
+            log(message) {
+                const output = document.getElementById('console-output');
+                const timestamp = new Date().toLocaleTimeString();
+                output.textContent += `\n[${timestamp}] ${message}`;
+                output.scrollTop = output.scrollHeight;
+            }
+            
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            
+            clearCaches() {
+                Array.from(this.modules.values()).forEach(module => {
+                    module.cached = false;
+                });
+                this.log('🗑️ All caches cleared');
+                this.updateUI();
+            }
+            
+            setOfflineStrategy(strategy) {
+                this.offlineStrategy = strategy;
+                this.log(`⚙️ Offline strategy changed to: ${strategy}`);
+            }
+        }
+
+        // Initialize demo
+        window.moduleSystem = new DemoModuleSystem();
+
+        // Demo functions
+        window.simulateAppStart = async function() {
+            moduleSystem.log('🚀 App startup initiated...');
+            
+            // Load critical modules first
+            const criticalModules = Array.from(moduleSystem.modules.values())
+                .filter(m => m.loadStrategy === 'critical');
+            
+            for (const module of criticalModules) {
+                await moduleSystem.loadModule(module.name);
+            }
+            
+            moduleSystem.log('✅ App startup complete - ready for user interaction');
+        };
+
+        window.simulateUserLogin = async function() {
+            moduleSystem.log('👤 User logging in...');
+            await moduleSystem.loadModule('authentication');
+            await moduleSystem.loadModule('user-management');
+            moduleSystem.log('✅ User login modules loaded');
+        };
+
+        window.simulateAdminAccess = async function() {
+            moduleSystem.log('🛠️ Admin access requested...');
+            await moduleSystem.loadModule('admin-panel');
+            moduleSystem.log('✅ Admin panel loaded');
+        };
+
+        window.simulateReportsView = async function() {
+            moduleSystem.log('📈 Reports section accessed...');
+            await moduleSystem.loadModule('analytics');
+            moduleSystem.log('✅ Analytics module loaded');
+        };
+
+        window.simulateOfflineMode = function() {
+            // Simulate going offline
+            Object.defineProperty(navigator, 'onLine', { value: false, writable: false });
+            window.dispatchEvent(new Event('offline'));
+        };
+
+        window.simulateOnlineMode = function() {
+            // Simulate going online
+            Object.defineProperty(navigator, 'onLine', { value: true, writable: false });
+            window.dispatchEvent(new Event('online'));
+        };
+
+        window.loadModuleByName = async function(name) {
+            try {
+                await moduleSystem.loadModule(name);
+            } catch (error) {
+                moduleSystem.log(`❌ Failed to load ${name}: ${error.message}`);
+            }
+        };
+
+        window.navigateToRoute = async function(route) {
+            try {
+                await moduleSystem.loadModulesForRoute(route);
+            } catch (error) {
+                moduleSystem.log(`❌ Failed to load modules for ${route}: ${error.message}`);
+            }
+        };
+
+        window.clearAllCaches = function() {
+            moduleSystem.clearCaches();
+        };
+
+        window.changeOfflineStrategy = function() {
+            const select = document.getElementById('offline-strategy');
+            moduleSystem.setOfflineStrategy(select.value);
+        };
+
+        window.toggleServiceWorker = function() {
+            const button = document.getElementById('sw-toggle');
+            moduleSystem.serviceWorkerEnabled = !moduleSystem.serviceWorkerEnabled;
+            button.textContent = moduleSystem.serviceWorkerEnabled ? 'Disable SW' : 'Enable SW';
+            moduleSystem.log(`🔧 Service Worker ${moduleSystem.serviceWorkerEnabled ? 'enabled' : 'disabled'}`);
+        };
+    </script>
+</body>
+</html>

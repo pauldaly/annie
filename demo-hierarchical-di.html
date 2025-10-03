@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Hierarchical Dependency Injection Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .demo-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        h1, h2, h3 { color: #333; }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: #007acc;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover { background: #005a9e; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .hierarchy-tree {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 15px 0;
+            white-space: pre-line;
+            border-left: 4px solid #007acc;
+        }
+        
+        .service-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .container-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .container-card {
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            background: #f8f9fa;
+        }
+        
+        .container-card.root { border-color: #28a745; }
+        .container-card.module { border-color: #007bff; }
+        .container-card.request { border-color: #fd7e14; }
+        
+        .service-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+        
+        .service-list li {
+            padding: 5px 10px;
+            margin: 2px 0;
+            background: white;
+            border-radius: 3px;
+            border-left: 3px solid #007acc;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .service-list li.singleton { border-left-color: #28a745; }
+        .service-list li.scoped { border-left-color: #007bff; }
+        .service-list li.transient { border-left-color: #fd7e14; }
+        
+        .log-output {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .comparison-table th {
+            background: #007acc;
+            color: white;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .metric {
+            text-align: center;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 4px;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007acc;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏗️ Annie Framework - Hierarchical Dependency Injection Demo</h1>
+
+    <div class="demo-container">
+        <h2>🎯 Hierarchical DI Features</h2>
+        <div class="container-info">
+            <div>
+                <h3>✅ Enhanced Capabilities:</h3>
+                <ul>
+                    <li><strong>Multi-Level Hierarchy</strong> - Parent/child containers</li>
+                    <li><strong>Service Scoping</strong> - Singleton, Scoped, Transient</li>
+                    <li><strong>Service Modules</strong> - Feature-based organization</li>
+                    <li><strong>Service Overrides</strong> - Child overrides parent</li>
+                    <li><strong>Interceptors</strong> - Before/after resolution hooks</li>
+                    <li><strong>Service Inspection</strong> - Runtime container analysis</li>
+                    <li><strong>Circular Detection</strong> - Dependency cycle prevention</li>
+                    <li><strong>Memory Management</strong> - Automatic scope disposal</li>
+                </ul>
+            </div>
+            <div>
+                <h3>🔄 Backward Compatible:</h3>
+                <div class="code-block">
+// Existing Annie code still works:
+const container = new DIContainer();
+container.registerSingleton('logger', 
+  () => new ConsoleLogger());
+  
+const logger = container.resolve('logger');
+
+// Plus new capabilities:
+const userModule = container
+  .createModuleScope('users');
+  
+userModule.registerScoped('userService',
+  (logger) => new UserService(logger),
+  ['logger']);
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>🎮 Interactive Hierarchy Demo</h2>
+        <p>Click buttons to see different hierarchical DI patterns:</p>
+        
+        <div class="controls">
+            <button onclick="createBasicHierarchy()">Basic Hierarchy</button>
+            <button onclick="createModularApp()">Modular Application</button>
+            <button onclick="createWebAppScoping()">Web App Scoping</button>
+            <button onclick="demonstrateOverrides()">Service Overrides</button>
+            <button onclick="showPerformanceDemo()">Performance Demo</button>
+            <button onclick="clearDemo()">Clear</button>
+        </div>
+
+        <div class="hierarchy-tree" id="hierarchy-display"></div>
+        
+        <div class="container-info" id="container-details"></div>
+        
+        <div class="log-output" id="di-log"></div>
+    </div>
+
+    <div class="demo-container">
+        <h2>📊 Service Lifetime Comparison</h2>
+        
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Lifetime</th>
+                    <th>Scope</th>
+                    <th>Instance Creation</th>
+                    <th>Memory Usage</th>
+                    <th>Best For</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Singleton</strong></td>
+                    <td>Application-wide</td>
+                    <td>Once per application</td>
+                    <td>Low</td>
+                    <td>Configuration, Database, Logging</td>
+                </tr>
+                <tr>
+                    <td><strong>Scoped</strong></td>
+                    <td>Container scope</td>
+                    <td>Once per scope</td>
+                    <td>Medium</td>
+                    <td>Business services, Repositories</td>
+                </tr>
+                <tr>
+                    <td><strong>Transient</strong></td>
+                    <td>Per resolution</td>
+                    <td>Every time resolved</td>
+                    <td>High</td>
+                    <td>Lightweight objects, Handlers</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3>🎯 Usage Examples:</h3>
+        <div class="code-block">
+// Singleton - shared across entire app
+container.registerSingleton('config', () => new AppConfig());
+
+// Scoped - one instance per module/request
+moduleContainer.registerScoped('userService', 
+  (config) => new UserService(config), ['config']);
+
+// Transient - new instance each time
+container.registerTransient('httpRequest', 
+  () => new HttpRequest());
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>🚀 Advanced Features Demo</h2>
+        
+        <h3>Service Modules & Organization:</h3>
+        <div class="code-block">
+// Create reusable service modules
+const userModule = ServiceModuleBuilder
+  .create('user-management')
+  .addSingleton('userValidator', () => new UserValidator())
+  .addScoped('userService', (validator) => new UserService(validator), ['userValidator'])
+  .addScoped('userRepository', (db) => new UserRepository(db), ['database'])
+  .dependsOn('core-module')
+  .build();
+
+// Register in container
+container.registerModule(userModule);
+        </div>
+        
+        <h3>Service Interceptors:</h3>
+        <div class="code-block">
+// Performance monitoring
+class PerformanceInterceptor {
+  before() { this.startTime = performance.now(); }
+  after(instance, context) {
+    const duration = performance.now() - this.startTime;
+    console.log(`${context.token} resolved in ${duration}ms`);
+    return instance;
+  }
+}
+
+// Register with interceptor
+container.register({
+  token: 'expensiveService',
+  factory: () => new ExpensiveService(),
+  lifetime: 'singleton',
+  interceptors: [new PerformanceInterceptor()]
+});
+        </div>
+        
+        <h3>Decorator Support (Optional):</h3>
+        <div class="code-block">
+@Injectable({ lifetime: 'scoped', tags: ['business-logic'] })
+class UserService {
+  constructor(
+    @Inject('userRepository') private userRepo,
+    @Inject('logger') private logger
+  ) {}
+}
+
+// Auto-register decorated classes
+autoRegisterDecorated(container, [UserService, UserRepository]);
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>🏢 Real-World Architecture Example</h2>
+        
+        <div class="hierarchy-tree">
+Root Container (Application)
+├── 🔧 AppConfig (singleton)
+├── 📊 Database (singleton) 
+├── 📝 Logger (singleton)
+└── Module Containers
+    ├── 👤 User Module
+    │   ├── UserService (scoped)
+    │   ├── UserRepository (scoped)
+    │   └── UserValidator (singleton)
+    ├── 🛒 Order Module
+    │   ├── OrderService (scoped)
+    │   ├── OrderRepository (scoped)
+    │   └── PaymentService (scoped)
+    └── 🌐 Request Containers (per HTTP request)
+        ├── HttpContext (transient)
+        ├── CurrentUser (scoped to request)
+        └── RequestLogger (scoped to request)
+        </div>
+        
+        <div class="service-info">
+            <h4>💡 Benefits of This Architecture:</h4>
+            <ul>
+                <li><strong>Service Isolation:</strong> Modules can't interfere with each other</li>
+                <li><strong>Memory Efficiency:</strong> Request-scoped services auto-disposed</li>
+                <li><strong>Testing Flexibility:</strong> Easy to override services for tests</li>
+                <li><strong>Development Speed:</strong> Hot-swap services without restart</li>
+                <li><strong>Performance:</strong> Singletons shared, scoped services cached per request</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Mock DI Container implementation for demo
+        class MockDIContainer {
+            constructor(parent = null, scopeName = 'root') {
+                this.parent = parent;
+                this.scopeName = scopeName;
+                this.services = new Map();
+                this.instances = new Map();
+                this.children = [];
+                this.resolutionCount = 0;
+                this.creationTime = performance.now();
+                
+                if (parent) {
+                    parent.children.push(this);
+                }
+            }
+            
+            registerSingleton(token, factory, dependencies = []) {
+                this.services.set(token, {
+                    token, factory, dependencies,
+                    lifetime: 'singleton',
+                    scope: this.scopeName
+                });
+                this.log(`📝 Registered singleton: ${token}`);
+            }
+            
+            registerScoped(token, factory, dependencies = []) {
+                this.services.set(token, {
+                    token, factory, dependencies,
+                    lifetime: 'scoped',
+                    scope: this.scopeName
+                });
+                this.log(`📝 Registered scoped: ${token}`);
+            }
+            
+            registerTransient(token, factory, dependencies = []) {
+                this.services.set(token, {
+                    token, factory, dependencies,
+                    lifetime: 'transient',
+                    scope: this.scopeName
+                });
+                this.log(`📝 Registered transient: ${token}`);
+            }
+            
+            resolve(token) {
+                this.resolutionCount++;
+                
+                // Find service in hierarchy
+                let service = this.services.get(token);
+                let container = this;
+                
+                while (!service && container.parent) {
+                    container = container.parent;
+                    service = container.services.get(token);
+                }
+                
+                if (!service) {
+                    throw new Error(`Service '${token}' not found`);
+                }
+                
+                // Check for existing instance
+                if (service.lifetime === 'singleton') {
+                    let instance = container.instances.get(token);
+                    if (instance) {
+                        this.log(`♻️ Retrieved existing singleton: ${token}`);
+                        return instance;
+                    }
+                } else if (service.lifetime === 'scoped') {
+                    let instance = this.instances.get(token);
+                    if (instance) {
+                        this.log(`♻️ Retrieved existing scoped: ${token}`);
+                        return instance;
+                    }
+                }
+                
+                // Resolve dependencies
+                const deps = service.dependencies.map(dep => this.resolve(dep));
+                
+                // Create instance
+                const instance = service.factory(...deps);
+                
+                // Cache based on lifetime
+                if (service.lifetime === 'singleton') {
+                    container.instances.set(token, instance);
+                } else if (service.lifetime === 'scoped') {
+                    this.instances.set(token, instance);
+                }
+                
+                this.log(`✅ Created ${service.lifetime}: ${token}`);
+                return instance;
+            }
+            
+            createModuleScope(name) {
+                const moduleScope = new MockDIContainer(this, `${this.scopeName}.${name}`);
+                this.log(`🏗️ Created module scope: ${moduleScope.scopeName}`);
+                return moduleScope;
+            }
+            
+            createChildScope(name) {
+                const childScope = new MockDIContainer(this, name || `${this.scopeName}.child-${this.children.length}`);
+                this.log(`🏗️ Created child scope: ${childScope.scopeName}`);
+                return childScope;
+            }
+            
+            getAllServices() {
+                const services = [];
+                
+                // Get from this container
+                this.services.forEach(service => {
+                    services.push({
+                        ...service,
+                        container: this.scopeName,
+                        isResolved: this.instances.has(service.token)
+                    });
+                });
+                
+                return services;
+            }
+            
+            getHierarchyInfo() {
+                return {
+                    scopeName: this.scopeName,
+                    serviceCount: this.services.size,
+                    instanceCount: this.instances.size,
+                    resolutionCount: this.resolutionCount,
+                    uptime: performance.now() - this.creationTime,
+                    children: this.children.map(child => child.getHierarchyInfo())
+                };
+            }
+            
+            log(message) {
+                const logElement = document.getElementById('di-log');
+                const timestamp = new Date().toLocaleTimeString();
+                const scopePrefix = `[${this.scopeName}]`;
+                logElement.innerHTML += `${timestamp} ${scopePrefix} ${message}\n`;
+                logElement.scrollTop = logElement.scrollHeight;
+            }
+            
+            dispose() {
+                this.log(`🗑️ Disposing container: ${this.scopeName}`);
+                this.instances.clear();
+                this.children.forEach(child => child.dispose());
+                this.children.length = 0;
+            }
+        }
+        
+        // Mock service classes
+        class AppConfig { constructor() { this.version = '1.0.0'; } }
+        class Logger { log(msg) { console.log(msg); } }
+        class Database { query(sql) { return `Result for: ${sql}`; } }
+        class UserService { constructor(config, logger) { this.config = config; this.logger = logger; } }
+        class UserRepository { constructor(db) { this.db = db; } }
+        class OrderService { constructor(userService, db) { this.userService = userService; this.db = db; } }
+        class HttpContext { constructor(req) { this.request = req; } }
+        
+        let rootContainer = null;
+        let demoContainers = [];
+        
+        function createBasicHierarchy() {
+            clearDemo();
+            updateHierarchyDisplay('🏗️ Creating Basic Hierarchy...');
+            
+            // Root container
+            rootContainer = new MockDIContainer();
+            rootContainer.registerSingleton('config', () => new AppConfig());
+            rootContainer.registerSingleton('logger', () => new Logger());
+            
+            // Child container
+            const childContainer = rootContainer.createChildScope('child');
+            childContainer.registerScoped('userService', 
+                (config, logger) => new UserService(config, logger),
+                ['config', 'logger']
+            );
+            
+            // Resolve services
+            const config = rootContainer.resolve('config');
+            const userService = childContainer.resolve('userService');
+            
+            demoContainers = [rootContainer, childContainer];
+            updateContainerDisplay();
+            updateHierarchyDisplay(generateHierarchyTree(rootContainer));
+        }
+        
+        function createModularApp() {
+            clearDemo();
+            updateHierarchyDisplay('🏗️ Creating Modular Application...');
+            
+            // Root container with core services
+            rootContainer = new MockDIContainer();
+            rootContainer.registerSingleton('config', () => new AppConfig());
+            rootContainer.registerSingleton('logger', () => new Logger());
+            rootContainer.registerSingleton('database', () => new Database());
+            
+            // User module
+            const userModule = rootContainer.createModuleScope('user-module');
+            userModule.registerScoped('userRepository', 
+                (db) => new UserRepository(db), ['database']
+            );
+            userModule.registerScoped('userService',
+                (repo, logger) => new UserService(repo, logger),
+                ['userRepository', 'logger']
+            );
+            
+            // Order module
+            const orderModule = rootContainer.createModuleScope('order-module');
+            orderModule.registerScoped('orderService',
+                (userService, db) => new OrderService(userService, db),
+                ['userService', 'database']
+            );
+            
+            // Resolve cross-module dependencies
+            const orderService = orderModule.resolve('orderService');
+            
+            demoContainers = [rootContainer, userModule, orderModule];
+            updateContainerDisplay();
+            updateHierarchyDisplay(generateHierarchyTree(rootContainer));
+        }
+        
+        function createWebAppScoping() {
+            clearDemo();
+            updateHierarchyDisplay('🌐 Creating Web Application Scoping...');
+            
+            // App container
+            rootContainer = new MockDIContainer(null, 'app');
+            rootContainer.registerSingleton('config', () => new AppConfig());
+            rootContainer.registerSingleton('database', () => new Database());
+            
+            // Module container
+            const apiModule = rootContainer.createModuleScope('api-module');
+            apiModule.registerScoped('userService', 
+                (db, config) => new UserService(db, config),
+                ['database', 'config']
+            );
+            
+            // Simulate multiple requests
+            const request1 = apiModule.createChildScope('request-1');
+            const request2 = apiModule.createChildScope('request-2');
+            
+            request1.registerTransient('httpContext', () => new HttpContext({id: 1}));
+            request2.registerTransient('httpContext', () => new HttpContext({id: 2}));
+            
+            // Resolve services in different request scopes
+            const userService1 = request1.resolve('userService');
+            const userService2 = request2.resolve('userService');
+            
+            demoContainers = [rootContainer, apiModule, request1, request2];
+            updateContainerDisplay();
+            updateHierarchyDisplay(generateHierarchyTree(rootContainer));
+        }
+        
+        function demonstrateOverrides() {
+            clearDemo();
+            updateHierarchyDisplay('🔄 Demonstrating Service Overrides...');
+            
+            // Production container
+            rootContainer = new MockDIContainer(null, 'production');
+            rootContainer.registerSingleton('logger', () => ({ log: (msg) => console.log(`PROD: ${msg}`) }));
+            rootContainer.registerSingleton('database', () => ({ type: 'PostgreSQL' }));
+            
+            // Test container overrides
+            const testContainer = rootContainer.createChildScope('test');
+            testContainer.registerSingleton('logger', () => ({ log: (msg) => console.log(`TEST: ${msg}`) }));
+            testContainer.registerSingleton('database', () => ({ type: 'Mock' }));
+            
+            // Development container partial override
+            const devContainer = rootContainer.createChildScope('development');
+            devContainer.registerSingleton('logger', () => ({ log: (msg) => console.log(`DEV: ${msg}`) }));
+            // Inherits database from parent
+            
+            // Resolve and show differences
+            const prodLogger = rootContainer.resolve('logger');
+            const testLogger = testContainer.resolve('logger');
+            const devLogger = devContainer.resolve('logger');
+            
+            demoContainers = [rootContainer, testContainer, devContainer];
+            updateContainerDisplay();
+            updateHierarchyDisplay(generateHierarchyTree(rootContainer));
+        }
+        
+        function showPerformanceDemo() {
+            clearDemo();
+            updateHierarchyDisplay('⚡ Performance Demonstration...');
+            
+            const startTime = performance.now();
+            
+            rootContainer = new MockDIContainer();
+            
+            // Register many services to show performance
+            for (let i = 0; i < 50; i++) {
+                rootContainer.registerTransient(`service${i}`, () => ({ id: i }));
+            }
+            
+            // Create hierarchy with many containers
+            const modules = [];
+            for (let i = 0; i < 5; i++) {
+                const module = rootContainer.createModuleScope(`module${i}`);
+                for (let j = 0; j < 10; j++) {
+                    module.registerScoped(`moduleService${i}_${j}`, () => ({ moduleId: i, serviceId: j }));
+                }
+                modules.push(module);
+            }
+            
+            // Resolve many services
+            const resolveStart = performance.now();
+            for (let i = 0; i < 100; i++) {
+                rootContainer.resolve(`service${i % 50}`);
+            }
+            const resolveTime = performance.now() - resolveStart;
+            
+            const totalTime = performance.now() - startTime;
+            
+            demoContainers = [rootContainer, ...modules];
+            updateContainerDisplay();
+            
+            const performanceInfo = `
+⚡ Performance Metrics:
+📊 Total Setup Time: ${totalTime.toFixed(2)}ms
+🔍 Service Resolution Time: ${resolveTime.toFixed(2)}ms
+📈 Services Registered: ${50 + (5 * 10)}
+🏗️ Containers Created: ${1 + 5}
+💾 Memory Efficient: Scoped services auto-disposed
+🚀 Resolution Speed: ~${(resolveTime / 100).toFixed(3)}ms per service
+            `;
+            
+            updateHierarchyDisplay(performanceInfo);
+        }
+        
+        function clearDemo() {
+            if (rootContainer) {
+                rootContainer.dispose();
+            }
+            demoContainers = [];
+            rootContainer = null;
+            document.getElementById('hierarchy-display').textContent = '';
+            document.getElementById('container-details').innerHTML = '';
+            document.getElementById('di-log').innerHTML = '';
+        }
+        
+        function updateHierarchyDisplay(content) {
+            document.getElementById('hierarchy-display').textContent = content;
+        }
+        
+        function generateHierarchyTree(container, level = 0) {
+            const indent = '  '.repeat(level);
+            const info = container.getHierarchyInfo();
+            
+            let tree = `${indent}📦 ${info.scopeName} (${info.serviceCount} services, ${info.instanceCount} instances)\n`;
+            
+            info.children.forEach(child => {
+                tree += generateHierarchyTree({ getHierarchyInfo: () => child }, level + 1);
+            });
+            
+            return tree;
+        }
+        
+        function updateContainerDisplay() {
+            const container = document.getElementById('container-details');
+            container.innerHTML = '';
+            
+            demoContainers.forEach(cont => {
+                const info = cont.getHierarchyInfo();
+                const services = cont.getAllServices();
+                
+                const card = document.createElement('div');
+                card.className = `container-card ${getContainerType(info.scopeName)}`;
+                
+                card.innerHTML = `
+                    <h4>📦 ${info.scopeName}</h4>
+                    <div class="performance-metrics">
+                        <div class="metric">
+                            <div class="metric-value">${info.serviceCount}</div>
+                            <div class="metric-label">Services</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">${info.instanceCount}</div>
+                            <div class="metric-label">Instances</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">${info.resolutionCount}</div>
+                            <div class="metric-label">Resolutions</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">${info.uptime.toFixed(0)}ms</div>
+                            <div class="metric-label">Uptime</div>
+                        </div>
+                    </div>
+                    <h5>Registered Services:</h5>
+                    <ul class="service-list">
+                        ${services.map(s => 
+                            `<li class="${s.lifetime}">
+                                ${s.token} (${s.lifetime})
+                                ${s.isResolved ? ' ✅' : ' ⏳'}
+                            </li>`
+                        ).join('')}
+                    </ul>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        function getContainerType(scopeName) {
+            if (scopeName.includes('module')) return 'module';
+            if (scopeName.includes('request') || scopeName.includes('child')) return 'request';
+            return 'root';
+        }
+        
+        // Initialize with basic demo
+        document.addEventListener('DOMContentLoaded', () => {
+            createBasicHierarchy();
+        });
+    </script>
+</body>
+</html>
