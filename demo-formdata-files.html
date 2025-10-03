@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - FormData & File Upload Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn.secondary {
+            background: #95a5a6;
+        }
+
+        .btn.success {
+            background: #27ae60;
+        }
+
+        .btn.danger {
+            background: #e74c3c;
+        }
+
+        .log {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .status {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #3498db;
+        }
+
+        .format-toggle {
+            background: #e8f5e8;
+            border: 2px solid #27ae60;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .file-input {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .file-info {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📁 Annie Framework - FormData & File Upload Demo</h1>
+    
+    <div class="format-toggle">
+        <h2>🔧 Request Format Control</h2>
+        <p><strong>Current Format:</strong> <span id="currentFormat">FormData (Default)</span></p>
+        
+        <button class="btn success" onclick="setFormDataMode()">Use FormData (Default)</button>
+        <button class="btn secondary" onclick="setJsonMode()">Use JSON Body</button>
+        <button class="btn" onclick="showCurrentFormat()">Show Current Format</button>
+        
+        <p><strong>Note:</strong> FormData is required for file uploads. JSON mode will only send filenames.</p>
+    </div>
+
+    <div class="section">
+        <h2>📋 User Profile Form</h2>
+        <form id="profileForm">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" value="john_doe" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="john@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="fullname">Full Name:</label>
+                <input type="text" id="fullname" name="fullname" value="John Doe">
+            </div>
+            
+            <div class="form-group">
+                <label for="department">Department:</label>
+                <select id="department" name="department">
+                    <option value="engineering">Engineering</option>
+                    <option value="marketing">Marketing</option>
+                    <option value="sales">Sales</option>
+                    <option value="hr">Human Resources</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="bio">Bio:</label>
+                <textarea id="bio" name="bio" rows="3">Software developer with 5 years experience...</textarea>
+            </div>
+        </form>
+        
+        <button class="btn" onclick="submitProfileData()">Submit Profile (FormData/JSON)</button>
+        <button class="btn secondary" onclick="submitWithOverride(true)">Force FormData</button>
+        <button class="btn secondary" onclick="submitWithOverride(false)">Force JSON</button>
+    </div>
+
+    <div class="file-input">
+        <h2>📁 File Upload Section</h2>
+        <form id="fileForm">
+            <div class="form-group">
+                <label for="profilePicture">Profile Picture:</label>
+                <input type="file" id="profilePicture" name="profilePicture" accept="image/*" onchange="previewFile(this, 'imagePreview')">
+                <div id="imagePreview"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="resume">Resume (PDF):</label>
+                <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" onchange="showFileInfo(this, 'resumeInfo')">
+                <div id="resumeInfo"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="documents">Additional Documents:</label>
+                <input type="file" id="documents" name="documents" multiple onchange="showFileInfo(this, 'documentsInfo')">
+                <div id="documentsInfo"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="uploadNote">Upload Note:</label>
+                <input type="text" id="uploadNote" name="uploadNote" value="Quarterly report submission">
+            </div>
+        </form>
+        
+        <button class="btn success" onclick="submitWithFiles()">Submit with Files (Auto FormData)</button>
+        <button class="btn" onclick="submitCombined()">Submit Profile + Files</button>
+    </div>
+
+    <div class="section">
+        <h2>🧪 Testing Various Scenarios</h2>
+        
+        <button class="btn" onclick="testSimpleData()">Test Simple Data</button>
+        <button class="btn" onclick="testComplexData()">Test Complex Nested Data</button>
+        <button class="btn" onclick="testMixedData()">Test Mixed Data with Files</button>
+        <button class="btn danger" onclick="clearLog()">Clear Log</button>
+        
+        <div class="form-group">
+            <label for="testEndpoint">Test Endpoint:</label>
+            <input type="text" id="testEndpoint" value="/api/test" placeholder="Enter test endpoint">
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📋 Request/Response Log</h2>
+        <div id="apiLog" class="log">
+            API Client initialized - Ready for testing...
+        </div>
+    </div>
+
+    <div class="status">
+        <h3>📖 FormData vs JSON Comparison:</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr style="background: #f8f9fa;">
+                <th style="padding: 10px; border: 1px solid #ddd;">Feature</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">FormData</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">JSON</th>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;"><strong>File Uploads</strong></td>
+                <td style="padding: 10px; border: 1px solid #ddd;">✅ Full file binary data</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">❌ Only filename (string)</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;"><strong>Content-Type</strong></td>
+                <td style="padding: 10px; border: 1px solid #ddd;">multipart/form-data (auto)</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">application/json</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;"><strong>Nested Objects</strong></td>
+                <td style="padding: 10px; border: 1px solid #ddd;">Flattened with brackets</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">Native nested structure</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;"><strong>Arrays</strong></td>
+                <td style="padding: 10px; border: 1px solid #ddd;">name[0], name[1], etc.</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">Native array format</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;"><strong>Server Parsing</strong></td>
+                <td style="padding: 10px; border: 1px solid #ddd;">Standard form parser</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">JSON parser required</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Include Annie Framework -->
+    <script type="module">
+        import { AnnieFramework } from './dist/annie.js';
+
+        // Initialize Annie with FormData as default
+        const config = {
+            logLevel: 'debug',
+            apiConfig: {
+                baseUrl: '/api',
+                timeout: 30000,
+                useFormData: true  // This is the default
+            },
+            autoInitialize: true
+        };
+
+        console.log('🚀 Initializing Annie Framework with FormData support...');
+        
+        let annie;
+        
+        try {
+            annie = new AnnieFramework(config);
+            window.annie = annie;
+            
+            // Set up logging to display in the UI
+            const logElement = document.getElementById('apiLog');
+            const originalLog = console.log;
+            const originalError = console.error;
+            
+            function addLogMessage(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = `[${timestamp}] ${message}`;
+                
+                if (logElement) {
+                    logElement.textContent += logEntry + '\n';
+                    logElement.scrollTop = logElement.scrollHeight;
+                }
+                
+                // Also log to browser console
+                if (type === 'error') {
+                    originalError(logEntry);
+                } else {
+                    originalLog(logEntry);
+                }
+            }
+            
+            // Override console methods to capture API logs
+            console.log = function(...args) {
+                addLogMessage(args.join(' '), 'info');
+            };
+            
+            console.error = function(...args) {
+                addLogMessage('ERROR: ' + args.join(' '), 'error');
+            };
+
+            // Format control functions
+            window.setFormDataMode = function() {
+                const apiClient = annie.getApiClient();
+                if (apiClient) {
+                    apiClient.setRequestFormat(true);
+                    document.getElementById('currentFormat').textContent = 'FormData';
+                    addLogMessage('✅ Switched to FormData format');
+                } else {
+                    addLogMessage('❌ API Client not available');
+                }
+            };
+
+            window.setJsonMode = function() {
+                const apiClient = annie.getApiClient();
+                if (apiClient) {
+                    apiClient.setRequestFormat(false);
+                    document.getElementById('currentFormat').textContent = 'JSON';
+                    addLogMessage('✅ Switched to JSON format');
+                } else {
+                    addLogMessage('❌ API Client not available');
+                }
+            };
+
+            window.showCurrentFormat = function() {
+                const apiClient = annie.getApiClient();
+                if (apiClient) {
+                    const isFormData = apiClient.isUsingFormData();
+                    addLogMessage(`Current format: ${isFormData ? 'FormData' : 'JSON'}`);
+                    document.getElementById('currentFormat').textContent = isFormData ? 'FormData' : 'JSON';
+                } else {
+                    addLogMessage('❌ API Client not available');
+                }
+            };
+
+            // Form submission functions
+            window.submitProfileData = async function() {
+                const apiClient = annie.getApiClient();
+                if (!apiClient) {
+                    addLogMessage('❌ API Client not available');
+                    return;
+                }
+
+                const endpoint = document.getElementById('testEndpoint').value;
+                
+                const apiObject = {
+                    object: [{
+                        action: endpoint,
+                        method: 'POST',
+                        form: ['profileForm'],
+                        callback: 'handleProfileSubmit'
+                    }]
+                };
+
+                try {
+                    addLogMessage(`📤 Submitting profile data to ${endpoint}`);
+                    const result = await apiClient.call(apiObject);
+                    addLogMessage(`✅ Profile submission completed`);
+                } catch (error) {
+                    addLogMessage(`❌ Profile submission failed: ${error.message}`);
+                }
+            };
+
+            window.submitWithOverride = async function(useFormData) {
+                const apiClient = annie.getApiClient();
+                if (!apiClient) {
+                    addLogMessage('❌ API Client not available');
+                    return;
+                }
+
+                const endpoint = document.getElementById('testEndpoint').value;
+                
+                const apiObject = {
+                    object: [{
+                        action: endpoint,
+                        method: 'POST',
+                        form: ['profileForm'],
+                        useFormData: useFormData,  // Per-request override
+                        callback: 'handleProfileSubmit'
+                    }]
+                };
+
+                try {
+                    addLogMessage(`📤 Submitting with ${useFormData ? 'FormData' : 'JSON'} override`);
+                    const result = await apiClient.call(apiObject);
+                    addLogMessage(`✅ Submission with override completed`);
+                } catch (error) {
+                    addLogMessage(`❌ Submission failed: ${error.message}`);
+                }
+            };
+
+            window.submitWithFiles = async function() {
+                const apiClient = annie.getApiClient();
+                if (!apiClient) {
+                    addLogMessage('❌ API Client not available');
+                    return;
+                }
+
+                const endpoint = document.getElementById('testEndpoint').value;
+                
+                const apiObject = {
+                    object: [{
+                        action: endpoint,
+                        method: 'POST',
+                        form: ['fileForm'],
+                        expectsFiles: true,  // This will auto-use FormData
+                        callback: 'handleFileSubmit'
+                    }]
+                };
+
+                try {
+                    addLogMessage(`📤 Submitting files to ${endpoint}`);
+                    const result = await apiClient.call(apiObject);
+                    addLogMessage(`✅ File submission completed`);
+                } catch (error) {
+                    addLogMessage(`❌ File submission failed: ${error.message}`);
+                }
+            };
+
+            window.submitCombined = async function() {
+                const apiClient = annie.getApiClient();
+                if (!apiClient) {
+                    addLogMessage('❌ API Client not available');
+                    return;
+                }
+
+                const endpoint = document.getElementById('testEndpoint').value;
+                
+                const apiObject = {
+                    object: [{
+                        action: endpoint,
+                        method: 'POST',
+                        form: ['profileForm', 'fileForm'],  // Multiple forms
+                        expectsFiles: true,
+                        callback: 'handleCombinedSubmit'
+                    }]
+                };
+
+                try {
+                    addLogMessage(`📤 Submitting combined profile + files to ${endpoint}`);
+                    const result = await apiClient.call(apiObject);
+                    addLogMessage(`✅ Combined submission completed`);
+                } catch (error) {
+                    addLogMessage(`❌ Combined submission failed: ${error.message}`);
+                }
+            };
+
+            // Test functions
+            window.testSimpleData = async function() {
+                const apiClient = annie.getApiClient();
+                if (!apiClient) return;
+
+                const testData = {
+                    object: [{
+                        action: '/api/test-simple',
+                        method: 'POST',
+                        params: [
+                            { name: 'Test User', id: 123 },
+                            { category: 'testing', priority: 'high' }
+                        ]
+                    }]
+                };
+
+                try {
+                    addLogMessage('🧪 Testing simple data structure');
+                    await apiClient.call(testData);
+                } catch (error) {
+                    addLogMessage(`❌ Simple test failed: ${error.message}`);
+                }
+            };
+
+            window.testComplexData = async function() {
+                const apiClient = annie.getApiClient();
+                if (!apiClient) return;
+
+                const testData = {
+                    object: [{
+                        action: '/api/test-complex',
+                        method: 'POST',
+                        params: [{
+                            user: {
+                                profile: { name: 'John', age: 30 },
+                                settings: { theme: 'dark', notifications: true }
+                            },
+                            tags: ['developer', 'javascript', 'typescript'],
+                            metadata: { created: new Date().toISOString() }
+                        }]
+                    }]
+                };
+
+                try {
+                    addLogMessage('🧪 Testing complex nested data structure');
+                    await apiClient.call(testData);
+                } catch (error) {
+                    addLogMessage(`❌ Complex test failed: ${error.message}`);
+                }
+            };
+
+            window.testMixedData = async function() {
+                // This would need actual file inputs to work properly
+                addLogMessage('🧪 Mixed data test - select files first, then use "Submit Combined"');
+            };
+
+            // Utility functions for file preview
+            window.previewFile = function(input, previewId) {
+                const preview = document.getElementById(previewId);
+                preview.innerHTML = '';
+                
+                if (input.files && input.files[0]) {
+                    const file = input.files[0];
+                    
+                    if (file.type.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = URL.createObjectURL(file);
+                        img.className = 'preview-image';
+                        img.onload = () => URL.revokeObjectURL(img.src);
+                        preview.appendChild(img);
+                    }
+                    
+                    const info = document.createElement('div');
+                    info.className = 'file-info';
+                    info.textContent = `📁 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+                    preview.appendChild(info);
+                    
+                    addLogMessage(`📁 File selected: ${file.name}`);
+                }
+            };
+
+            window.showFileInfo = function(input, infoId) {
+                const info = document.getElementById(infoId);
+                info.innerHTML = '';
+                
+                if (input.files) {
+                    for (let i = 0; i < input.files.length; i++) {
+                        const file = input.files[i];
+                        const fileInfo = document.createElement('div');
+                        fileInfo.className = 'file-info';
+                        fileInfo.textContent = `📁 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+                        info.appendChild(fileInfo);
+                    }
+                    
+                    addLogMessage(`📁 ${input.files.length} file(s) selected`);
+                }
+            };
+
+            window.clearLog = function() {
+                const logElement = document.getElementById('apiLog');
+                if (logElement) {
+                    logElement.textContent = 'Log cleared...\n';
+                }
+            };
+
+            // Global callback functions for API responses
+            window.handleProfileSubmit = function(apiObject) {
+                addLogMessage('📥 Profile submit callback executed');
+            };
+
+            window.handleFileSubmit = function(apiObject) {
+                addLogMessage('📥 File submit callback executed');
+            };
+
+            window.handleCombinedSubmit = function(apiObject) {
+                addLogMessage('📥 Combined submit callback executed');
+            };
+
+            addLogMessage('🎉 Annie Framework initialized with FormData support!');
+            addLogMessage('📁 Ready for file uploads and form submissions');
+            addLogMessage('🔧 Use the format toggle to switch between FormData and JSON');
+            
+        } catch (error) {
+            console.error('Failed to initialize Annie Framework:', error);
+        }
+    </script>
+</body>
+</html>

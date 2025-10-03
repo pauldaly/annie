@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Production Animation Example</title>
+    
+    <!-- Option 1: Manual CSS inclusion for best performance -->
+    <link rel="stylesheet" href="dist/annie-animations.css">
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .demo-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            max-width: 600px;
+        }
+        
+        .demo-element {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Annie Framework - Production Animation Example</h1>
+    
+    <div class="demo-card">
+        <h2>CSS Distribution Methods</h2>
+        <p>This example shows how to use Annie Framework animations in production with proper CSS distribution.</p>
+        
+        <h3>Method Used: Manual CSS Inclusion</h3>
+        <pre><code>&lt;link rel="stylesheet" href="dist/annie-animations.css"&gt;
+&lt;script src="dist/annie.umd.min.js"&gt;&lt;/script&gt;</code></pre>
+    </div>
+
+    <div class="demo-card">
+        <h2>Interactive Animation Demo</h2>
+        
+        <!-- Click animations -->
+        <div class="demo-element" 
+             data-annie-animate="bounce"
+             data-annie-trigger="onClick"
+             data-annie-duration="800ms">
+            Click me to Bounce!
+        </div>
+        
+        <!-- Data change animation -->
+        <div class="demo-element"
+             data-annie-animate="highlight"
+             data-annie-trigger="dataChange"
+             id="dataElement">
+            Data will update here with animation...
+        </div>
+        
+        <!-- Animation sequence -->
+        <div class="demo-element"
+             data-annie-animate-sequence='[
+                 {"name": "fadeIn", "delay": "0ms", "duration": "300ms"},
+                 {"name": "pulse", "delay": "200ms", "duration": "600ms"}
+             ]'
+             data-annie-trigger="onClick"
+             id="sequenceElement">
+            Click for Animation Sequence
+        </div>
+        
+        <div>
+            <button class="btn" onclick="updateData()">Update Data (triggers animation)</button>
+            <button class="btn" onclick="playSequence()">Play Sequence</button>
+        </div>
+    </div>
+
+    <div class="demo-card">
+        <h2>📁 File Structure for Production</h2>
+        <pre><code>your-website/
+├── index.html                    (this file)
+├── dist/
+│   ├── annie.umd.min.js         (main framework - 🔹 REQUIRED)
+│   └── annie-animations.css     (animations - 🔹 REQUIRED for animations)
+└── your-other-files...</code></pre>
+        
+        <h3>Alternative Distribution Methods:</h3>
+        <ul>
+            <li><strong>Auto-injection:</strong> Let Annie load CSS automatically</li>
+            <li><strong>Custom path:</strong> Serve CSS from different location</li>
+            <li><strong>CDN:</strong> Host both files on CDN</li>
+            <li><strong>Bundled:</strong> Include in your build process</li>
+        </ul>
+    </div>
+
+    <!-- Annie Framework -->
+    <script src="dist/annie.umd.js"></script>
+    <script>
+        // Initialize Annie Framework with animations
+        const annie = new Annie.AnnieFramework({
+            enableAnimations: true,
+            animationConfig: {
+                // CSS already included manually above
+                autoInjectCSS: false,
+                respectReducedMotion: true,
+                defaultDuration: '400ms',
+                defaultEasing: 'ease-out'
+            }
+        });
+
+        // Initialize the framework
+        annie.initialize().then(() => {
+            console.log('✅ Annie Framework initialized with animations');
+            console.log('📊 Animation metrics:', annie.getAnimations()?.getPerformanceMetrics());
+        });
+
+        // Demo functions
+        let counter = 0;
+        window.updateData = function() {
+            counter++;
+            const element = document.getElementById('dataElement');
+            element.textContent = `Data updated ${counter} times - animated!`;
+            
+            // Trigger data change animation
+            annie.getAnimations()?.triggerDataChangeAnimation(element);
+        };
+
+        window.playSequence = function() {
+            const element = document.getElementById('sequenceElement');
+            annie.getAnimations()?.triggerSequenceAnimation(element);
+        };
+
+        // Show file sizes for reference
+        console.log('📦 Distribution files:');
+        console.log('  - annie.umd.min.js: ~168 KB (minified JavaScript)');
+        console.log('  - annie-animations.css: ~18 KB (CSS animations)');
+        console.log('💡 Total overhead: ~186 KB for enterprise-grade framework + animations');
+    </script>
+</body>
+</html>

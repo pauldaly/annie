@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Data-Observe with JsonLogic Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .demo-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .user-card {
+            border: 1px solid #ccc;
+            padding: 1rem;
+            border-radius: 8px;
+            background: #f9f9f9;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .user-card.active {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .user-card.premium {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .user-card.offline {
+            opacity: 0.6;
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .online { background: #28a745; color: white; }
+        .offline { background: #6c757d; color: white; }
+        
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+        
+        .code-example {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin: 15px 0;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Enhanced Data-Observe with JsonLogic</h1>
+    <p>Using your existing data-observe system enhanced with JsonLogic capabilities.</p>
+
+    <div class="demo-section">
+        <h2>1. Enhanced data-observe Syntax</h2>
+        
+        <h3>Simple User Card with Conditional Classes</h3>
+        <div class="code-example">{
+  "datasource": "currentUser",
+  "type": "template",
+  "template": "&lt;h3&gt;{{name}}&lt;/h3&gt;&lt;p&gt;{{email}}&lt;/p&gt;",
+  "jsonlogic": {
+    "if": {"var": "isActive"},
+    "class": {
+      "active": {"var": "isActive"},
+      "premium": {"==": [{"var": "plan"}, "premium"]}
+    }
+  }
+}</div>
+
+        <h3>User List with Loop and Filtering</h3>
+        <div class="code-example">{
+  "datasource": "users",
+  "type": "template",
+  "template": "&lt;div class='user-item'&gt;{{name}} - {{status}}&lt;/div&gt;",
+  "jsonlogic": {
+    "loop": "user in users",
+    "if": {"var": "user.isActive"}
+  }
+}</div>
+
+        <h3>Complex Status Message with Transform</h3>
+        <div class="code-example">{
+  "datasource": "userStatus",
+  "type": "html", 
+  "jsonlogic": {
+    "transform": {
+      "if": [
+        {"var": "isOnline"},
+        {"cat": ["&lt;span class='online'&gt;", {"var": "name"}, " is online&lt;/span&gt;"]},
+        {"cat": ["&lt;span class='offline'&gt;", {"var": "name"}, " is offline&lt;/span&gt;"]}
+      ]
+    }
+  }
+}</div>
+    </div>
+
+    <div class="demo-section">
+        <h2>2. Live Demo</h2>
+        
+        <div class="controls">
+            <button onclick="updateUserStatus()">Toggle User Online Status</button>
+            <button onclick="updateUserPlan()">Toggle Premium Plan</button>
+            <button onclick="updateUserActive()">Toggle Active Status</button>
+            <button onclick="addUser()">Add New User</button>
+        </div>
+
+        <!-- Current User Card -->
+        <h3>Current User (with conditional visibility and classes)</h3>
+        <div data-observe='{
+            "datasource": "currentUser",
+            "type": "template",
+            "template": "<div class=\"user-card\"><h3>{{name}}</h3><p>{{email}}</p><p>Plan: {{plan}}</p></div>",
+            "jsonlogic": {
+                "if": {"var": "isActive"},
+                "class": {
+                    "active": {"var": "isActive"},
+                    "premium": {"==": [{"var": "plan"}, "premium"]},
+                    "offline": {"!": {"var": "isOnline"}}
+                }
+            }
+        }'></div>
+
+        <!-- Status Message -->
+        <h3>Dynamic Status Message</h3>
+        <div data-observe='{
+            "datasource": "currentUser",
+            "type": "html",
+            "jsonlogic": {
+                "transform": {
+                    "if": [
+                        {"var": "isOnline"},
+                        {"cat": ["<span class=\"status-badge online\">", {"var": "name"}, " is online</span>"]},
+                        {"cat": ["<span class=\"status-badge offline\">", {"var": "name"}, " is offline</span>"]}
+                    ]
+                }
+            }
+        }'></div>
+
+        <!-- User List with Loop -->
+        <h3>Active Users List (loop with filtering)</h3>
+        <div id="users-container">
+            <!-- This will be populated by loop -->
+        </div>
+
+        <!-- User Count -->
+        <h3>User Statistics</h3>
+        <div data-observe='{
+            "datasource": "users",
+            "type": "html",
+            "jsonlogic": {
+                "transform": {
+                    "cat": [
+                        "Total Users: ", {"var": "length"}, " | ",
+                        "Active: ", {"var": "activeCount"}, " | ",
+                        "Premium: ", {"var": "premiumCount"}
+                    ]
+                }
+            }
+        }'></div>
+    </div>
+
+    <div class="demo-section">
+        <h2>3. Benefits of This Approach</h2>
+        <ul>
+            <li>✅ <strong>No Redundant Code</strong> - Uses your existing data-observe system</li>
+            <li>✅ <strong>JsonLogic Integration</strong> - Adds conditional logic without complexity</li>
+            <li>✅ <strong>Backward Compatible</strong> - Existing data-observe elements still work</li>
+            <li>✅ <strong>Visual Builder Ready</strong> - JSON structure perfect for visual tools</li>
+            <li>✅ <strong>Progressive Enhancement</strong> - Add JsonLogic features incrementally</li>
+        </ul>
+    </div>
+
+    <!-- Mock Annie Framework -->
+    <script>
+        // Mock your existing observer system
+        class Observer {
+            constructor() {
+                this.observers = {};
+            }
+
+            addObserver(datasource, observerFunction) {
+                const _ds = datasource.replace(/-/g, "_");
+                if (!this.observers[_ds]) {
+                    this.observers[_ds] = [];
+                }
+                this.observers[_ds].push(observerFunction);
+            }
+
+            notifyObservers(datasetName) {
+                const data = window._mockData[datasetName];
+                if (this.observers[datasetName]) {
+                    this.observers[datasetName].forEach(observerFunction => {
+                        observerFunction(data);
+                    });
+                }
+            }
+        }
+
+        // Mock data store
+        window._mockData = {
+            currentUser: {
+                name: 'John Doe',
+                email: 'john@example.com', 
+                plan: 'basic',
+                isActive: true,
+                isOnline: true
+            },
+            users: [
+                { name: 'Alice', plan: 'premium', isActive: true, isOnline: true },
+                { name: 'Bob', plan: 'basic', isActive: true, isOnline: false },
+                { name: 'Carol', plan: 'premium', isActive: false, isOnline: true }
+            ]
+        };
+
+        // Calculate stats
+        function updateUserStats() {
+            const users = window._mockData.users;
+            window._mockData.users.length = users.length;
+            window._mockData.users.activeCount = users.filter(u => u.isActive).length;
+            window._mockData.users.premiumCount = users.filter(u => u.plan === 'premium').length;
+        }
+
+        const dataObserver = new Observer();
+
+        // Simple JsonLogic implementation for demo
+        const jsonLogic = {
+            apply: function(logic, data) {
+                if (typeof logic === 'string' || typeof logic === 'number' || typeof logic === 'boolean') {
+                    return logic;
+                }
+                
+                if (typeof logic === 'object' && logic !== null) {
+                    const operator = Object.keys(logic)[0];
+                    const values = logic[operator];
+                    
+                    switch (operator) {
+                        case 'var':
+                            return this.getVar(values, data);
+                        case 'if':
+                            return values.length >= 2 ? 
+                                (this.truthy(this.apply(values[0], data)) ? this.apply(values[1], data) : (values[2] ? this.apply(values[2], data) : null)) :
+                                null;
+                        case '==':
+                            return this.apply(values[0], data) == this.apply(values[1], data);
+                        case '!':
+                            return !this.truthy(this.apply(values, data));
+                        case 'cat':
+                            return values.map(v => this.apply(v, data)).join('');
+                        default:
+                            return logic;
+                    }
+                }
+                
+                return logic;
+            },
+            
+            getVar: function(path, data) {
+                if (!data) return null;
+                const keys = String(path).split('.');
+                let result = data;
+                for (let key of keys) {
+                    result = result?.[key];
+                }
+                return result;
+            },
+            
+            truthy: function(value) {
+                if (Array.isArray(value) && value.length === 0) return false;
+                return !!value;
+            }
+        };
+
+        // Enhanced data-observe processor
+        function processDataObserveElements() {
+            const elements = document.querySelectorAll('[data-observe]');
+            
+            elements.forEach(element => {
+                try {
+                    const config = JSON.parse(element.getAttribute('data-observe'));
+                    
+                    if (config.datasource) {
+                        dataObserver.addObserver(config.datasource, (data) => {
+                            processElement(element, config, data);
+                        });
+                        
+                        // Initial render
+                        const initialData = window._mockData[config.datasource];
+                        if (initialData) {
+                            processElement(element, config, initialData);
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Failed to process data-observe element:', error);
+                }
+            });
+        }
+
+        function processElement(element, config, data) {
+            // Handle JsonLogic conditional visibility
+            if (config.jsonlogic?.if) {
+                const shouldShow = jsonLogic.truthy(jsonLogic.apply(config.jsonlogic.if, data));
+                element.style.display = shouldShow ? '' : 'none';
+                if (!shouldShow) return;
+            }
+            
+            // Handle JsonLogic dynamic classes
+            if (config.jsonlogic?.class) {
+                Object.entries(config.jsonlogic.class).forEach(([className, condition]) => {
+                    const shouldApply = jsonLogic.truthy(jsonLogic.apply(condition, data));
+                    element.classList.toggle(className, shouldApply);
+                });
+            }
+            
+            // Handle content rendering
+            let content = '';
+            if (config.jsonlogic?.transform) {
+                content = jsonLogic.apply(config.jsonlogic.transform, data);
+            } else if (config.template) {
+                content = processTemplate(config.template, data);
+            }
+            
+            if (content) {
+                element.innerHTML = content;
+            }
+        }
+
+        function processTemplate(template, data) {
+            return template.replace(/\{\{([^}]+)\}\}/g, (match, path) => {
+                const value = jsonLogic.getVar(path.trim(), data);
+                return value !== undefined ? String(value) : match;
+            });
+        }
+
+        // Demo functions
+        function updateUserStatus() {
+            window._mockData.currentUser.isOnline = !window._mockData.currentUser.isOnline;
+            dataObserver.notifyObservers('currentUser');
+        }
+
+        function updateUserPlan() {
+            const user = window._mockData.currentUser;
+            user.plan = user.plan === 'premium' ? 'basic' : 'premium';
+            dataObserver.notifyObservers('currentUser');
+        }
+
+        function updateUserActive() {
+            window._mockData.currentUser.isActive = !window._mockData.currentUser.isActive;
+            dataObserver.notifyObservers('currentUser');
+        }
+
+        function addUser() {
+            const newUser = {
+                name: `User ${window._mockData.users.length + 1}`,
+                plan: Math.random() > 0.5 ? 'premium' : 'basic',
+                isActive: Math.random() > 0.3,
+                isOnline: Math.random() > 0.5
+            };
+            window._mockData.users.push(newUser);
+            updateUserStats();
+            dataObserver.notifyObservers('users');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUserStats();
+            processDataObserveElements();
+        });
+    </script>
+</body>
+</html>

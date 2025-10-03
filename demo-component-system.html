@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Component System - Visual Builder Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .demo-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .component-library {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .user-card {
+            border: 1px solid #ccc;
+            padding: 1rem;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        
+        .user-card img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .product-card {
+            border: 1px solid #ddd;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            background: white;
+        }
+        
+        .product-card img {
+            width: 100%;
+            max-width: 200px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        .notification {
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .notification.success { background: #d4edda; color: #155724; }
+        .notification.error { background: #f8d7da; color: #721c24; }
+        .notification.warning { background: #fff3cd; color: #856404; }
+        
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+        
+        .controls button {
+            margin: 5px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .controls button:hover {
+            background: #0056b3;
+        }
+        
+        .visual-builder-output {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Annie Component System Demo</h1>
+    <p>This demonstrates how components created in a visual builder are processed by Annie.</p>
+
+    <div class="demo-section">
+        <h2>1. Visual Builder Output</h2>
+        <p>This is what BoltAPI would generate from a visual builder:</p>
+        
+        <div class="visual-builder-output">
+&lt;!-- User Card Component --&gt;
+&lt;div data-annie-component="user-card" 
+     data-user='{"name":"John Doe","email":"john@example.com","avatar":"https://via.placeholder.com/50"}'
+     data-on-contact="showContactForm"&gt;
+&lt;/div&gt;
+
+&lt;!-- Product Card with Slot Content --&gt;
+&lt;div data-annie-component="product-card"
+     data-product='{"name":"Laptop","price":999.99,"image":"https://via.placeholder.com/200x150"}'
+     data-on-purchase="handlePurchase"&gt;
+  &lt;div slot="actions"&gt;
+    &lt;button&gt;Add to Cart&lt;/button&gt;
+    &lt;button&gt;Buy Now&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>2. Rendered Components</h2>
+        <div class="component-library">
+            <!-- This will be processed by Annie's component system -->
+            <div data-annie-component="user-card" 
+                 data-user='{"name":"John Doe","email":"john@example.com","avatar":"https://via.placeholder.com/50"}'
+                 data-on-contact="showContactForm">
+            </div>
+
+            <div data-annie-component="product-card"
+                 data-product='{"name":"Laptop","price":999.99,"image":"https://via.placeholder.com/200x150"}'
+                 data-on-purchase="handlePurchase">
+                <div slot="actions">
+                    <button>Add to Cart</button>
+                    <button>Buy Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>3. Dynamic Component Creation</h2>
+        <div class="controls">
+            <button onclick="createUserCard()">Create User Card</button>
+            <button onclick="createNotification('success', 'Operation completed successfully!')">Success Notification</button>
+            <button onclick="createNotification('error', 'Something went wrong!')">Error Notification</button>
+            <button onclick="updateUserCard()">Update User Data</button>
+        </div>
+        
+        <div id="dynamic-components"></div>
+    </div>
+
+    <div class="demo-section">
+        <h2>4. State Integration</h2>
+        <p>Components can bind to Annie's state manager:</p>
+        
+        <div class="controls">
+            <input type="text" id="userNameInput" placeholder="Enter user name" />
+            <button onclick="updateUserInState()">Update User in State</button>
+        </div>
+        
+        <!-- This component binds to Annie's state -->
+        <div data-annie-component="user-card"
+             data-user="state:currentUser"
+             data-on-contact="showContactForm">
+        </div>
+    </div>
+
+    <!-- Annie Framework -->
+    <script src="dist/annie.js"></script>
+    <script>
+        // Mock BoltAPI component definitions
+        window.mockComponentAPI = {
+            'user-card': {
+                id: 'user-card',
+                name: 'User Card',
+                version: '1.0.0',
+                template: `
+                    <div class="user-card" data-annie-ref="root">
+                        <img data-annie-bind="user.avatar" alt="Avatar" />
+                        <div>
+                            <h3 data-annie-bind="user.name">{{user.name}}</h3>
+                            <p data-annie-bind="user.email">{{user.email}}</p>
+                            <button data-annie-event="click:onContact">Contact</button>
+                        </div>
+                    </div>
+                `,
+                properties: {
+                    user: {
+                        type: 'object',
+                        required: true,
+                        properties: {
+                            name: { type: 'string' },
+                            email: { type: 'string' },
+                            avatar: { type: 'string' }
+                        }
+                    }
+                },
+                events: {
+                    onContact: {
+                        description: 'Fired when contact button is clicked',
+                        parameters: ['user']
+                    }
+                }
+            },
+            
+            'product-card': {
+                id: 'product-card',
+                name: 'Product Card',
+                version: '1.0.0',
+                template: `
+                    <div class="product-card">
+                        <img data-annie-bind="product.image" alt="Product" />
+                        <h3 data-annie-bind="product.name">{{product.name}}</h3>
+                        <p>$<span data-annie-bind="product.price">{{product.price}}</span></p>
+                        <slot name="actions">
+                            <button data-annie-event="click:onPurchase">Purchase</button>
+                        </slot>
+                    </div>
+                `,
+                properties: {
+                    product: {
+                        type: 'object',
+                        required: true,
+                        properties: {
+                            name: { type: 'string' },
+                            price: { type: 'number' },
+                            image: { type: 'string' }
+                        }
+                    }
+                },
+                events: {
+                    onPurchase: {
+                        description: 'Fired when purchase button is clicked',
+                        parameters: ['product']
+                    }
+                }
+            },
+            
+            'notification': {
+                id: 'notification',
+                name: 'Notification',
+                version: '1.0.0',
+                template: `
+                    <div class="notification {{type}}" data-annie-ref="root">
+                        <span data-annie-bind="message">{{message}}</span>
+                        <button data-annie-event="click:onDismiss" style="float: right; background: transparent; border: none; cursor: pointer;">×</button>
+                    </div>
+                `,
+                properties: {
+                    type: { type: 'string', default: 'info' },
+                    message: { type: 'string', required: true }
+                },
+                events: {
+                    onDismiss: {
+                        description: 'Fired when notification is dismissed'
+                    }
+                }
+            }
+        };
+
+        // Initialize Annie
+        const annie = new Annie({
+            apiBaseUrl: '/api',
+            enableDevtools: true
+        });
+
+        // Initialize component system with mock API
+        annie.components = new ComponentSystem(annie);
+        
+        // Override API call to use mock data
+        annie.components.loadComponentDefinition = async function(componentId) {
+            if (this.definitions.has(componentId)) {
+                return this.definitions.get(componentId);
+            }
+            
+            const definition = window.mockComponentAPI[componentId];
+            if (!definition) {
+                throw new Error(`Component ${componentId} not found`);
+            }
+            
+            this.definitions.set(componentId, definition);
+            return definition;
+        };
+
+        // Initialize Annie and components
+        document.addEventListener('DOMContentLoaded', async () => {
+            await annie.initialize();
+            await annie.components.initialize();
+            
+            // Set initial state for state-bound component
+            annie.state.set('currentUser', {
+                name: 'Jane Smith',
+                email: 'jane@example.com',
+                avatar: 'https://via.placeholder.com/50'
+            });
+        });
+
+        // Event handlers for demos
+        function showContactForm(user, event, instance) {
+            alert(`Contacting ${user.name} at ${user.email}`);
+        }
+
+        function handlePurchase(product, event, instance) {
+            alert(`Purchasing ${product.name} for $${product.price}`);
+        }
+
+        function createUserCard() {
+            annie.components.create('user-card', {
+                user: {
+                    name: 'Alice Johnson',
+                    email: 'alice@example.com',
+                    avatar: 'https://via.placeholder.com/50'
+                }
+            }, '#dynamic-components');
+        }
+
+        function createNotification(type, message) {
+            annie.components.create('notification', {
+                type: type,
+                message: message
+            }, '#dynamic-components');
+        }
+
+        function updateUserCard() {
+            // Find first user card and update it
+            const userCard = document.querySelector('[data-annie-component="user-card"]');
+            const instanceId = userCard?.getAttribute('data-annie-instance-id');
+            
+            if (instanceId) {
+                annie.components.update(instanceId, {
+                    user: {
+                        name: 'Updated User',
+                        email: 'updated@example.com',
+                        avatar: 'https://via.placeholder.com/50/ff0000'
+                    }
+                });
+            }
+        }
+
+        function updateUserInState() {
+            const newName = document.getElementById('userNameInput').value;
+            if (newName) {
+                annie.state.set('currentUser', {
+                    name: newName,
+                    email: 'updated@state.com',
+                    avatar: 'https://via.placeholder.com/50/00ff00'
+                });
+                document.getElementById('userNameInput').value = '';
+            }
+        }
+
+        // Listen for component events
+        annie.events.on('component:user-card:onContact', (data) => {
+            console.log('User card contact event:', data);
+            showContactForm(data.data.user, data.event, data.instance);
+        });
+
+        annie.events.on('component:product-card:onPurchase', (data) => {
+            console.log('Product purchase event:', data);
+            handlePurchase(data.data.product, data.event, data.instance);
+        });
+
+        annie.events.on('component:notification:onDismiss', (data) => {
+            data.instance.element.remove();
+        });
+    </script>
+</body>
+</html>

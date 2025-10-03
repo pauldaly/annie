@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced HTTP Client Demo - Annie Framework</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: #f5f5f5; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            color: #333; 
+            border-bottom: 3px solid #007acc; 
+            padding-bottom: 10px; 
+        }
+        .demo-section { 
+            margin: 20px 0; 
+            padding: 20px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+            background: #fafafa; 
+        }
+        .button-group { 
+            margin: 15px 0; 
+        }
+        button { 
+            background: #007acc; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            margin: 5px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            transition: background 0.3s; 
+        }
+        button:hover { 
+            background: #005999; 
+        }
+        button:disabled { 
+            background: #ccc; 
+            cursor: not-allowed; 
+        }
+        .output { 
+            background: #f8f8f8; 
+            border: 1px solid #ddd; 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 4px; 
+            font-family: 'Courier New', monospace; 
+            white-space: pre-wrap; 
+            max-height: 300px; 
+            overflow-y: auto; 
+        }
+        .comparison { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+            margin: 20px 0; 
+        }
+        .comparison-item { 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+        }
+        .old { 
+            background: #fff3cd; 
+            border-color: #ffeaa7; 
+        }
+        .new { 
+            background: #d4edda; 
+            border-color: #28a745; 
+        }
+        .feature-list { 
+            list-style: none; 
+            padding: 0; 
+        }
+        .feature-list li { 
+            padding: 5px 0; 
+            border-bottom: 1px solid #eee; 
+        }
+        .feature-list li:before { 
+            content: "✓ "; 
+            color: #28a745; 
+            font-weight: bold; 
+        }
+        .loading-indicator { 
+            display: none; 
+            color: #007acc; 
+            font-style: italic; 
+        }
+        .loading-indicator.active { 
+            display: inline; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enhanced HTTP Client Demo</h1>
+        <p>This demonstrates the advanced capabilities of Annie's Enhanced HTTP Client compared to the basic ApiClient.</p>
+
+        <div class="comparison">
+            <div class="comparison-item old">
+                <h3>Basic ApiClient (Old)</h3>
+                <ul class="feature-list">
+                    <li>XMLHttpRequest-based</li>
+                    <li>Promise-based responses</li>
+                    <li>Basic error handling</li>
+                    <li>FormData/JSON support</li>
+                    <li>Simple timeout handling</li>
+                    <li>Basic validation</li>
+                </ul>
+            </div>
+            <div class="comparison-item new">
+                <h3>Enhanced HTTP Client (New)</h3>
+                <ul class="feature-list">
+                    <li>Observable-based responses</li>
+                    <li>Request/Response interceptors</li>
+                    <li>Built-in caching system</li>
+                    <li>Automatic retry with backoff</li>
+                    <li>Loading state management</li>
+                    <li>Authentication middleware</li>
+                    <li>Response transformation</li>
+                    <li>Advanced error handling</li>
+                    <li>Request cancellation</li>
+                    <li>Promise + Observable APIs</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>1. Observable vs Promise Responses</h2>
+            <p>Enhanced HTTP Client supports both Observable and Promise patterns for maximum flexibility.</p>
+            <div class="button-group">
+                <button onclick="demoObservable()">Observable Request</button>
+                <button onclick="demoPromise()">Promise Request</button>
+            </div>
+            <div class="output" id="observable-output"></div>
+        </div>
+
+        <div class="demo-section">
+            <h2>2. Request/Response Interceptors</h2>
+            <p>Interceptors allow you to transform requests and responses automatically.</p>
+            <div class="button-group">
+                <button onclick="setupInterceptors()">Setup Auth + Logging Interceptors</button>
+                <button onclick="testWithInterceptors()">Test Intercepted Request</button>
+            </div>
+            <div class="output" id="interceptor-output"></div>
+        </div>
+
+        <div class="demo-section">
+            <h2>3. Caching System</h2>
+            <p>Automatic response caching for GET requests with configurable TTL.</p>
+            <div class="button-group">
+                <button onclick="testCaching()">Test Caching (1st call)</button>
+                <button onclick="testCaching()">Test Caching (2nd call - cached)</button>
+                <button onclick="clearCache()">Clear Cache</button>
+            </div>
+            <div class="output" id="cache-output"></div>
+        </div>
+
+        <div class="demo-section">
+            <h2>4. Loading State Management</h2>
+            <p>Automatic loading state tracking across multiple concurrent requests.</p>
+            <div class="button-group">
+                <button onclick="testLoadingState()">Start Multiple Requests</button>
+            </div>
+            <span class="loading-indicator" id="loading-indicator">⏳ Loading...</span>
+            <div class="output" id="loading-output"></div>
+        </div>
+
+        <div class="demo-section">
+            <h2>5. Retry with Exponential Backoff</h2>
+            <p>Automatic retries with intelligent backoff strategy for failed requests.</p>
+            <div class="button-group">
+                <button onclick="testRetry()">Test Retry Logic</button>
+            </div>
+            <div class="output" id="retry-output"></div>
+        </div>
+
+        <div class="demo-section">
+            <h2>6. Response Transformation</h2>
+            <p>Transform responses on the fly with interceptors.</p>
+            <div class="button-group">
+                <button onclick="setupTransformation()">Setup Data Transformation</button>
+                <button onclick="testTransformation()">Test Transformed Response</button>
+            </div>
+            <div class="output" id="transform-output"></div>
+        </div>
+    </div>
+
+    <!-- We'll simulate the Enhanced HTTP Client for demo purposes -->
+    <script type="module">
+        // Simulated Enhanced HTTP Client for demonstration
+        // In real usage, you'd import from: import { EnhancedHttpClient } from '../src/core/enhanced-http-client.js';
+        
+        class DemoObservable {
+            constructor(subscribeFn) {
+                this.subscribeFn = subscribeFn;
+            }
+            
+            subscribe(next, error, complete) {
+                const observer = {
+                    next: next || (() => {}),
+                    error: error || (() => {}),
+                    complete: complete || (() => {})
+                };
+                return this.subscribeFn(observer);
+            }
+        }
+
+        class DemoEnhancedHttpClient {
+            constructor() {
+                this.interceptors = {
+                    request: [],
+                    response: []
+                };
+                this.cache = new Map();
+                this.isLoading = false;
+                this.activeRequests = 0;
+            }
+
+            request(config) {
+                return new DemoObservable((observer) => {
+                    this.executeRequest(config).then(response => {
+                        observer.next(response);
+                        observer.complete();
+                    }).catch(error => {
+                        observer.error(error);
+                    });
+                });
+            }
+
+            async requestAsync(config) {
+                return this.executeRequest(config);
+            }
+
+            async executeRequest(config) {
+                this.activeRequests++;
+                this.updateLoadingState();
+
+                // Apply request interceptors
+                let processedConfig = { ...config };
+                for (const interceptor of this.interceptors.request) {
+                    processedConfig = await interceptor.request(processedConfig);
+                }
+
+                // Check cache for GET requests
+                if (config.method === 'GET' && config.cache) {
+                    const cached = this.cache.get(config.url);
+                    if (cached && Date.now() < cached.expires) {
+                        this.activeRequests--;
+                        this.updateLoadingState();
+                        return cached.response;
+                    }
+                }
+
+                // Simulate network request
+                await this.delay(Math.random() * 1000 + 500);
+
+                let response = {
+                    data: { message: 'Success', timestamp: Date.now(), url: config.url },
+                    status: 200,
+                    statusText: 'OK',
+                    headers: { 'content-type': 'application/json' },
+                    config: processedConfig
+                };
+
+                // Apply response interceptors
+                for (const interceptor of this.interceptors.response) {
+                    response = await interceptor.response(response);
+                }
+
+                // Cache GET responses
+                if (config.method === 'GET' && config.cache) {
+                    this.cache.set(config.url, {
+                        response,
+                        expires: Date.now() + (config.cacheTimeout || 300000)
+                    });
+                }
+
+                this.activeRequests--;
+                this.updateLoadingState();
+                return response;
+            }
+
+            get(url, config = {}) {
+                return this.request({ ...config, url, method: 'GET' });
+            }
+
+            post(url, data, config = {}) {
+                return this.request({ ...config, url, method: 'POST', body: data });
+            }
+
+            addRequestInterceptor(interceptor) {
+                this.interceptors.request.push(interceptor);
+            }
+
+            addResponseInterceptor(interceptor) {
+                this.interceptors.response.push(interceptor);
+            }
+
+            clearCache() {
+                this.cache.clear();
+            }
+
+            updateLoadingState() {
+                const wasLoading = this.isLoading;
+                this.isLoading = this.activeRequests > 0;
+                
+                if (wasLoading !== this.isLoading) {
+                    const indicator = document.getElementById('loading-indicator');
+                    if (this.isLoading) {
+                        indicator.classList.add('active');
+                    } else {
+                        indicator.classList.remove('active');
+                    }
+                }
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        // Global demo client
+        window.httpClient = new DemoEnhancedHttpClient();
+
+        // Demo functions
+        window.demoObservable = function() {
+            const output = document.getElementById('observable-output');
+            output.textContent = 'Starting Observable request...\n';
+            
+            const subscription = window.httpClient.get('/api/users/observable', { cache: false })
+                .subscribe(
+                    response => {
+                        output.textContent += `✓ Observable Response: ${JSON.stringify(response.data, null, 2)}\n`;
+                    },
+                    error => {
+                        output.textContent += `✗ Observable Error: ${error.message}\n`;
+                    },
+                    () => {
+                        output.textContent += '✓ Observable completed\n';
+                    }
+                );
+        };
+
+        window.demoPromise = function() {
+            const output = document.getElementById('observable-output');
+            output.textContent += 'Starting Promise request...\n';
+            
+            window.httpClient.requestAsync({ url: '/api/users/promise', method: 'GET' })
+                .then(response => {
+                    output.textContent += `✓ Promise Response: ${JSON.stringify(response.data, null, 2)}\n`;
+                })
+                .catch(error => {
+                    output.textContent += `✗ Promise Error: ${error.message}\n`;
+                });
+        };
+
+        window.setupInterceptors = function() {
+            const output = document.getElementById('interceptor-output');
+            
+            // Auth interceptor
+            window.httpClient.addRequestInterceptor({
+                request: (config) => {
+                    config.headers = config.headers || {};
+                    config.headers['Authorization'] = 'Bearer demo-token-12345';
+                    output.textContent += `🔐 Added Authorization header\n`;
+                    return config;
+                }
+            });
+
+            // Logging interceptor
+            window.httpClient.addResponseInterceptor({
+                response: (response) => {
+                    output.textContent += `📝 Logged ${response.config.method} ${response.config.url} - ${response.status}\n`;
+                    return response;
+                }
+            });
+
+            output.textContent += '✓ Interceptors setup complete\n';
+        };
+
+        window.testWithInterceptors = function() {
+            const output = document.getElementById('interceptor-output');
+            
+            window.httpClient.get('/api/protected/data')
+                .subscribe(response => {
+                    output.textContent += `✓ Intercepted request completed successfully\n`;
+                });
+        };
+
+        window.testCaching = function() {
+            const output = document.getElementById('cache-output');
+            const startTime = Date.now();
+            
+            window.httpClient.get('/api/cached-data', { cache: true, cacheTimeout: 10000 })
+                .subscribe(response => {
+                    const duration = Date.now() - startTime;
+                    const isCached = duration < 100; // Cached responses are much faster
+                    output.textContent += `${isCached ? '🚀 CACHED' : '🌐 NETWORK'} Response in ${duration}ms: ${JSON.stringify(response.data, null, 2)}\n`;
+                });
+        };
+
+        window.clearCache = function() {
+            window.httpClient.clearCache();
+            document.getElementById('cache-output').textContent += '🗑️ Cache cleared\n';
+        };
+
+        window.testLoadingState = function() {
+            const output = document.getElementById('loading-output');
+            output.textContent = 'Starting 3 concurrent requests...\n';
+            
+            // Start multiple concurrent requests
+            for (let i = 1; i <= 3; i++) {
+                window.httpClient.get(`/api/data/${i}`)
+                    .subscribe(response => {
+                        output.textContent += `✓ Request ${i} completed: ${response.data.message}\n`;
+                    });
+            }
+        };
+
+        window.testRetry = function() {
+            const output = document.getElementById('retry-output');
+            output.textContent = 'Testing retry logic (simulated failures)...\n';
+            
+            // Simulate a request that fails then succeeds
+            let attempt = 0;
+            const makeRequest = () => {
+                attempt++;
+                output.textContent += `Attempt ${attempt}...\n`;
+                
+                if (attempt < 3) {
+                    setTimeout(() => {
+                        output.textContent += `✗ Attempt ${attempt} failed, retrying...\n`;
+                        makeRequest();
+                    }, 1000);
+                } else {
+                    setTimeout(() => {
+                        output.textContent += `✓ Attempt ${attempt} succeeded!\n`;
+                    }, 1000);
+                }
+            };
+            
+            makeRequest();
+        };
+
+        window.setupTransformation = function() {
+            const output = document.getElementById('transform-output');
+            
+            // Add transformation interceptor
+            window.httpClient.addResponseInterceptor({
+                response: (response) => {
+                    if (response.data && typeof response.data === 'object') {
+                        // Transform the response data
+                        response.data = {
+                            ...response.data,
+                            transformed: true,
+                            transformedAt: new Date().toISOString(),
+                            originalKeys: Object.keys(response.data)
+                        };
+                    }
+                    return response;
+                }
+            });
+            
+            output.textContent = '✓ Response transformation interceptor added\n';
+        };
+
+        window.testTransformation = function() {
+            const output = document.getElementById('transform-output');
+            
+            window.httpClient.get('/api/raw-data')
+                .subscribe(response => {
+                    output.textContent += `✓ Transformed Response:\n${JSON.stringify(response.data, null, 2)}\n`;
+                });
+        };
+    </script>
+</body>
+</html>

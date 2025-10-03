@@ -1,0 +1,632 @@
+/**
+ * Annie Framework - Animation CSS Library
+ * 
+ * Declarative CSS animations optimized for performance and accessibility.
+ * All animations respect CSS custom properties for dynamic configuration.
+ */
+
+/* ============================================================================
+   CSS Custom Properties (Variables) for Dynamic Configuration
+   ============================================================================ */
+:root {
+  --annie-duration: 300ms;
+  --annie-delay: 0ms;
+  --annie-easing: ease;
+  --annie-direction: normal;
+  --annie-fill-mode: both;
+  --annie-iteration-count: 1;
+}
+
+/* ============================================================================
+   Base Animation Classes
+   ============================================================================ */
+.annie-animate-base {
+  animation-duration: var(--annie-duration, 300ms);
+  animation-delay: var(--annie-delay, 0ms);
+  animation-timing-function: var(--annie-easing, ease);
+  animation-direction: var(--annie-direction, normal);
+  animation-fill-mode: var(--annie-fill-mode, both);
+  animation-iteration-count: var(--annie-iteration-count, 1);
+}
+
+/* ============================================================================
+   Fade Animations
+   ============================================================================ */
+@keyframes annie-fadeIn {
+  from { 
+    opacity: 0; 
+  }
+  to { 
+    opacity: 1; 
+  }
+}
+
+@keyframes annie-fadeOut {
+  from { 
+    opacity: 1; 
+  }
+  to { 
+    opacity: 0; 
+  }
+}
+
+.annie-animate-fadeIn {
+  animation: annie-fadeIn var(--annie-duration, 300ms) var(--annie-easing, ease) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-fadeOut {
+  animation: annie-fadeOut var(--annie-duration, 300ms) var(--annie-easing, ease) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+/* ============================================================================
+   Slide Animations
+   ============================================================================ */
+@keyframes annie-slideUp {
+  from { 
+    transform: translateY(100%); 
+    opacity: 0; 
+  }
+  to { 
+    transform: translateY(0); 
+    opacity: 1; 
+  }
+}
+
+@keyframes annie-slideDown {
+  from { 
+    transform: translateY(-100%); 
+    opacity: 0; 
+  }
+  to { 
+    transform: translateY(0); 
+    opacity: 1; 
+  }
+}
+
+@keyframes annie-slideLeft {
+  from { 
+    transform: translateX(100%); 
+    opacity: 0; 
+  }
+  to { 
+    transform: translateX(0); 
+    opacity: 1; 
+  }
+}
+
+@keyframes annie-slideRight {
+  from { 
+    transform: translateX(-100%); 
+    opacity: 0; 
+  }
+  to { 
+    transform: translateX(0); 
+    opacity: 1; 
+  }
+}
+
+.annie-animate-slideUp {
+  animation: annie-slideUp var(--annie-duration, 500ms) var(--annie-easing, ease-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-slideDown {
+  animation: annie-slideDown var(--annie-duration, 500ms) var(--annie-easing, ease-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-slideLeft {
+  animation: annie-slideLeft var(--annie-duration, 500ms) var(--annie-easing, ease-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-slideRight {
+  animation: annie-slideRight var(--annie-duration, 500ms) var(--annie-easing, ease-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+/* ============================================================================
+   Scale Animations
+   ============================================================================ */
+@keyframes annie-scaleIn {
+  from { 
+    transform: scale(0); 
+    opacity: 0; 
+  }
+  to { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+}
+
+@keyframes annie-scaleOut {
+  from { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+  to { 
+    transform: scale(0); 
+    opacity: 0; 
+  }
+}
+
+@keyframes annie-zoomIn {
+  from { 
+    transform: scale(0.3); 
+    opacity: 0; 
+  }
+  50% { 
+    opacity: 1; 
+  }
+  to { 
+    transform: scale(1); 
+  }
+}
+
+@keyframes annie-zoomOut {
+  from { 
+    transform: scale(1); 
+  }
+  50% { 
+    opacity: 1; 
+  }
+  to { 
+    transform: scale(0.3); 
+    opacity: 0; 
+  }
+}
+
+.annie-animate-scaleIn {
+  animation: annie-scaleIn var(--annie-duration, 300ms) var(--annie-easing, ease-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-scaleOut {
+  animation: annie-scaleOut var(--annie-duration, 300ms) var(--annie-easing, ease-in) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-zoomIn {
+  animation: annie-zoomIn var(--annie-duration, 600ms) var(--annie-easing, ease) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-zoomOut {
+  animation: annie-zoomOut var(--annie-duration, 600ms) var(--annie-easing, ease) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+/* ============================================================================
+   Rotation Animations
+   ============================================================================ */
+@keyframes annie-rotate {
+  from { 
+    transform: rotate(0deg); 
+  }
+  to { 
+    transform: rotate(360deg); 
+  }
+}
+
+@keyframes annie-rotateIn {
+  from { 
+    transform: rotate(-200deg); 
+    opacity: 0; 
+  }
+  to { 
+    transform: rotate(0deg); 
+    opacity: 1; 
+  }
+}
+
+@keyframes annie-rotateOut {
+  from { 
+    transform: rotate(0deg); 
+    opacity: 1; 
+  }
+  to { 
+    transform: rotate(200deg); 
+    opacity: 0; 
+  }
+}
+
+.annie-animate-rotate {
+  animation: annie-rotate var(--annie-duration, 1000ms) var(--annie-easing, linear) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-rotateIn {
+  animation: annie-rotateIn var(--annie-duration, 600ms) var(--annie-easing, ease-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-rotateOut {
+  animation: annie-rotateOut var(--annie-duration, 600ms) var(--annie-easing, ease-in) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+/* ============================================================================
+   Attention Seeking Animations
+   ============================================================================ */
+@keyframes annie-bounce {
+  0%, 20%, 53%, 80%, to {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    transform: translate3d(0, -30px, 0) scaleY(1.1);
+  }
+  70% {
+    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    transform: translate3d(0, -15px, 0) scaleY(1.05);
+  }
+  90% {
+    transform: translate3d(0, -4px, 0) scaleY(1.02);
+  }
+}
+
+@keyframes annie-pulse {
+  0% { 
+    transform: scale3d(1, 1, 1); 
+  }
+  50% { 
+    transform: scale3d(1.05, 1.05, 1.05); 
+  }
+  100% { 
+    transform: scale3d(1, 1, 1); 
+  }
+}
+
+@keyframes annie-shake {
+  0%, 100% { 
+    transform: translate3d(0, 0, 0); 
+  }
+  10%, 30%, 50%, 70%, 90% { 
+    transform: translate3d(-10px, 0, 0); 
+  }
+  20%, 40%, 60%, 80% { 
+    transform: translate3d(10px, 0, 0); 
+  }
+}
+
+@keyframes annie-wobble {
+  0% { 
+    transform: translate3d(0, 0, 0); 
+  }
+  15% { 
+    transform: translate3d(-25%, 0, 0) rotate3d(0, 0, 1, -5deg); 
+  }
+  30% { 
+    transform: translate3d(20%, 0, 0) rotate3d(0, 0, 1, 3deg); 
+  }
+  45% { 
+    transform: translate3d(-15%, 0, 0) rotate3d(0, 0, 1, -3deg); 
+  }
+  60% { 
+    transform: translate3d(10%, 0, 0) rotate3d(0, 0, 1, 2deg); 
+  }
+  75% { 
+    transform: translate3d(-5%, 0, 0) rotate3d(0, 0, 1, -1deg); 
+  }
+  100% { 
+    transform: translate3d(0, 0, 0); 
+  }
+}
+
+@keyframes annie-swing {
+  20% { 
+    transform: rotate3d(0, 0, 1, 15deg); 
+  }
+  40% { 
+    transform: rotate3d(0, 0, 1, -10deg); 
+  }
+  60% { 
+    transform: rotate3d(0, 0, 1, 5deg); 
+  }
+  80% { 
+    transform: rotate3d(0, 0, 1, -5deg); 
+  }
+  100% { 
+    transform: rotate3d(0, 0, 1, 0deg); 
+  }
+}
+
+.annie-animate-bounce {
+  animation: annie-bounce var(--annie-duration, 1000ms) var(--annie-easing, ease) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+  transform-origin: center bottom;
+}
+
+.annie-animate-pulse {
+  animation: annie-pulse var(--annie-duration, 1000ms) var(--annie-easing, ease-in-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-shake {
+  animation: annie-shake var(--annie-duration, 600ms) var(--annie-easing, ease-in-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-wobble {
+  animation: annie-wobble var(--annie-duration, 1000ms) var(--annie-easing, ease-in-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-swing {
+  animation: annie-swing var(--annie-duration, 1000ms) var(--annie-easing, ease-in-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+  transform-origin: top center;
+}
+
+/* ============================================================================
+   Special Effect Animations
+   ============================================================================ */
+@keyframes annie-highlight {
+  0%, 100% { 
+    background-color: transparent; 
+  }
+  50% { 
+    background-color: #fff3cd; 
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5); 
+  }
+}
+
+@keyframes annie-flash {
+  0%, 50%, 100% { 
+    opacity: 1; 
+  }
+  25%, 75% { 
+    opacity: 0; 
+  }
+}
+
+@keyframes annie-rubber {
+  0% { 
+    transform: scale3d(1, 1, 1); 
+  }
+  30% { 
+    transform: scale3d(1.25, 0.75, 1); 
+  }
+  40% { 
+    transform: scale3d(0.75, 1.25, 1); 
+  }
+  50% { 
+    transform: scale3d(1.15, 0.85, 1); 
+  }
+  65% { 
+    transform: scale3d(0.95, 1.05, 1); 
+  }
+  75% { 
+    transform: scale3d(1.05, 0.95, 1); 
+  }
+  100% { 
+    transform: scale3d(1, 1, 1); 
+  }
+}
+
+@keyframes annie-tada {
+  0% { 
+    transform: scale3d(1, 1, 1); 
+  }
+  10%, 20% { 
+    transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, -3deg); 
+  }
+  30%, 50%, 70%, 90% { 
+    transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg); 
+  }
+  40%, 60%, 80% { 
+    transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg); 
+  }
+  100% { 
+    transform: scale3d(1, 1, 1); 
+  }
+}
+
+.annie-animate-highlight {
+  animation: annie-highlight var(--annie-duration, 600ms) var(--annie-easing, ease-in-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-flash {
+  animation: annie-flash var(--annie-duration, 1000ms) var(--annie-easing, ease-in-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-rubber {
+  animation: annie-rubber var(--annie-duration, 1000ms) var(--annie-easing, ease-in-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-tada {
+  animation: annie-tada var(--annie-duration, 1000ms) var(--annie-easing, ease-in-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+/* ============================================================================
+   Loading State Animations
+   ============================================================================ */
+@keyframes annie-spin {
+  0% { 
+    transform: rotate(0deg); 
+  }
+  100% { 
+    transform: rotate(360deg); 
+  }
+}
+
+@keyframes annie-breathe {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+  50% { 
+    opacity: 0.6; 
+    transform: scale(0.98); 
+  }
+}
+
+.annie-animate-spin {
+  animation: annie-spin var(--annie-duration, 1000ms) linear 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, infinite) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-breathe {
+  animation: annie-breathe var(--annie-duration, 2000ms) var(--annie-easing, ease-in-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, infinite) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+/* ============================================================================
+   Form Validation Animations
+   ============================================================================ */
+@keyframes annie-invalid {
+  0%, 100% { 
+    transform: translateX(0); 
+    border-color: #dc3545; 
+  }
+  10%, 30%, 50%, 70%, 90% { 
+    transform: translateX(-5px); 
+  }
+  20%, 40%, 60%, 80% { 
+    transform: translateX(5px); 
+  }
+}
+
+@keyframes annie-valid {
+  0% { 
+    border-color: #28a745; 
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); 
+  }
+  50% { 
+    box-shadow: 0 0 15px rgba(40, 167, 69, 0.7); 
+  }
+  100% { 
+    border-color: #28a745; 
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); 
+  }
+}
+
+.annie-animate-invalid {
+  animation: annie-invalid var(--annie-duration, 600ms) var(--annie-easing, ease-in-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+.annie-animate-valid {
+  animation: annie-valid var(--annie-duration, 600ms) var(--annie-easing, ease-in-out) 
+             var(--annie-delay, 0ms) var(--annie-iteration-count, 1) var(--annie-direction, normal) 
+             var(--annie-fill-mode, both);
+}
+
+/* ============================================================================
+   Accessibility - Respect Reduced Motion Preferences
+   ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* Disable transform animations entirely for reduced motion */
+  [class*="annie-animate-"] {
+    animation: none !important;
+  }
+  
+  /* Keep opacity changes but remove transforms */
+  .annie-animate-fadeIn {
+    opacity: 1 !important;
+  }
+  
+  .annie-animate-fadeOut {
+    opacity: 0 !important;
+  }
+}
+
+/* ============================================================================
+   Performance Optimizations
+   ============================================================================ */
+
+/* Force hardware acceleration for transform-based animations */
+[class*="annie-animate-"] {
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Optimize for 60fps animations */
+.annie-animate-slideUp,
+.annie-animate-slideDown,
+.annie-animate-slideLeft,
+.annie-animate-slideRight,
+.annie-animate-scaleIn,
+.annie-animate-scaleOut,
+.annie-animate-zoomIn,
+.annie-animate-zoomOut {
+  will-change: transform, opacity;
+}
+
+.annie-animate-fadeIn,
+.annie-animate-fadeOut {
+  will-change: opacity;
+}
+
+.annie-animate-rotate,
+.annie-animate-rotateIn,
+.annie-animate-rotateOut,
+.annie-animate-spin {
+  will-change: transform;
+}
+
+/* ============================================================================
+   Utility Classes for Animation Control
+   ============================================================================ */
+
+/* Pause animations */
+.annie-animation-paused {
+  animation-play-state: paused !important;
+}
+
+/* Animation delays */
+.annie-delay-100 { animation-delay: 100ms !important; }
+.annie-delay-200 { animation-delay: 200ms !important; }
+.annie-delay-300 { animation-delay: 300ms !important; }
+.annie-delay-500 { animation-delay: 500ms !important; }
+.annie-delay-1000 { animation-delay: 1000ms !important; }
+
+/* Animation durations */
+.annie-duration-fast { animation-duration: 150ms !important; }
+.annie-duration-normal { animation-duration: 300ms !important; }
+.annie-duration-slow { animation-duration: 600ms !important; }
+.annie-duration-slower { animation-duration: 1000ms !important; }
+
+/* Infinite animations */
+.annie-infinite { animation-iteration-count: infinite !important; }

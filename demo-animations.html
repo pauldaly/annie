@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Animation System Demo</title>
+    <!-- CSS included manually for development - in production use dist/annie-animations.css -->
+    <link rel="stylesheet" href="/src/styles/annie-animations.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .demo-section {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e8ecef;
+        }
+
+        .demo-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.3em;
+        }
+
+        .demo-section h2::before {
+            content: "🎨";
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .animation-demo {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .demo-element {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .demo-element:hover {
+            transform: translateY(-2px);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .configuration-panel {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e8ecef;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group select,
+        .form-group input {
+            padding: 8px 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .performance-stats {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .code-example {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+
+        .trigger-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .data-binding-demo {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .state-demo {
+            background: #f3e5f5;
+            border-left: 4px solid #9c27b0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .sequence-demo {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .accessibility-note {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Annie Framework Animation System</h1>
+        <p class="subtitle">Declarative CSS animations through AI-first data attributes</p>
+
+        <!-- Configuration Panel -->
+        <div class="configuration-panel">
+            <h2>⚙️ Global Animation Configuration</h2>
+            <div class="config-grid">
+                <div class="form-group">
+                    <label for="enableAnimations">Enable Animations</label>
+                    <select id="enableAnimations">
+                        <option value="true" selected>Enabled</option>
+                        <option value="false">Disabled</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="defaultDuration">Default Duration</label>
+                    <select id="defaultDuration">
+                        <option value="150ms">Fast (150ms)</option>
+                        <option value="300ms" selected>Normal (300ms)</option>
+                        <option value="600ms">Slow (600ms)</option>
+                        <option value="1000ms">Slower (1000ms)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="defaultEasing">Default Easing</label>
+                    <select id="defaultEasing">
+                        <option value="ease" selected>ease</option>
+                        <option value="ease-in">ease-in</option>
+                        <option value="ease-out">ease-out</option>
+                        <option value="ease-in-out">ease-in-out</option>
+                        <option value="linear">linear</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="respectReducedMotion">Respect Reduced Motion</label>
+                    <select id="respectReducedMotion">
+                        <option value="true" selected>Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="performance-stats">
+                <h3>📊 Performance Metrics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="activeAnimations">0</div>
+                        <div class="stat-label">Active Animations</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalElements">0</div>
+                        <div class="stat-label">Animated Elements</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="memoryUsage">~0B</div>
+                        <div class="stat-label">Memory Usage</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="framerate">60fps</div>
+                        <div class="stat-label">Target Framerate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Animation Demos -->
+        <div class="demo-grid">
+            <!-- Basic Animations -->
+            <div class="demo-section">
+                <h2>Basic Animations</h2>
+                
+                <div class="animation-demo">
+                    <div class="demo-element" 
+                         data-annie-animate="fadeIn"
+                         data-annie-trigger="onClick"
+                         data-annie-duration="500ms">
+                        Click me to Fade In
+                    </div>
+                </div>
+                
+                <div class="code-example">&lt;div data-annie-animate="fadeIn"
+     data-annie-trigger="onClick"
+     data-annie-duration="500ms"&gt;</div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="playBasicAnimation('fadeIn')">Fade In</button>
+                    <button class="btn btn-primary" onclick="playBasicAnimation('fadeOut')">Fade Out</button>
+                    <button class="btn btn-primary" onclick="playBasicAnimation('slideUp')">Slide Up</button>
+                    <button class="btn btn-primary" onclick="playBasicAnimation('slideDown')">Slide Down</button>
+                </div>
+            </div>
+
+            <!-- Scale Animations -->
+            <div class="demo-section">
+                <h2>Scale & Transform</h2>
+                
+                <div class="animation-demo">
+                    <div class="demo-element" 
+                         data-annie-animate="scaleIn"
+                         data-annie-trigger="onClick"
+                         data-annie-duration="400ms"
+                         data-annie-easing="ease-out">
+                        Scale & Transform Me
+                    </div>
+                </div>
+
+                <div class="code-example">&lt;div data-annie-animate="scaleIn"
+     data-annie-trigger="onClick"
+     data-annie-easing="ease-out"&gt;</div>
+
+                <div class="controls">
+                    <button class="btn btn-success" onclick="playScaleAnimation('scaleIn')">Scale In</button>
+                    <button class="btn btn-success" onclick="playScaleAnimation('zoomIn')">Zoom In</button>
+                    <button class="btn btn-success" onclick="playScaleAnimation('rotateIn')">Rotate In</button>
+                </div>
+            </div>
+
+            <!-- Attention Seekers -->
+            <div class="demo-section">
+                <h2>Attention Seekers</h2>
+                
+                <div class="animation-demo">
+                    <div class="demo-element" 
+                         data-annie-animate="bounce"
+                         data-annie-trigger="onClick"
+                         data-annie-duration="1000ms">
+                        Get Attention!
+                    </div>
+                </div>
+
+                <div class="code-example">&lt;div data-annie-animate="bounce"
+     data-annie-duration="1000ms"&gt;</div>
+
+                <div class="controls">
+                    <button class="btn btn-warning" onclick="playAttentionAnimation('bounce')">Bounce</button>
+                    <button class="btn btn-warning" onclick="playAttentionAnimation('pulse')">Pulse</button>
+                    <button class="btn btn-warning" onclick="playAttentionAnimation('shake')">Shake</button>
+                    <button class="btn btn-warning" onclick="playAttentionAnimation('wobble')">Wobble</button>
+                </div>
+            </div>
+
+            <!-- Special Effects -->
+            <div class="demo-section">
+                <h2>Special Effects</h2>
+                
+                <div class="animation-demo">
+                    <div class="demo-element" 
+                         data-annie-animate="highlight"
+                         data-annie-trigger="onClick"
+                         data-annie-duration="600ms">
+                        Special Effects
+                    </div>
+                </div>
+
+                <div class="code-example">&lt;div data-annie-animate="highlight"
+     data-annie-duration="600ms"&gt;</div>
+
+                <div class="controls">
+                    <button class="btn btn-danger" onclick="playSpecialAnimation('highlight')">Highlight</button>
+                    <button class="btn btn-danger" onclick="playSpecialAnimation('flash')">Flash</button>
+                    <button class="btn btn-danger" onclick="playSpecialAnimation('rubber')">Rubber</button>
+                    <button class="btn btn-danger" onclick="playSpecialAnimation('tada')">Tada</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Features -->
+        <div class="trigger-section">
+            <!-- Data Binding Integration -->
+            <div class="demo-section data-binding-demo">
+                <h2>📊 Data Binding Integration</h2>
+                <p>Animations triggered by data changes (Annie's data-observe system)</p>
+                
+                <div class="animation-demo">
+                    <div data-observe='[{"datasource": "demo", "type": "html", "field": "message"}]'
+                         data-annie-animate="highlight"
+                         data-annie-trigger="dataChange"
+                         data-annie-duration="400ms"
+                         id="dataElement">
+                        Data will appear here...
+                    </div>
+                </div>
+
+                <div class="code-example">&lt;div data-observe='[{"datasource": "demo", "type": "html", "field": "message"}]'
+     data-annie-animate="highlight"
+     data-annie-trigger="dataChange"&gt;</div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="updateData('Hello World!')">Update Data 1</button>
+                    <button class="btn btn-primary" onclick="updateData('Annie Rocks!')">Update Data 2</button>
+                    <button class="btn btn-primary" onclick="updateData('Animated!')">Update Data 3</button>
+                </div>
+            </div>
+
+            <!-- State Management Integration -->
+            <div class="demo-section state-demo">
+                <h2>🔄 State Change Integration</h2>
+                <p>Animations triggered by state changes</p>
+                
+                <div class="animation-demo">
+                    <div data-annie-state-status="offline"
+                         data-annie-animate="slideIn"
+                         data-annie-trigger="stateChange"
+                         id="stateElement">
+                        User Status: Offline
+                    </div>
+                </div>
+
+                <div class="code-example">&lt;div data-annie-state-status="offline"
+     data-annie-animate="slideIn"
+     data-annie-trigger="stateChange"&gt;</div>
+
+                <div class="controls">
+                    <button class="btn btn-success" onclick="changeState('online')">Go Online</button>
+                    <button class="btn btn-warning" onclick="changeState('away')">Go Away</button>
+                    <button class="btn btn-danger" onclick="changeState('offline')">Go Offline</button>
+                </div>
+            </div>
+
+            <!-- Animation Sequences -->
+            <div class="demo-section sequence-demo">
+                <h2>🎬 Animation Sequences</h2>
+                <p>Multi-step animation chains</p>
+                
+                <div class="animation-demo">
+                    <div data-annie-animate-sequence='[
+                         {"name": "fadeIn", "delay": "0ms", "duration": "300ms"},
+                         {"name": "bounce", "delay": "200ms", "duration": "600ms"},
+                         {"name": "highlight", "delay": "100ms", "duration": "400ms"}
+                     ]'
+                     data-annie-trigger="onClick"
+                     id="sequenceElement">
+                        Click for Sequence
+                    </div>
+                </div>
+
+                <div class="code-example">data-annie-animate-sequence='[
+  {"name": "fadeIn", "delay": "0ms"},
+  {"name": "bounce", "delay": "200ms"},
+  {"name": "highlight", "delay": "100ms"}
+]'</div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="playSequence()">Play Sequence</button>
+                    <button class="btn btn-success" onclick="playCustomSequence('loading')">Loading Sequence</button>
+                    <button class="btn btn-warning" onclick="playCustomSequence('success')">Success Sequence</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Validation Demo -->
+        <div class="demo-section">
+            <h2>📝 Form Validation Animations</h2>
+            <p>Interactive form with animated validation feedback</p>
+            
+            <form id="validationForm" style="max-width: 400px; margin: 20px auto;">
+                <div style="margin-bottom: 15px;">
+                    <label for="email" style="display: block; margin-bottom: 5px;">Email:</label>
+                    <input type="email" 
+                           id="email" 
+                           name="email" 
+                           required 
+                           data-annie-animate="invalid"
+                           data-annie-trigger="validation"
+                           style="width: 100%; padding: 10px; border: 2px solid #dee2e6; border-radius: 5px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="password" style="display: block; margin-bottom: 5px;">Password:</label>
+                    <input type="password" 
+                           id="password" 
+                           name="password" 
+                           required 
+                           minlength="6"
+                           data-annie-animate="invalid"
+                           data-annie-trigger="validation"
+                           style="width: 100%; padding: 10px; border: 2px solid #dee2e6; border-radius: 5px;">
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Validate Form</button>
+            </form>
+
+            <div class="code-example">&lt;input data-annie-animate="invalid"
+       data-annie-trigger="validation"&gt;</div>
+        </div>
+
+        <!-- Accessibility Notice -->
+        <div class="accessibility-note">
+            <strong>♿ Accessibility:</strong> The Annie Animation System automatically respects the user's 
+            <code>prefers-reduced-motion</code> setting. When reduced motion is preferred, animations are 
+            either disabled or significantly reduced to ensure a comfortable experience for all users.
+        </div>
+
+        <!-- Documentation Section -->
+        <div class="demo-section">
+            <h2>📚 Data Attribute Reference</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div>
+                    <h3>Basic Attributes</h3>
+                    <div class="code-example">data-annie-animate="fadeIn"
+data-annie-duration="300ms"
+data-annie-delay="100ms"
+data-annie-easing="ease"</div>
+                </div>
+                
+                <div>
+                    <h3>Trigger Types</h3>
+                    <div class="code-example">data-annie-trigger="onClick"
+data-annie-trigger="onHover"
+data-annie-trigger="dataChange"
+data-annie-trigger="stateChange"
+data-annie-trigger="onVisible"
+data-annie-trigger="validation"</div>
+                </div>
+                
+                <div>
+                    <h3>Animation Names</h3>
+                    <div class="code-example">fadeIn, fadeOut, slideUp, slideDown,
+slideLeft, slideRight, scaleIn, scaleOut,
+zoomIn, zoomOut, rotate, rotateIn,
+bounce, pulse, shake, wobble, swing,
+highlight, flash, rubber, tada,
+spin, breathe, invalid, valid</div>
+                </div>
+                
+                <div>
+                    <h3>Advanced Options</h3>
+                    <div class="code-example">data-annie-direction="reverse"
+data-annie-fill-mode="forwards"
+data-annie-repeat="infinite"
+data-annie-when="condition"</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Annie Framework Animation System -->
+    <script type="module">
+        import { AnnieAnimations } from '/src/ui/animations.js';
+
+        // Initialize Annie Animations
+        const animations = new AnnieAnimations({
+            enableAnimations: true,
+            respectReducedMotion: true,
+            defaultDuration: '300ms',
+            defaultEasing: 'ease',
+            // CSS already included manually above, so disable auto-injection
+            autoInjectCSS: false
+        });
+
+        animations.initialize();
+        window.annieAnimations = animations;
+
+        // Mock data store for demo
+        window.demoData = {
+            message: 'Initial message',
+            status: 'offline'
+        };
+
+        // Configuration handlers
+        document.getElementById('enableAnimations').addEventListener('change', (e) => {
+            animations.config.enableAnimations = e.target.value === 'true';
+            updatePerformanceStats();
+        });
+
+        document.getElementById('defaultDuration').addEventListener('change', (e) => {
+            animations.config.defaultDuration = e.target.value;
+        });
+
+        document.getElementById('defaultEasing').addEventListener('change', (e) => {
+            animations.config.defaultEasing = e.target.value;
+        });
+
+        // Performance stats updater
+        function updatePerformanceStats() {
+            const metrics = animations.getPerformanceMetrics();
+            document.getElementById('activeAnimations').textContent = metrics.activeAnimations;
+            document.getElementById('totalElements').textContent = metrics.totalElements;
+            document.getElementById('memoryUsage').textContent = metrics.memoryUsage;
+        }
+
+        // Update stats every 2 seconds
+        setInterval(updatePerformanceStats, 2000);
+        updatePerformanceStats();
+
+        // Demo functions
+        window.playBasicAnimation = (animationName) => {
+            const element = document.querySelector('[data-annie-animate]');
+            element.setAttribute('data-annie-animate', animationName);
+            animations.playAnimation(element, {
+                name: animationName,
+                duration: '500ms'
+            });
+        };
+
+        window.playScaleAnimation = (animationName) => {
+            const element = document.querySelector('.demo-section:nth-child(2) .demo-element');
+            animations.playAnimation(element, {
+                name: animationName,
+                duration: '600ms',
+                easing: 'ease-out'
+            });
+        };
+
+        window.playAttentionAnimation = (animationName) => {
+            const element = document.querySelector('.demo-section:nth-child(3) .demo-element');
+            animations.playAnimation(element, {
+                name: animationName,
+                duration: '1000ms'
+            });
+        };
+
+        window.playSpecialAnimation = (animationName) => {
+            const element = document.querySelector('.demo-section:nth-child(4) .demo-element');
+            animations.playAnimation(element, {
+                name: animationName,
+                duration: '600ms'
+            });
+        };
+
+        window.updateData = (newMessage) => {
+            window.demoData.message = newMessage;
+            const element = document.getElementById('dataElement');
+            element.textContent = newMessage;
+            animations.triggerDataChangeAnimation(element);
+        };
+
+        window.changeState = (newStatus) => {
+            window.demoData.status = newStatus;
+            const element = document.getElementById('stateElement');
+            element.textContent = `User Status: ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`;
+            element.setAttribute('data-annie-state-status', newStatus);
+            animations.triggerStateChangeAnimation(element);
+        };
+
+        window.playSequence = () => {
+            const element = document.getElementById('sequenceElement');
+            animations.triggerSequenceAnimation(element);
+        };
+
+        window.playCustomSequence = (type) => {
+            const element = document.getElementById('sequenceElement');
+            
+            let sequence;
+            if (type === 'loading') {
+                sequence = {
+                    steps: [
+                        { name: 'fadeIn', delay: '0ms', duration: '200ms' },
+                        { name: 'pulse', delay: '100ms', duration: '800ms' },
+                        { name: 'breathe', delay: '0ms', duration: '1000ms' }
+                    ]
+                };
+            } else if (type === 'success') {
+                sequence = {
+                    steps: [
+                        { name: 'scaleIn', delay: '0ms', duration: '300ms' },
+                        { name: 'bounce', delay: '200ms', duration: '600ms' },
+                        { name: 'highlight', delay: '100ms', duration: '400ms' }
+                    ]
+                };
+            }
+            
+            animations.playSequence(element, sequence);
+        };
+
+        // Form validation
+        document.getElementById('validationForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            
+            // Validate email
+            if (!email.checkValidity()) {
+                animations.playValidationAnimation(email, false);
+            } else {
+                animations.playValidationAnimation(email, true);
+            }
+            
+            // Validate password
+            if (!password.checkValidity()) {
+                animations.playValidationAnimation(password, false);
+            } else {
+                animations.playValidationAnimation(password, true);
+            }
+        });
+
+        // Real-time validation on blur
+        document.getElementById('email').addEventListener('blur', (e) => {
+            const isValid = e.target.checkValidity();
+            animations.playValidationAnimation(e.target, isValid);
+        });
+
+        document.getElementById('password').addEventListener('blur', (e) => {
+            const isValid = e.target.checkValidity();
+            animations.playValidationAnimation(e.target, isValid);
+        });
+
+        console.log('Annie Animation System Demo loaded successfully! 🎨');
+        console.log('Available animations:', Object.keys(window.annieAnimations.constructor.ANNIE_ANIMATIONS || {}));
+    </script>
+</body>
+</html>

@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Enhanced Forms API Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .demo-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        
+        h2 {
+            color: #555;
+            border-bottom: 2px solid #007acc;
+            padding-bottom: 10px;
+        }
+        
+        .annie-form {
+            max-width: 600px;
+        }
+        
+        .annie-field-group {
+            margin-bottom: 20px;
+        }
+        
+        .annie-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .required-indicator {
+            color: #d32f2f;
+        }
+        
+        .annie-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .annie-input:focus {
+            outline: none;
+            border-color: #007acc;
+            box-shadow: 0 0 0 3px rgba(0,122,204,0.1);
+        }
+        
+        .annie-help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .annie-validation-messages {
+            margin-top: 5px;
+        }
+        
+        .annie-error {
+            color: #d32f2f;
+            font-size: 12px;
+            display: block;
+            margin-top: 2px;
+        }
+        
+        .annie-warning {
+            color: #ff9800;
+            font-size: 12px;
+            display: block;
+            margin-top: 2px;
+        }
+        
+        .annie-success {
+            color: #4caf50;
+            font-size: 12px;
+            display: block;
+            margin-top: 2px;
+        }
+        
+        .has-error .annie-input {
+            border-color: #d32f2f;
+        }
+        
+        .has-warning .annie-input {
+            border-color: #ff9800;
+        }
+        
+        .has-success .annie-input {
+            border-color: #4caf50;
+        }
+        
+        .annie-form-error {
+            background: #ffebee;
+            color: #d32f2f;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #ffcdd2;
+        }
+        
+        .annie-radio-wrapper {
+            margin-bottom: 8px;
+        }
+        
+        .annie-radio-wrapper input[type="radio"] {
+            margin-right: 8px;
+        }
+        
+        button {
+            background: #007acc;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: #005a9e;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .submitting {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .feature-list {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .feature-list ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .feature-list li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Annie Enhanced Forms API (#6 Roadmap Item)</h1>
+    
+    <div class="demo-container">
+        <h2>🚀 What's New in Annie Forms</h2>
+        <div class="feature-list">
+            <h3>Enhanced Capabilities:</h3>
+            <ul>
+                <li><strong>Reactive Forms:</strong> Real-time state management with validation</li>
+                <li><strong>Advanced Validation:</strong> Email, phone, credit card, password strength, file validation</li>
+                <li><strong>Dynamic Rendering:</strong> Programmatic form creation and field manipulation</li>
+                <li><strong>State Integration:</strong> Full integration with Annie's StateManager and DataStore</li>
+                <li><strong>Production Ready:</strong> Testing framework with full production build exclusion</li>
+                <li><strong>Type Safety:</strong> Complete TypeScript support with intelligent type guards</li>
+                <li><strong>Event System:</strong> Custom DOM events for form submission and state changes</li>
+                <li><strong>Modular Architecture:</strong> Separate validation utilities, form renderers, and builders</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>📋 Interactive Form Demo</h2>
+        <div id="form-container"></div>
+        <button id="add-field-btn">Add Phone Field</button>
+        <button id="remove-field-btn">Remove Phone Field</button>
+        <button id="validate-btn">Validate Form</button>
+    </div>
+
+    <div class="demo-container">
+        <h2>📝 Form Submission Output</h2>
+        <div id="submission-output" class="code-block">
+            Form submission data will appear here...
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>🔐 Modern Password Security (Updated NIST Guidelines)</h2>
+        <div class="feature-list">
+            <h3>Following Bill Burr's Updated Recommendations:</h3>
+            <ul>
+                <li><strong>Length Over Complexity:</strong> 12+ characters minimum (was 8+ with complexity)</li>
+                <li><strong>No Forced Complexity:</strong> Users can choose natural, memorable passwords</li>
+                <li><strong>Breach Database Checking:</strong> Real-time verification against known compromised passwords</li>
+                <li><strong>Pattern Detection:</strong> Blocks keyboard patterns and common sequences</li>
+                <li><strong>User-Friendly Feedback:</strong> Positive reinforcement for good choices</li>
+                <li><strong>Privacy-First API:</strong> Uses k-anonymity (only 5 chars of hash sent)</li>
+            </ul>
+        </div>
+        
+        <div class="code-block">
+<strong>Modern Approach vs Legacy:</strong>
+
+❌ LEGACY (Bill Burr's 2003 NIST Guidelines):
+• P@ssw0rd1! → Hard to remember, easy to crack
+• Forces symbols, numbers, capitals
+• Leads to predictable patterns
+• User frustration → password reuse
+
+✅ MODERN (NIST SP 800-63B):
+• "my favorite pizza place downtown" → Easy to remember, hard to crack  
+• Length is primary security factor
+• Natural language patterns allowed
+• Checks against breach databases
+• User-friendly experience
+
+<strong>API Integration:</strong>
+• Have I Been Pwned compatible
+• Custom breach database support
+• 5-second timeout protection
+• Graceful offline fallback
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>⚙️ Architecture Overview</h2>
+        <div class="code-block">
+<strong>Annie Enhanced Forms Structure:</strong>
+src/forms/
+├── reactive-form.ts        # Core reactive form with state management
+├── form-validators.ts      # Modern validation utilities (NIST compliant)
+├── form-renderer.ts        # DOM rendering and field management
+└── (Future) form-builder.ts   # Declarative form creation
+
+<strong>Integration Points:</strong>
+• StateManager: Real-time form state with time travel
+• DataStore: Persistent form data storage  
+• Observable: Reactive validation and submission states
+• TriggerHandler: Event-driven form interactions
+• Testing Framework: Complete coverage with mocks
+
+<strong>Modern Validation Features:</strong>
+• Length-Based Security: 12+ chars (not complexity requirements)
+• Breach Database API: Real-time compromise checking
+• Pattern Detection: Keyboard walks, common sequences
+• Privacy-Preserving: k-anonymity API calls
+• User Experience: Positive feedback, clear guidance
+• Backward Compatibility: Legacy complexity mode available
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>🔧 Usage Examples</h2>
+        <div class="code-block">
+<strong>1. Creating a Reactive Form:</strong>
+const form = new ReactiveForm(config, stateManager, dataStore, logger);
+
+<strong>2. Modern Password Validation:</strong>
+// Basic modern approach (length-focused)
+FormValidators.passwordStrength({ 
+  minLength: 12,
+  checkCommonPasswords: true 
+})
+
+// Advanced with breach database checking
+FormValidators.advancedPasswordValidator({
+  minLength: 12,
+  checkCompromised: true,
+  apiEndpoint: 'https://your-breach-api.com/check'
+})
+
+// Legacy compatibility mode (if needed)
+FormValidators.passwordStrength({ 
+  minLength: 8,
+  allowLegacyComplexity: true 
+})
+
+<strong>3. Other Validation Examples:</strong>
+FormValidators.email()
+FormValidators.required()  
+FormValidators.creditCard()
+FormValidators.phone()
+FormValidators.fileType(['jpg', 'png', 'pdf'])
+
+<strong>4. Dynamic Field Management:</strong>
+form.addField('phone', { type: 'tel', validators: [FormValidators.phone()] });
+form.removeField('phone');
+form.validateField('email');
+
+<strong>5. Form Rendering:</strong>
+const renderer = new FormRenderer(form, options);
+renderer.render('#form-container');
+renderer.addField({ name: 'newField', type: 'text' });
+
+<strong>6. Async Password Checking:</strong>
+const result = await FormValidators.checkPasswordCompromised('password123');
+if (result.isCompromised) {
+  console.log(`Found in ${result.breachCount} breaches`);
+}
+
+<strong>7. Event Handling:</strong>
+document.addEventListener('annie:form:submit', (e) => {
+    console.log('Form submitted:', e.detail);
+});
+        </div>
+    </div>
+
+    <!-- This is a demo file - normally you'd load Annie's build output -->
+    <script>
+        // Mock Annie core classes for demo purposes
+        class MockObservable {
+            constructor(fn) {
+                this.fn = fn;
+            }
+            
+            subscribe(observer) {
+                const cleanup = this.fn(observer);
+                return {
+                    unsubscribe: cleanup || (() => {})
+                };
+            }
+            
+            next(value) {
+                // Mock implementation
+            }
+        }
+        
+        class MockStateManager {
+            constructor() {
+                this.state = {};
+            }
+            
+            setState(key, value) {
+                this.state[key] = value;
+            }
+            
+            getState(key) {
+                return this.state[key];
+            }
+            
+            subscribe() {
+                return 'mock-subscription';
+            }
+        }
+        
+        class MockDataStore {
+            constructor() {
+                this.data = {};
+            }
+            
+            set(key, value) {
+                this.data[key] = value;
+            }
+            
+            get(key) {
+                return this.data[key];
+            }
+        }
+        
+        class MockLogger {
+            info(msg) { console.log('[INFO]', msg); }
+            debug(msg) { console.log('[DEBUG]', msg); }
+            warn(msg) { console.log('[WARN]', msg); }
+            error(msg) { console.log('[ERROR]', msg); }
+        }
+        
+        // Demo form creation and interaction
+        function createDemoForm() {
+            // This would normally use Annie's DI container
+            const stateManager = new MockStateManager();
+            const dataStore = new MockDataStore();
+            const logger = new MockLogger();
+            
+            // Create a mock form configuration
+            const formConfig = {
+                id: 'user-profile-form',
+                fields: [
+                    {
+                        name: 'firstName',
+                        type: 'text',
+                        label: 'First Name',
+                        required: true,
+                        placeholder: 'Enter your first name',
+                        helpText: 'This field is required'
+                    },
+                    {
+                        name: 'lastName',
+                        type: 'text',
+                        label: 'Last Name',
+                        required: true,
+                        placeholder: 'Enter your last name'
+                    },
+                    {
+                        name: 'email',
+                        type: 'email',
+                        label: 'Email Address',
+                        required: true,
+                        placeholder: 'your@email.com',
+                        helpText: 'We\'ll never share your email'
+                    },
+                    {
+                        name: 'age',
+                        type: 'number',
+                        label: 'Age',
+                        placeholder: '18'
+                    },
+                    {
+                        name: 'country',
+                        type: 'select',
+                        label: 'Country',
+                        options: [
+                            { value: '', label: 'Select a country' },
+                            { value: 'us', label: 'United States' },
+                            { value: 'ca', label: 'Canada' },
+                            { value: 'uk', label: 'United Kingdom' },
+                            { value: 'de', label: 'Germany' },
+                            { value: 'fr', label: 'France' }
+                        ]
+                    },
+                    {
+                        name: 'newsletter',
+                        type: 'checkbox',
+                        label: 'Subscribe to Newsletter',
+                        helpText: 'Get updates about new features'
+                    },
+                    {
+                        name: 'comments',
+                        type: 'textarea',
+                        label: 'Comments',
+                        placeholder: 'Tell us about yourself...',
+                        helpText: 'Optional field for additional information'
+                    }
+                ]
+            };
+            
+            // Create HTML form elements manually for demo
+            const container = document.getElementById('form-container');
+            const form = document.createElement('form');
+            form.className = 'annie-form';
+            form.setAttribute('novalidate', 'true');
+            
+            formConfig.fields.forEach(fieldConfig => {
+                const fieldGroup = createFieldElement(fieldConfig);
+                form.appendChild(fieldGroup);
+            });
+            
+            // Add submit button
+            const submitButton = document.createElement('button');
+            submitButton.type = 'submit';
+            submitButton.textContent = 'Submit Form';
+            form.appendChild(submitButton);
+            
+            container.appendChild(form);
+            
+            // Add form submission handler
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(form);
+                const data = {};
+                
+                for (let [key, value] of formData.entries()) {
+                    data[key] = value;
+                }
+                
+                // Show submission data
+                document.getElementById('submission-output').innerHTML = 
+                    `<strong>Form Submitted Successfully!</strong>\n` +
+                    JSON.stringify(data, null, 2);
+                
+                // Emit Annie form event
+                const event = new CustomEvent('annie:form:submit', {
+                    detail: { 
+                        formName: 'user-profile-form',
+                        data: data,
+                        timestamp: new Date().toISOString()
+                    },
+                    bubbles: true
+                });
+                document.dispatchEvent(event);
+                
+                logger.info('Form submitted with data:', data);
+            });
+            
+            // Add validation on blur
+            form.addEventListener('blur', function(e) {
+                if (e.target.matches('input, select, textarea')) {
+                    validateField(e.target);
+                }
+            }, true);
+            
+            return form;
+        }
+        
+        function createFieldElement(fieldConfig) {
+            const fieldGroup = document.createElement('div');
+            fieldGroup.className = 'annie-field-group';
+            fieldGroup.setAttribute('data-field', fieldConfig.name);
+            
+            // Create label
+            if (fieldConfig.label) {
+                const label = document.createElement('label');
+                label.className = 'annie-label';
+                label.setAttribute('for', fieldConfig.name);
+                label.textContent = fieldConfig.label;
+                
+                if (fieldConfig.required) {
+                    const required = document.createElement('span');
+                    required.className = 'required-indicator';
+                    required.textContent = ' *';
+                    label.appendChild(required);
+                }
+                
+                fieldGroup.appendChild(label);
+            }
+            
+            // Create input element
+            let inputElement;
+            
+            switch (fieldConfig.type) {
+                case 'select':
+                    inputElement = document.createElement('select');
+                    if (fieldConfig.options) {
+                        fieldConfig.options.forEach(option => {
+                            const optionElement = document.createElement('option');
+                            optionElement.value = option.value;
+                            optionElement.textContent = option.label;
+                            inputElement.appendChild(optionElement);
+                        });
+                    }
+                    break;
+                    
+                case 'textarea':
+                    inputElement = document.createElement('textarea');
+                    inputElement.rows = 4;
+                    break;
+                    
+                case 'checkbox':
+                    inputElement = document.createElement('input');
+                    inputElement.type = 'checkbox';
+                    inputElement.value = '1';
+                    break;
+                    
+                default:
+                    inputElement = document.createElement('input');
+                    inputElement.type = fieldConfig.type;
+                    break;
+            }
+            
+            inputElement.className = 'annie-input';
+            inputElement.id = fieldConfig.name;
+            inputElement.name = fieldConfig.name;
+            
+            if (fieldConfig.placeholder) {
+                inputElement.placeholder = fieldConfig.placeholder;
+            }
+            
+            if (fieldConfig.required) {
+                inputElement.setAttribute('required', 'true');
+            }
+            
+            fieldGroup.appendChild(inputElement);
+            
+            // Add help text
+            if (fieldConfig.helpText) {
+                const helpText = document.createElement('div');
+                helpText.className = 'annie-help-text';
+                helpText.textContent = fieldConfig.helpText;
+                fieldGroup.appendChild(helpText);
+            }
+            
+            // Add validation container
+            const validationContainer = document.createElement('div');
+            validationContainer.className = 'annie-validation-messages';
+            validationContainer.setAttribute('data-validation-for', fieldConfig.name);
+            fieldGroup.appendChild(validationContainer);
+            
+            return fieldGroup;
+        }
+        
+        function validateField(field) {
+            const fieldGroup = field.closest('.annie-field-group');
+            const validationContainer = fieldGroup.querySelector('.annie-validation-messages');
+            const value = field.value;
+            const isRequired = field.hasAttribute('required');
+            
+            // Clear previous validation
+            validationContainer.innerHTML = '';
+            fieldGroup.classList.remove('has-error', 'has-warning', 'has-success');
+            
+            const errors = [];
+            
+            // Required validation
+            if (isRequired && (!value || value.trim() === '')) {
+                errors.push(`${field.name} is required`);
+            }
+            
+            // Email validation
+            if (field.type === 'email' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                errors.push('Please enter a valid email address');
+            }
+            
+            // Show validation results
+            if (errors.length > 0) {
+                fieldGroup.classList.add('has-error');
+                errors.forEach(error => {
+                    const errorElement = document.createElement('div');
+                    errorElement.className = 'annie-error';
+                    errorElement.textContent = error;
+                    validationContainer.appendChild(errorElement);
+                });
+            } else if (value) {
+                fieldGroup.classList.add('has-success');
+            }
+        }
+        
+        // Initialize demo
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = createDemoForm();
+            
+            // Add dynamic field management
+            let phoneFieldAdded = false;
+            
+            document.getElementById('add-field-btn').addEventListener('click', function() {
+                if (!phoneFieldAdded) {
+                    const phoneConfig = {
+                        name: 'phone',
+                        type: 'tel',
+                        label: 'Phone Number',
+                        placeholder: '+1 (555) 123-4567',
+                        helpText: 'Enter your phone number with country code'
+                    };
+                    
+                    const phoneField = createFieldElement(phoneConfig);
+                    form.insertBefore(phoneField, form.lastElementChild);
+                    phoneFieldAdded = true;
+                    this.disabled = true;
+                    document.getElementById('remove-field-btn').disabled = false;
+                }
+            });
+            
+            document.getElementById('remove-field-btn').addEventListener('click', function() {
+                if (phoneFieldAdded) {
+                    const phoneField = form.querySelector('[data-field="phone"]');
+                    if (phoneField) {
+                        phoneField.remove();
+                        phoneFieldAdded = false;
+                        this.disabled = true;
+                        document.getElementById('add-field-btn').disabled = false;
+                    }
+                }
+            });
+            
+            document.getElementById('validate-btn').addEventListener('click', function() {
+                const inputs = form.querySelectorAll('input, select, textarea');
+                let allValid = true;
+                
+                inputs.forEach(input => {
+                    validateField(input);
+                    const fieldGroup = input.closest('.annie-field-group');
+                    if (fieldGroup.classList.contains('has-error')) {
+                        allValid = false;
+                    }
+                });
+                
+                document.getElementById('submission-output').innerHTML = 
+                    allValid ? 
+                    '<strong>✅ Form is valid!</strong>' : 
+                    '<strong>❌ Form has validation errors</strong>';
+            });
+            
+            // Initially disable remove button
+            document.getElementById('remove-field-btn').disabled = true;
+            
+            // Listen for Annie form events
+            document.addEventListener('annie:form:submit', function(e) {
+                console.log('Annie form event received:', e.detail);
+            });
+        });
+    </script>
+</body>
+</html>

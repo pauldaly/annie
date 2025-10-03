@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Template System Demo - Annie Framework</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .demo-section { 
+            border: 2px solid #e1e5e9; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .demo-section h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .result { 
+            background: white; 
+            padding: 15px; 
+            border-left: 4px solid #28a745;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .code {
+            background: #f1f3f4;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        .user-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .product-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status-active { color: #28a745; font-weight: bold; }
+        .status-inactive { color: #dc3545; font-style: italic; }
+        .price { font-size: 1.2em; font-weight: bold; color: #2c3e50; }
+        .loading { color: #6c757d; font-style: italic; }
+        .error { color: #dc3545; font-weight: bold; }
+        .empty { color: #6c757d; text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Enhanced Template System Demo</h1>
+    <p>Showcasing Annie's enhanced <code>data-observe</code> system with advanced templating, formatting, and JsonLogic integration.</p>
+
+    <div class="demo-section">
+        <h3>1. Basic Variable Interpolation with Formatting</h3>
+        <div class="code">
+data-observe='{"datasource": "user", "type": "template", "template": "Hello {{name | capitalize}}, you have {{balance | currency:USD}} remaining."}'
+        </div>
+        <div class="result" data-observe='{"datasource": "user", "type": "template", "template": "Hello {{name | capitalize}}, you have {{balance | currency:USD}} remaining."}'>
+            Loading user info...
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h3>2. Conditional Content with JsonLogic</h3>
+        <div class="code">
+data-observe='{"datasource": "user", "type": "template", "template": "{{#if {\">\": [{\"var\": \"age\"}, 18]}}}Adult User{{/if}}{{#if {\"<=\": [{\"var\": \"age\"}, 18]}}}Minor User{{/if}}"}'
+        </div>
+        <div class="result" data-observe='{"datasource": "user", "type": "template", "template": "{{#if {\">\": [{\"var\": \"age\"}, 18]}}}Adult User{{/if}}{{#if {\"<=\": [{\"var\": \"age\"}, 18]}}}Minor User{{/if}}"}'>
+            Loading user status...
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h3>3. Advanced List Rendering with Item Templates</h3>
+        <div class="code">
+data-observe='{
+  "datasource": "products", 
+  "type": "list", 
+  "templates": {
+    "item": "&lt;div class=\"product-item\">&lt;span>{{this.name}}&lt;/span>&lt;span class=\"price\">{{this.price | currency:USD}}&lt;/span>&lt;/div>",
+    "empty": "&lt;div class=\"empty\">No products available&lt;/div>"
+  }
+}'
+        </div>
+        <div class="result" data-observe='{"datasource": "products", "type": "list", "templates": {"item": "<div class=\"product-item\"><span>{{this.name}}</span><span class=\"price\">{{this.price | currency:USD}}</span></div>", "empty": "<div class=\"empty\">No products available</div>"}}'>
+            Loading products...
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h3>4. Loop Templates with Context Variables</h3>
+        <div class="code">
+data-observe='{
+  "datasource": "users", 
+  "type": "template", 
+  "template": "{{#each users}}&lt;div class=\"user-card\">User {{@index}}: {{this.name}} ({{#if @first}}First{{/if}}{{#if @last}}Last{{/if}})&lt;/div>{{/each}}"
+}'
+        </div>
+        <div class="result" data-observe='{"datasource": "users", "type": "template", "template": "{{#each users}}<div class=\"user-card\">User {{@index}}: {{this.name}} ({{#if @first}}First{{/if}}{{#if @last}}Last{{/if}})</div>{{/each}}"}'>
+            Loading users...
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h3>5. State-Aware Templates (Loading/Error/Empty)</h3>
+        <div class="code">
+data-observe='{
+  "datasource": "apiData", 
+  "type": "html",
+  "templates": {
+    "loading": "&lt;div class=\"loading\">⏳ Loading data...&lt;/div>",
+    "error": "&lt;div class=\"error\">❌ Error: {{error.message}}&lt;/div>",
+    "empty": "&lt;div class=\"empty\">📭 No data available&lt;/div>"
+  },
+  "template": "&lt;div>Data loaded: {{count}} items&lt;/div>"
+}'
+        </div>
+        <div class="result" data-observe='{"datasource": "apiData", "type": "html", "templates": {"loading": "<div class=\"loading\">⏳ Loading data...</div>", "error": "<div class=\"error\">❌ Error: {{error.message}}</div>", "empty": "<div class=\"empty\">📭 No data available</div>"}, "template": "<div>Data loaded: {{count}} items</div>"}'>
+            Initial state
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h3>6. JsonLogic Expressions in Templates</h3>
+        <div class="code">
+data-observe='{
+  "datasource": "user", 
+  "type": "template", 
+  "template": "Status: {{jsonlogic: {\"if\": [{\"var\": \"isActive\"}, \"🟢 Active\", \"🔴 Inactive\"]}}}"
+}'
+        </div>
+        <div class="result" data-observe='{"datasource": "user", "type": "template", "template": "Status: {{jsonlogic: {\"if\": [{\"var\": \"isActive\"}, \"🟢 Active\", \"🔴 Inactive\"]}}}"}'>
+            Loading status...
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h3>7. Multiple Formatting Options</h3>
+        <div class="code">
+Various formatters: currency, date, number, text transforms
+        </div>
+        <div class="result" data-observe='{"datasource": "sampleData", "type": "template", "template": "Created: {{createdDate | date}} | Price: {{price | currency:EUR}} | Count: {{count | number}} | Name: {{name | uppercase}}"}'>
+            Loading formatted data...
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h3>8. Attribute Binding</h3>
+        <div class="code">
+data-observe='{"datasource": "user", "type": "attribute", "value": "title:name"}'
+        </div>
+        <div class="result" data-observe='{"datasource": "user", "type": "attribute", "value": "title:name"}' title="Default Title">
+            Hover to see dynamic title attribute
+        </div>
+    </div>
+
+    <h2>🎯 Key Enhancements</h2>
+    <ul>
+        <li>✅ <strong>Advanced Template Processing</strong> - {{variable}}, {{#if condition}}, {{#each array}} syntax</li>
+        <li>✅ <strong>Built-in Formatters</strong> - currency, date, number, text transforms</li>
+        <li>✅ <strong>JsonLogic Integration</strong> - Complex logic expressions in templates</li>
+        <li>✅ <strong>State-Aware Rendering</strong> - Loading, error, and empty state templates</li>
+        <li>✅ <strong>Loop Context Variables</strong> - @index, @first, @last, @even, @odd, @length</li>
+        <li>✅ <strong>Multiple Content Types</strong> - html, text, template, list, attribute</li>
+        <li>✅ <strong>Nested Data Access</strong> - Deep object property access with fallbacks</li>
+        <li>✅ <strong>AI-First Design</strong> - Pure JSON configs that AI can generate reliably</li>
+    </ul>
+
+    <script type="module">
+        // Simulate Annie framework with enhanced data-observe
+        window.annie = {
+            state: {
+                user: {
+                    name: 'john doe',
+                    age: 25,
+                    balance: 1234.56,
+                    isActive: true
+                },
+                products: [
+                    { name: 'Laptop', price: 999.99 },
+                    { name: 'Mouse', price: 29.99 },
+                    { name: 'Keyboard', price: 79.99 }
+                ],
+                users: [
+                    { name: 'Alice Johnson' },
+                    { name: 'Bob Smith' },
+                    { name: 'Carol Williams' }
+                ],
+                apiData: null, // Will simulate loading states
+                sampleData: {
+                    createdDate: '2025-10-02T10:30:00Z',
+                    price: 299.99,
+                    count: 1337,
+                    name: 'sample product'
+                }
+            },
+            dataStore: new Map()
+        };
+
+        // Enhanced template processor (simplified version)
+        class EnhancedTemplateProcessor {
+            processTemplate(template, context) {
+                // Handle {{variable}} with formatting
+                template = template.replace(/\{\{([^}]+)\}\}/g, (match, expr) => {
+                    return this.processExpression(expr.trim(), context, match);
+                });
+
+                // Handle JsonLogic expressions
+                template = template.replace(/\{\{jsonlogic:\s*(\{[^}]*\})\s*\}\}/g, (match, logic) => {
+                    try {
+                        // Simplified JsonLogic evaluation
+                        const logicObj = JSON.parse(logic);
+                        return this.evaluateJsonLogic(logicObj, context);
+                    } catch (e) {
+                        return match;
+                    }
+                });
+
+                // Handle conditionals
+                template = this.processConditionals(template, context);
+
+                // Handle loops
+                template = this.processLoops(template, context);
+
+                return template;
+            }
+
+            processExpression(expr, context, fallback) {
+                const formatMatch = expr.match(/^([^|]+)\s*\|\s*([^:]+)(?::(.+))?$/);
+                
+                if (formatMatch) {
+                    const [, varPath, formatter, options] = formatMatch;
+                    const value = this.getValue(varPath.trim(), context);
+                    return this.formatValue(value, formatter.trim(), options?.trim());
+                }
+
+                return this.getValue(expr, context) ?? fallback;
+            }
+
+            getValue(path, context) {
+                const parts = path.split('.');
+                let value = context;
+                for (const part of parts) {
+                    value = value?.[part];
+                    if (value === undefined) break;
+                }
+                return value;
+            }
+
+            formatValue(value, formatter, options) {
+                if (value == null) return '';
+
+                switch (formatter) {
+                    case 'currency':
+                        const currency = options || 'USD';
+                        return new Intl.NumberFormat('en-US', { 
+                            style: 'currency', 
+                            currency 
+                        }).format(Number(value) || 0);
+                    case 'date':
+                        return new Intl.DateTimeFormat('en-US').format(new Date(value));
+                    case 'number':
+                        return new Intl.NumberFormat('en-US').format(Number(value) || 0);
+                    case 'uppercase':
+                        return String(value).toUpperCase();
+                    case 'lowercase':
+                        return String(value).toLowerCase();
+                    case 'capitalize':
+                        return String(value).charAt(0).toUpperCase() + String(value).slice(1).toLowerCase();
+                    default:
+                        return String(value);
+                }
+            }
+
+            processConditionals(template, context) {
+                return template.replace(/\{\{#if\s+(\{[^}]*\})\}\}(.*?)\{\{\/if\}\}/gs, (match, condition, content) => {
+                    try {
+                        const condObj = JSON.parse(condition);
+                        const result = this.evaluateJsonLogic(condObj, context);
+                        return result ? this.processTemplate(content, context) : '';
+                    } catch (e) {
+                        return match;
+                    }
+                });
+            }
+
+            processLoops(template, context) {
+                return template.replace(/\{\{#each\s+([^}]+)\}\}(.*?)\{\{\/each\}\}/gs, (match, arrayPath, itemTemplate) => {
+                    const items = this.getValue(arrayPath.trim(), context);
+                    if (!Array.isArray(items)) return '';
+
+                    return items.map((item, index) => {
+                        const loopContext = {
+                            ...context,
+                            this: item,
+                            '@index': index,
+                            '@first': index === 0,
+                            '@last': index === items.length - 1,
+                            '@even': index % 2 === 0,
+                            '@odd': index % 2 === 1,
+                            '@length': items.length
+                        };
+                        return this.processTemplate(itemTemplate, loopContext);
+                    }).join('');
+                });
+            }
+
+            evaluateJsonLogic(logic, context) {
+                // Simplified JsonLogic implementation for demo
+                if (logic.if) {
+                    const [condition, trueVal, falseVal] = logic.if;
+                    return this.evaluateCondition(condition, context) ? trueVal : falseVal;
+                }
+                if (logic['>']) {
+                    const [a, b] = logic['>'];
+                    return this.getValue(a.var, context) > b;
+                }
+                if (logic['<=']) {
+                    const [a, b] = logic['<='];
+                    return this.getValue(a.var, context) <= b;
+                }
+                if (logic.var) {
+                    return this.getValue(logic.var, context);
+                }
+                return false;
+            }
+
+            evaluateCondition(condition, context) {
+                if (condition['>']) {
+                    const [a, b] = condition['>'];
+                    return this.getValue(a.var, context) > b;
+                }
+                if (condition['<=']) {
+                    const [a, b] = condition['<='];
+                    return this.getValue(a.var, context) <= b;
+                }
+                if (condition.var) {
+                    return Boolean(this.getValue(condition.var, context));
+                }
+                return false;
+            }
+        }
+
+        // Initialize enhanced data-observe system
+        const processor = new EnhancedTemplateProcessor();
+
+        function processDataObserve() {
+            const elements = document.querySelectorAll('[data-observe]');
+            
+            elements.forEach(element => {
+                try {
+                    const config = JSON.parse(element.getAttribute('data-observe'));
+                    const datasource = config.datasource;
+                    const data = annie.state[datasource];
+                    
+                    if (config.type === 'template' && config.template) {
+                        element.innerHTML = processor.processTemplate(config.template, { [datasource]: data, ...data });
+                    } else if (config.type === 'list' && config.templates?.item) {
+                        if (!data || (Array.isArray(data) && data.length === 0)) {
+                            element.innerHTML = config.templates.empty || 'No items';
+                        } else {
+                            const items = Array.isArray(data) ? data : [data];
+                            const rendered = items.map((item, index) => {
+                                const context = { 
+                                    this: item, 
+                                    '@index': index, 
+                                    '@first': index === 0, 
+                                    '@last': index === items.length - 1 
+                                };
+                                return processor.processTemplate(config.templates.item, context);
+                            }).join('');
+                            element.innerHTML = rendered;
+                        }
+                    } else if (config.type === 'attribute' && config.value) {
+                        const [attrName, path] = config.value.split(':');
+                        const value = processor.getValue(path, data);
+                        if (value !== undefined) {
+                            element.setAttribute(attrName, value);
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Failed to process data-observe:', error, element);
+                }
+            });
+        }
+
+        // Process on load
+        processDataObserve();
+
+        // Simulate loading states for demo #5
+        setTimeout(() => {
+            annie.state.apiData = { loading: true };
+            processDataObserve();
+            
+            setTimeout(() => {
+                annie.state.apiData = { count: 42 };
+                processDataObserve();
+            }, 2000);
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Advanced Routing Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --annie-primary: #667eea;
+            --annie-secondary: #764ba2;
+            --annie-success: #48bb78;
+            --annie-warning: #ed8936;
+            --annie-danger: #f56565;
+            --annie-info: #4299e1;
+            --annie-dark: #2d3748;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .annie-header {
+            background: linear-gradient(135deg, var(--annie-primary), var(--annie-secondary));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .annie-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            border-bottom: 3px solid var(--annie-primary);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .annie-nav-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .route-button {
+            background: linear-gradient(135deg, var(--annie-primary), var(--annie-secondary));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .route-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .route-button.active {
+            background: linear-gradient(135deg, var(--annie-success), #38a169);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        view, [data-annie-view] {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+            min-height: 500px;
+            padding: 2rem;
+        }
+
+        view.active, [data-annie-view].active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .demo-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--annie-primary);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        .status-bar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 250px;
+            z-index: 1000;
+        }
+
+        .param-display {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: monospace;
+        }
+
+        .nested-nav {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .nested-nav button {
+            background: var(--annie-info);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+
+        .lazy-loading {
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            border: 2px dashed #ccc;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .annie-loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--annie-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .route-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        @media (max-width: 768px) {
+            .annie-nav-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .route-button {
+                margin: 5px 0;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="annie-header">
+        <div class="container">
+            <h1><i class="fas fa-route"></i> Annie Advanced Routing</h1>
+            <p class="lead mb-0">Enterprise-grade routing with AI-friendly data attributes</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="annie-nav">
+        <div class="annie-nav-container" data-annie-route-container='{"classstates": {"active": "active", "enabled": "", "disabled": "disabled"}}'>
+            <!-- Basic routing (no parameters) -->
+            <a href="#" class="route-button active" 
+               data-annie-route='{"target": "overview"}'
+               data-annie-on-enter="handleNavigation">
+                <i class="fas fa-home"></i> Overview
+            </a>
+
+            <!-- Route with parameters -->
+            <a href="#" class="route-button" 
+               data-annie-route='{"path": "/user/:id"}'
+               data-annie-path="/user/123"
+               data-annie-params='{"id": "number"}'
+               data-annie-on-enter="handleUserNavigation">
+                <i class="fas fa-user"></i> User Profile
+            </a>
+
+            <!-- Lazy loaded route -->
+            <a href="#" class="route-button" 
+               data-annie-route='{"target": "dashboard"}'
+               data-annie-lazy="dashboard-module"
+               data-annie-preload="hover"
+               data-annie-on-enter="handleDashboard">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+
+            <!-- Nested routing -->
+            <a href="#" class="route-button" 
+               data-annie-route='{"target": "products"}'
+               data-annie-nested="true">
+                <i class="fas fa-shopping-cart"></i> Products
+            </a>
+
+            <!-- Route with query parameters -->
+            <a href="#" class="route-button" 
+               data-annie-route='{"target": "search"}'
+               data-annie-query='{"q": "annie", "category": "framework"}'
+               data-annie-history="push">
+                <i class="fas fa-search"></i> Search
+            </a>
+
+            <!-- Navigation events demo -->
+            <a href="#" class="route-button" 
+               data-annie-route='{"target": "events"}'
+               data-annie-on-enter="analytics.trackPageView"
+               data-annie-on-leave="analytics.trackPageLeave">
+                <i class="fas fa-calendar"></i> Events
+            </a>
+        </div>
+    </nav>
+
+    <!-- Views -->
+    <main class="container-fluid">
+        
+        <!-- Overview View -->
+        <view id="overview" class="active">
+            <div class="demo-card">
+                <h2><i class="fas fa-info-circle text-primary"></i> Advanced Routing Overview</h2>
+                <p class="lead">Annie's Advanced Routing brings enterprise-grade navigation capabilities while maintaining the framework's AI-first, declarative philosophy.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4><i class="fas fa-route text-primary"></i> Route Parameters</h4>
+                        <p>Handle dynamic URLs like <code>/user/:id</code> with automatic parameter parsing and type conversion.</p>
+                        <div class="code-block">
+&lt;a data-annie-route='{"path": "/user/:id"}'
+   data-annie-params='{"id": "number"}'&gt;
+   User Profile
+&lt;/a&gt;
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h4><i class="fas fa-layer-group text-success"></i> Nested Routes</h4>
+                        <p>Create complex hierarchical navigation structures with parent-child relationships.</p>
+                        <div class="code-block">
+&lt;div data-annie-nested-routes&gt;
+  &lt;a data-annie-subroute="/stats"&gt;Stats&lt;/a&gt;
+  &lt;a data-annie-subroute="/reports"&gt;Reports&lt;/a&gt;
+&lt;/div&gt;
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h4><i class="fas fa-rocket text-warning"></i> Lazy Loading</h4>
+                        <p>Load JavaScript modules on-demand with configurable preloading strategies.</p>
+                        <div class="code-block">
+&lt;a data-annie-lazy="analytics-bundle"
+   data-annie-preload="hover"&gt;
+   Analytics
+&lt;/a&gt;
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h4><i class="fas fa-history text-info"></i> History Management</h4>
+                        <p>Full browser history integration with push/replace state management.</p>
+                        <div class="code-block">
+&lt;a data-annie-history="push"
+   data-annie-state='{"context": "dashboard"}'&gt;
+   Navigate
+&lt;/a&gt;
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h4><i class="fas fa-search text-secondary"></i> Query Strings</h4>
+                        <p>Handle URL query parameters with automatic parsing and state management.</p>
+                        <div class="code-block">
+&lt;a data-annie-query='{"tab": "settings"}'&gt;
+   Settings Tab
+&lt;/a&gt;
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h4><i class="fas fa-code-branch text-danger"></i> Navigation Events</h4>
+                        <p>Lifecycle hooks for analytics, validation, and custom navigation logic.</p>
+                        <div class="code-block">
+&lt;a data-annie-on-enter="analytics.track"
+   data-annie-on-leave="form.saveProgress"&gt;
+   Tracked Route
+&lt;/a&gt;
+                        </div>
+                    </div>
+                </div>
+
+                <div class="route-info">
+                    <h5><i class="fas fa-lightbulb"></i> Why Advanced Routing?</h5>
+                    <ul>
+                        <li><strong>AI-Friendly:</strong> Declarative data attributes are easily understood and generated by AI</li>
+                        <li><strong>Performance:</strong> Lazy loading and preloading strategies optimize bundle sizes</li>
+                        <li><strong>Enterprise-Ready:</strong> Supports complex application architectures</li>
+                        <li><strong>SEO-Friendly:</strong> Proper URL structure and history management</li>
+                        <li><strong>Type-Safe:</strong> Parameter validation and TypeScript support</li>
+                    </ul>
+                </div>
+            </div>
+        </view>
+
+        <!-- User Profile View -->
+        <view id="user" data-annie-path="/user/:id">
+            <div class="demo-card">
+                <h2><i class="fas fa-user text-primary"></i> User Profile</h2>
+                <p>This view demonstrates route parameters and dynamic content loading.</p>
+                
+                <div class="param-display">
+                    <h5>Route Parameters:</h5>
+                    <div id="route-params">Loading...</div>
+                </div>
+
+                <div class="param-display">
+                    <h5>Query Parameters:</h5>
+                    <div id="query-params">Loading...</div>
+                </div>
+
+                <div class="feature-card">
+                    <h4>Parameter Handling</h4>
+                    <p>Annie automatically parses and converts route parameters:</p>
+                    <ul>
+                        <li><strong>Numbers:</strong> <code>:id</code> becomes <code>123</code> (number)</li>
+                        <li><strong>Strings:</strong> <code>:name</code> becomes <code>"john"</code> (string)</li>
+                        <li><strong>Booleans:</strong> <code>:active</code> becomes <code>true/false</code></li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+// Parameters are available in data store
+const params = annie.dataset('current-route-params');
+console.log('User ID:', params[0].id);
+
+// Or via data attributes
+const userView = document.getElementById('user');
+const params = JSON.parse(userView.getAttribute('data-annie-data-route-params'));
+                </div>
+            </div>
+        </view>
+
+        <!-- Dashboard View -->
+        <view id="dashboard">
+            <div class="demo-card">
+                <h2><i class="fas fa-tachometer-alt text-primary"></i> Dashboard</h2>
+                <p>This view demonstrates lazy loading capabilities.</p>
+                
+                <div class="lazy-loading" id="lazy-content">
+                    <div class="annie-loader"></div>
+                    <p>Loading dashboard module...</p>
+                </div>
+
+                <div class="feature-card">
+                    <h4>Lazy Loading Strategies</h4>
+                    <ul>
+                        <li><strong>None:</strong> <code>data-annie-preload="none"</code> - Load only when needed</li>
+                        <li><strong>Hover:</strong> <code>data-annie-preload="hover"</code> - Preload on hover</li>
+                        <li><strong>Visible:</strong> <code>data-annie-preload="visible"</code> - Preload when visible</li>
+                        <li><strong>Immediate:</strong> <code>data-annie-preload="immediate"</code> - Preload immediately</li>
+                    </ul>
+                </div>
+            </div>
+        </view>
+
+        <!-- Products View with Nested Routes -->
+        <view id="products">
+            <div class="demo-card">
+                <h2><i class="fas fa-shopping-cart text-primary"></i> Products</h2>
+                <p>This view demonstrates nested routing capabilities.</p>
+                
+                <div class="nested-nav" data-annie-nested-routes>
+                    <h5>Product Categories:</h5>
+                    <button data-annie-subroute="/electronics" data-annie-lazy="electronics-widget">Electronics</button>
+                    <button data-annie-subroute="/clothing" data-annie-lazy="clothing-widget">Clothing</button>
+                    <button data-annie-subroute="/books" data-annie-lazy="books-widget">Books</button>
+                </div>
+
+                <div data-annie-subroute-view="/electronics" style="display: none;">
+                    <h4>Electronics Department</h4>
+                    <p>Phones, laptops, gadgets and more...</p>
+                </div>
+
+                <div data-annie-subroute-view="/clothing" style="display: none;">
+                    <h4>Clothing Department</h4>
+                    <p>Fashion for every style and season...</p>
+                </div>
+
+                <div data-annie-subroute-view="/books" style="display: none;">
+                    <h4>Books Department</h4>
+                    <p>Fiction, non-fiction, technical books...</p>
+                </div>
+
+                <div class="feature-card">
+                    <h4>Nested Route Benefits</h4>
+                    <ul>
+                        <li>Hierarchical URL structure: <code>/products/electronics</code></li>
+                        <li>Independent lazy loading per subroute</li>
+                        <li>Parent-child parameter inheritance</li>
+                        <li>Modular component architecture</li>
+                    </ul>
+                </div>
+            </div>
+        </view>
+
+        <!-- Search View -->
+        <view id="search">
+            <div class="demo-card">
+                <h2><i class="fas fa-search text-primary"></i> Search</h2>
+                <p>This view demonstrates query parameter handling.</p>
+                
+                <div class="param-display">
+                    <h5>Search Query:</h5>
+                    <div id="search-query">Loading...</div>
+                </div>
+
+                <div class="param-display">
+                    <h5>Current URL:</h5>
+                    <div id="current-url">Loading...</div>
+                </div>
+
+                <div class="feature-card">
+                    <h4>Query Parameter Features</h4>
+                    <ul>
+                        <li>Automatic URL synchronization</li>
+                        <li>Type conversion (string, number, boolean)</li>
+                        <li>Default value support</li>
+                        <li>Reactive data binding</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+// Query parameters in data store
+const query = annie.dataset('current-route-query');
+console.log('Search term:', query[0].q);
+console.log('Category:', query[0].category);
+                </div>
+            </div>
+        </view>
+
+        <!-- Events View -->
+        <view id="events">
+            <div class="demo-card">
+                <h2><i class="fas fa-calendar text-primary"></i> Navigation Events</h2>
+                <p>This view demonstrates navigation lifecycle hooks.</p>
+                
+                <div id="event-log" class="param-display">
+                    <h5>Event Log:</h5>
+                    <div id="events-list">
+                        <p><em>Navigation events will appear here...</em></p>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <h4>Available Lifecycle Hooks</h4>
+                    <ul>
+                        <li><strong>onEnter:</strong> Called when navigating to a route</li>
+                        <li><strong>onLeave:</strong> Called when leaving a route</li>
+                        <li><strong>onParams:</strong> Called when route parameters change</li>
+                        <li><strong>beforeNavigate:</strong> Called before navigation (can cancel)</li>
+                        <li><strong>afterNavigate:</strong> Called after navigation completes</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+// Example lifecycle functions
+window.analytics = {
+    trackPageView: (event) => {
+        console.log('Page view:', event.to.path);
+        // Send to analytics service
+    },
+    
+    trackPageLeave: (event) => {
+        console.log('Page leave:', event.from.path);
+        // Track time on page
+    }
+};
+                </div>
+            </div>
+        </view>
+    </main>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <h6><i class="fas fa-info-circle"></i> Route Status</h6>
+        <div id="current-route">Loading...</div>
+        <div id="route-history">History: 0 routes</div>
+    </div>
+
+    <!-- Load Annie Framework -->
+    <script type="module">
+        // Import Annie Framework
+        import { AnnieFramework } from './src/annie.js';
+        
+        // Initialize with advanced routing enabled
+        window.annie = new AnnieFramework({
+            apiConfig: {
+                baseUrl: '/api'
+            },
+            autoInitialize: true,
+            enableAdvancedRouting: true,  // Enable advanced routing
+            enableAnimations: true
+        });
+
+        // Global functions for lifecycle hooks
+        window.handleNavigation = function(event) {
+            logEvent('Navigation to overview');
+            updateStatus();
+        };
+
+        window.handleUserNavigation = function(event) {
+            logEvent('Navigation to user profile');
+            updateUserParams();
+            updateStatus();
+        };
+
+        window.handleDashboard = function(event) {
+            logEvent('Navigation to dashboard');
+            simulateLazyLoading();
+            updateStatus();
+        };
+
+        // Analytics object for event demos
+        window.analytics = {
+            trackPageView: function(event) {
+                logEvent(`Analytics: Page view - ${event?.to?.path || 'unknown'}`);
+            },
+            
+            trackPageLeave: function(event) {
+                logEvent(`Analytics: Page leave - ${event?.from?.path || 'unknown'}`);
+            }
+        };
+
+        // Event logging
+        function logEvent(message) {
+            const eventsList = document.getElementById('events-list');
+            if (eventsList) {
+                const timestamp = new Date().toLocaleTimeString();
+                const eventItem = document.createElement('div');
+                eventItem.innerHTML = `<small class="text-muted">${timestamp}</small> ${message}`;
+                eventItem.style.padding = '5px 0';
+                eventItem.style.borderBottom = '1px solid #eee';
+                
+                if (eventsList.firstChild && eventsList.firstChild.tagName === 'P') {
+                    eventsList.removeChild(eventsList.firstChild);
+                }
+                
+                eventsList.insertBefore(eventItem, eventsList.firstChild);
+                
+                // Keep only last 10 events
+                while (eventsList.children.length > 10) {
+                    eventsList.removeChild(eventsList.lastChild);
+                }
+            }
+        }
+
+        // Update status display
+        function updateStatus() {
+            const currentRouteEl = document.getElementById('current-route');
+            const historyEl = document.getElementById('route-history');
+            
+            if (annie && annie.getAdvancedRouter) {
+                const router = annie.getAdvancedRouter();
+                if (router) {
+                    const current = router.getCurrentRoute();
+                    const history = router.getHistory();
+                    
+                    if (currentRouteEl) {
+                        currentRouteEl.innerHTML = current ? 
+                            `<strong>${current.path}</strong><br><small>Params: ${JSON.stringify(current.params)}</small>` : 
+                            'No route active';
+                    }
+                    
+                    if (historyEl) {
+                        historyEl.textContent = `History: ${history.length} routes`;
+                    }
+                }
+            }
+        }
+
+        // Update user parameters display
+        function updateUserParams() {
+            setTimeout(() => {
+                const routeParams = annie.dataset('current-route-params');
+                const queryParams = annie.dataset('current-route-query');
+                
+                const routeEl = document.getElementById('route-params');
+                const queryEl = document.getElementById('query-params');
+                
+                if (routeEl && routeParams && routeParams[0]) {
+                    routeEl.innerHTML = `<pre>${JSON.stringify(routeParams[0], null, 2)}</pre>`;
+                } else if (routeEl) {
+                    routeEl.innerHTML = '<em>No route parameters</em>';
+                }
+                
+                if (queryEl && queryParams && queryParams[0]) {
+                    queryEl.innerHTML = `<pre>${JSON.stringify(queryParams[0], null, 2)}</pre>`;
+                } else if (queryEl) {
+                    queryEl.innerHTML = '<em>No query parameters</em>';
+                }
+            }, 100);
+        }
+
+        // Update search display
+        function updateSearchDisplay() {
+            const queryParams = annie.dataset('current-route-query');
+            const searchQueryEl = document.getElementById('search-query');
+            const currentUrlEl = document.getElementById('current-url');
+            
+            if (searchQueryEl && queryParams && queryParams[0]) {
+                const query = queryParams[0];
+                searchQueryEl.innerHTML = `
+                    <strong>Term:</strong> ${query.q || 'none'}<br>
+                    <strong>Category:</strong> ${query.category || 'all'}
+                `;
+            } else if (searchQueryEl) {
+                searchQueryEl.innerHTML = '<em>No search parameters</em>';
+            }
+            
+            if (currentUrlEl) {
+                currentUrlEl.innerHTML = `<code>${window.location.pathname}${window.location.search}</code>`;
+            }
+        }
+
+        // Simulate lazy loading
+        function simulateLazyLoading() {
+            const lazyContent = document.getElementById('lazy-content');
+            if (lazyContent) {
+                setTimeout(() => {
+                    lazyContent.innerHTML = `
+                        <div class="feature-card">
+                            <h4><i class="fas fa-check-circle text-success"></i> Dashboard Module Loaded</h4>
+                            <p>This content was loaded lazily when the dashboard route was accessed.</p>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Users</h5>
+                                            <h2 class="text-primary">1,234</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Revenue</h5>
+                                            <h2 class="text-success">$56,789</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Orders</h5>
+                                            <h2 class="text-warning">890</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }, 1500);
+            }
+        }
+
+        // Update displays when views change
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up observers for different views
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        const element = mutation.target;
+                        if (element.tagName === 'VIEW' && element.style.display === 'block') {
+                            if (element.id === 'user') {
+                                updateUserParams();
+                            } else if (element.id === 'search') {
+                                updateSearchDisplay();
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Observe all views for style changes
+            document.querySelectorAll('view').forEach(view => {
+                observer.observe(view, { attributes: true, attributeFilter: ['style'] });
+            });
+
+            // Initial status update
+            setTimeout(updateStatus, 500);
+        });
+
+        // Handle programmatic navigation examples
+        window.navigateToUser = function(userId) {
+            annie.navigateToPath(`/user/${userId}`, {
+                query: { tab: 'profile', edit: true },
+                history: 'push'
+            });
+        };
+
+        window.navigateWithParams = function() {
+            annie.navigateWithParams('dashboard', {
+                params: { section: 'analytics' },
+                query: { period: '30d' },
+                state: { fromDemo: true }
+            });
+        };
+
+        // Log framework initialization
+        console.log('🚀 Annie Advanced Routing Demo initialized');
+        console.log('Available methods:', {
+            navigateToUser: 'navigateToUser(userId)',
+            navigateWithParams: 'navigateWithParams()',
+            getCurrentRoute: 'annie.getAdvancedRouter().getCurrentRoute()',
+            getHistory: 'annie.getAdvancedRouter().getHistory()'
+        });
+    </script>
+</body>
+</html>

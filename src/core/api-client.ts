@@ -17,6 +17,7 @@ import {
 export interface ApiConfig {
   baseUrl: string;
   timeout?: number;
+  useFormData?: boolean; // Default true, set to false for JSON body
 }
 
 export interface QueryObject {
@@ -29,6 +30,7 @@ export interface QueryObject {
 export class ApiClient implements IDisposable {
     private baseUrl: string;
     private timeout: number;
+    private useFormData: boolean;
     private logger: ILogger;
     private dataStore: DataStore;
     private xhr: XMLHttpRequest | null = null;
@@ -44,8 +46,11 @@ export class ApiClient implements IDisposable {
     
         this.baseUrl = config.baseUrl;
         this.timeout = config.timeout || 30000;
+        this.useFormData = config.useFormData !== false; // Default to true (FormData)
         this.dataStore = dataStore;
         this.validationManager = new ValidationManager(logger);
+        
+        this.logger.debug(`ApiClient initialized with ${this.useFormData ? 'FormData' : 'JSON'} format`);
     }
 
     private validateConfig(config: ApiConfig): void {
@@ -88,9 +93,21 @@ export class ApiClient implements IDisposable {
             this.processing = true;
       
             try {
+                // Check for per-request format override
+                const useFormDataForThisRequest = this.getRequestFormat(apiObject);
+                const originalFormat = this.useFormData;
+                
+                if (useFormDataForThisRequest !== null) {
+                    this.useFormData = useFormDataForThisRequest;
+                    this.logger.debug(`Using per-request format override: ${useFormDataForThisRequest ? 'FormData' : 'JSON'}`);
+                }
+                
                 const requestData = this.buildRequestData(apiObject);
                 const url = this.getUrl(apiObject);
                 const method = this.getMethod(apiObject);
+                
+                // Restore original format
+                this.useFormData = originalFormat;
 
                 this.logger.debug(`API call details - URL: ${url}, Method: ${method}, Data: ${requestData}`);
 
@@ -103,10 +120,19 @@ export class ApiClient implements IDisposable {
                 this.activeRequests.add(this.xhr);
         
                 this.xhr.open(method, url, true);
-                this.xhr.setRequestHeader('Content-Type', 'application/json');
+                
+                // Set appropriate Content-Type header
+                if (this.useFormData && requestData instanceof FormData) {
+                    // Don't set Content-Type for FormData - let browser set it with boundary
+                    this.logger.debug(`Using FormData - letting browser set Content-Type`);
+                } else {
+                    this.xhr.setRequestHeader('Content-Type', 'application/json');
+                    this.logger.debug(`Using JSON - setting Content-Type to application/json`);
+                }
                 
                 // Debug logging
-                this.logger.debug(`API Call - URL: ${url}, Method: ${method}, Data: ${requestData}`);
+                const debugData = requestData instanceof FormData ? '[FormData object]' : requestData;
+                this.logger.debug(`API Call - URL: ${url}, Method: ${method}, Data: ${debugData}`);
         
                 this.xhr.addEventListener('load', () => {
                     this.processing = false;
@@ -170,7 +196,7 @@ export class ApiClient implements IDisposable {
         return false;
     }
 
-    private buildRequestData(apiObject: unknown): string {
+    private buildRequestData(apiObject: unknown): FormData | string {
         const requestData: any = {};
     
         // Add store data (filter out problematic parameters)
@@ -190,7 +216,16 @@ export class ApiClient implements IDisposable {
         }
 
         this.logger.debug(`Request data being sent: ${JSON.stringify(requestData)}`);
-        return JSON.stringify(requestData);
+        
+        // Return FormData or JSON based on configuration
+        if (this.useFormData) {
+            const formData = this.objToFormData(requestData);
+            this.logger.debug(`Using FormData format for request`);
+            return formData;
+        } else {
+            this.logger.debug(`Using JSON format for request`);
+            return JSON.stringify(requestData);
+        }
     }
 
     private filterStoreData(storeData: any): any {
@@ -236,7 +271,17 @@ export class ApiClient implements IDisposable {
                         const formData = new FormData(formElement);
                         // Use forEach instead of entries() for better compatibility
                         formData.forEach((value, key) => {
-                            requestData[key] = value;
+                            // Handle file inputs - preserve File objects for FormData, convert to filename for JSON
+                            if (value instanceof File) {
+                                if (this.useFormData) {
+                                    requestData[key] = value; // Keep File object for FormData
+                                } else {
+                                    requestData[key] = value.name; // Just filename for JSON
+                                }
+                                this.logger.debug(`Added file: ${key} = ${value.name}`);
+                            } else {
+                                requestData[key] = value;
+                            }
                         });
                         this.logger.debug(`Added form data from ${formId}`);
                     }
@@ -529,7 +574,34 @@ export class ApiClient implements IDisposable {
         
                 if (value === null || value === undefined) {
                     formData.append(formKey, '');
-                } else if (typeof value === 'object' && !(value instanceof File)) {
+                } else if (value instanceof File) {
+                    // Handle File objects directly
+                    formData.append(formKey, value, value.name);
+                    this.logger.debug(`Added file to FormData: ${formKey} = ${value.name}`);
+                } else if (value instanceof FileList) {
+                    // Handle FileList (multiple files)
+                    for (let i = 0; i < value.length; i++) {
+                        const fileKey = value.length > 1 ? `${formKey}[${i}]` : formKey;
+                        formData.append(fileKey, value[i], value[i].name);
+                        this.logger.debug(`Added file to FormData: ${fileKey} = ${value[i].name}`);
+                    }
+                } else if (key === 'queries' && (Array.isArray(value) || typeof value === 'object')) {
+                    // Special handling for queries - always serialize as JSON string for FormData
+                    formData.append(formKey, JSON.stringify(value));
+                    this.logger.debug(`Added queries as JSON string to FormData: ${formKey}`);
+                } else if (Array.isArray(value)) {
+                    // Handle arrays (excluding queries which are handled above)
+                    value.forEach((item, index) => {
+                        if (item instanceof File) {
+                            formData!.append(`${formKey}[${index}]`, item, item.name);
+                        } else if (typeof item === 'object' && item !== null) {
+                            this.objToFormData(item as Record<string, unknown>, formData, `${formKey}[${index}]`);
+                        } else {
+                            formData!.append(`${formKey}[${index}]`, String(item));
+                        }
+                    });
+                } else if (typeof value === 'object' && value !== null) {
+                    // Handle nested objects
                     this.objToFormData(value as Record<string, unknown>, formData, formKey);
                 } else {
                     formData.append(formKey, String(value));
@@ -577,6 +649,44 @@ export class ApiClient implements IDisposable {
 
     isDisposed(): boolean {
         return this.disposed;
+    }
+
+    // Method to switch request format
+    setRequestFormat(useFormData: boolean): void {
+        this.useFormData = useFormData;
+        this.logger.debug(`Request format changed to: ${useFormData ? 'FormData' : 'JSON'}`);
+    }
+
+    // Method to check current request format
+    isUsingFormData(): boolean {
+        return this.useFormData;
+    }
+
+    // Extract per-request format preference from apiObject
+    private getRequestFormat(apiObject: unknown): boolean | null {
+        if (typeof apiObject === 'object' && apiObject && 
+            'object' in apiObject && Array.isArray(apiObject.object) && 
+            apiObject.object[0]) {
+            
+            const config = apiObject.object[0];
+            
+            // Check for explicit format specification
+            if (config.useFormData !== undefined) {
+                return config.useFormData;
+            }
+            
+            // Auto-detect: if form elements are specified, prefer FormData
+            if (config.form && Array.isArray(config.form) && config.form.length > 0) {
+                return true;
+            }
+            
+            // Auto-detect: if files are expected, prefer FormData
+            if (config.expectsFiles === true) {
+                return true;
+            }
+        }
+        
+        return null; // No override, use default
     }
 
     // Data attribute management for API responses

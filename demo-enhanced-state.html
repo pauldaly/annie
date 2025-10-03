@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Enhanced State Management Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f7;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        h1 {
+            color: #1d1d1f;
+            border-bottom: 2px solid #007aff;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #007aff;
+            margin-top: 40px;
+        }
+        .demo-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007aff;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .output {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f1f8e9;
+            border-radius: 8px;
+            border: 1px solid #c8e6c9;
+            font-family: 'Monaco', 'Consolas', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        button {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #0056cc;
+        }
+        button.secondary {
+            background: #6c757d;
+        }
+        button.secondary:hover {
+            background: #545b62;
+        }
+        button.danger {
+            background: #dc3545;
+        }
+        button.danger:hover {
+            background: #c82333;
+        }
+        input, select {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin: 5px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .action-log {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        .state-display {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .entity-display {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-active {
+            background-color: #28a745;
+        }
+        .status-inactive {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Annie Framework - Enhanced State Management</h1>
+        
+        <div class="demo-section">
+            <h2>📊 State Manager Status</h2>
+            <div id="statusDisplay" class="output state-display">
+                Initializing enhanced state manager...
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>⚡ Actions & Reducers</h2>
+            <div class="controls">
+                <button onclick="dispatchCounterActions()">Counter Actions</button>
+                <button onclick="dispatchUserActions()">User Actions</button>
+                <button onclick="dispatchTodoActions()">Todo Actions</button>
+                <button onclick="clearActionLog()" class="secondary">Clear Log</button>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <h3>Counter Example</h3>
+                    <div class="controls">
+                        <button onclick="incrementCounter()">Increment</button>
+                        <button onclick="decrementCounter()">Decrement</button>
+                        <button onclick="resetCounter()">Reset</button>
+                        <input type="number" id="counterValue" placeholder="Set value" style="width: 100px;">
+                        <button onclick="setCounter()">Set</button>
+                    </div>
+                    <div>Current Count: <strong id="counterDisplay">0</strong></div>
+                </div>
+                <div class="card">
+                    <h3>Action Log</h3>
+                    <div id="actionLog" class="output action-log" style="max-height: 200px;">
+                        No actions dispatched yet...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎯 Selectors & Memoization</h2>
+            <div class="controls">
+                <button onclick="demonstrateSelectors()">Run Selector Demo</button>
+                <button onclick="clearSelectorCache()">Clear Cache</button>
+            </div>
+            <div class="output" id="selectorOutput">
+                Click "Run Selector Demo" to see memoized selectors in action...
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🌊 Effects (Side Effects)</h2>
+            <div class="controls">
+                <button onclick="registerAsyncEffect()">
+                    <span class="status-indicator status-inactive" id="effectIndicator"></span>
+                    Toggle Async Effect
+                </button>
+                <button onclick="triggerAsyncAction()">Trigger Async Action</button>
+            </div>
+            <div class="output" id="effectOutput">
+                Register an effect to see asynchronous side effects...
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📦 Entity Management</h2>
+            <div class="controls">
+                <input type="text" id="todoTitle" placeholder="Todo title" style="width: 200px;">
+                <button onclick="addTodo()">Add Todo</button>
+                <button onclick="toggleRandomTodo()">Toggle Random</button>
+                <button onclick="removeCompleted()">Remove Completed</button>
+                <button onclick="clearAllTodos()" class="danger">Clear All</button>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <h3>Entity State</h3>
+                    <div id="entityOutput" class="output entity-display">
+                        No todos yet...
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Todo List UI</h3>
+                    <div id="todoListUI">
+                        <!-- Todos will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>⏱️ Time Travel & History</h2>
+            <div class="controls">
+                <button onclick="showHistory()">Show History</button>
+                <button onclick="goBackInTime()">Go Back</button>
+                <button onclick="goForwardInTime()">Go Forward</button>
+                <button onclick="jumpToHistoryIndex()">Jump to Index:</button>
+                <input type="number" id="historyIndex" min="0" style="width: 80px;">
+            </div>
+            <div class="output" id="historyOutput">
+                State history will appear here...
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔒 Immutable Updates</h2>
+            <div class="controls">
+                <button onclick="demonstrateImmutable()">Immutable Updates</button>
+                <button onclick="demonstrateMutable()">Mutable Updates (Error)</button>
+                <button onclick="toggleStrictMode()">
+                    <span id="strictModeText">Enable</span> Strict Mode
+                </button>
+            </div>
+            <div class="output" id="immutableOutput">
+                Demonstrate immutable state updates...
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📡 Observable Streams</h2>
+            <div class="controls">
+                <button onclick="subscribeToStreams()">
+                    <span class="status-indicator status-inactive" id="streamIndicator"></span>
+                    Toggle Stream Subscription
+                </button>
+            </div>
+            <div class="output" id="streamOutput">
+                Subscribe to action and state streams...
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🛠️ Code Examples</h2>
+            <div class="card">
+                <h3>Basic Usage</h3>
+                <pre><code>// Create enhanced state manager
+import { createEnhancedStateManager, createAction, createSelector } from './annie';
+
+const stateManager = createEnhancedStateManager(logger, {
+    enableActions: true,
+    enableEffects: true,
+    enableSelectors: true,
+    strictMode: false
+});
+
+// Define actions
+const increment = createAction&lt;number&gt;('INCREMENT');
+const decrement = createAction&lt;number&gt;('DECREMENT');
+
+// Register reducer
+stateManager.registerReducer('counter', (state = 0, action) => {
+    switch (action.type) {
+        case 'INCREMENT':
+            return state + (action.payload || 1);
+        case 'DECREMENT':
+            return state - (action.payload || 1);
+        default:
+            return state;
+    }
+});
+
+// Dispatch actions
+stateManager.dispatch(increment(5));
+stateManager.dispatch(decrement(2));
+
+// Use selectors
+const doubleCounter = createSelector(
+    (state) => state.counter * 2
+);
+
+stateManager.registerSelector('doubleCounter', doubleCounter);
+const result = stateManager.select('doubleCounter');</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { 
+            createEnhancedStateManager, 
+            createAction, 
+            createActionGroup,
+            createSelector,
+            createEntityAdapter,
+            Logger 
+        } from './src/index.js';
+
+        // Initialize logger and enhanced state manager
+        const logger = new Logger('Demo', 'Debug');
+        window.stateManager = createEnhancedStateManager(logger, {
+            enableActions: true,
+            enableEffects: true,
+            enableSelectors: true,
+            enableEntities: true,
+            strictMode: false,
+            enableActionLogging: true,
+            enableDevTools: true,
+            enableTimeTravel: true,
+            maxHistorySize: 50
+        });
+
+        // Store for demo state
+        window.demoState = {
+            effectRegistered: false,
+            streamSubscribed: false,
+            strictMode: false,
+            effectUnsubscribe: null,
+            streamUnsubscribes: []
+        };
+
+        // Action creators
+        const counterActions = createActionGroup('Counter', {
+            increment: undefined,
+            decrement: undefined,
+            reset: undefined,
+            setValue: undefined
+        });
+
+        const todoActions = createActionGroup('Todo', {
+            add: undefined,
+            toggle: undefined,
+            remove: undefined,
+            clear: undefined,
+            removeCompleted: undefined
+        });
+
+        const asyncActions = createActionGroup('Async', {
+            start: undefined,
+            success: undefined,
+            error: undefined
+        });
+
+        // Store actions globally
+        window.actions = {
+            ...counterActions,
+            ...todoActions,
+            ...asyncActions
+        };
+
+        // Entity adapter for todos
+        window.todoAdapter = createEntityAdapter({
+            selectId: (todo) => todo.id,
+            sortComparer: (a, b) => a.created - b.created
+        });
+
+        // Initialize reducers
+        function initializeReducers() {
+            // Counter reducer
+            window.stateManager.registerReducer('counter', (state = 0, action) => {
+                switch (action.type) {
+                    case '[Counter] increment':
+                        return state + (action.payload || 1);
+                    case '[Counter] decrement':
+                        return state - (action.payload || 1);
+                    case '[Counter] reset':
+                        return 0;
+                    case '[Counter] setValue':
+                        return action.payload || 0;
+                    default:
+                        return state;
+                }
+            });
+
+            // Todo entity reducer
+            window.stateManager.registerReducer('todos', (state = { ids: [], entities: {} }, action) => {
+                switch (action.type) {
+                    case '[Todo] add':
+                        return window.todoAdapter.addOne(state, {
+                            id: Date.now(),
+                            title: action.payload,
+                            completed: false,
+                            created: Date.now()
+                        });
+                    case '[Todo] toggle':
+                        return window.todoAdapter.updateOne(state, {
+                            id: action.payload,
+                            changes: { completed: !state.entities[action.payload]?.completed }
+                        });
+                    case '[Todo] remove':
+                        return window.todoAdapter.removeOne(state, action.payload);
+                    case '[Todo] clear':
+                        return window.todoAdapter.removeAll(state);
+                    case '[Todo] removeCompleted':
+                        const completedIds = Object.values(state.entities)
+                            .filter(todo => todo.completed)
+                            .map(todo => todo.id);
+                        return window.todoAdapter.removeMany(state, completedIds);
+                    default:
+                        return state;
+                }
+            });
+
+            // Async loading reducer
+            window.stateManager.registerReducer('loading', (state = false, action) => {
+                switch (action.type) {
+                    case '[Async] start':
+                        return true;
+                    case '[Async] success':
+                    case '[Async] error':
+                        return false;
+                    default:
+                        return state;
+                }
+            });
+        }
+
+        // Initialize selectors
+        function initializeSelectors() {
+            // Counter selectors
+            const doubleCounter = createSelector(
+                (state) => (state.counter || 0) * 2,
+                { memoize: true }
+            );
+
+            const isEvenCounter = createSelector(
+                (state) => (state.counter || 0) % 2 === 0,
+                { memoize: true }
+            );
+
+            // Todo selectors
+            const allTodos = createSelector(
+                (state) => window.todoAdapter.selectAll(state.todos || { ids: [], entities: {} }),
+                { memoize: true }
+            );
+
+            const completedTodos = createSelector(
+                (state) => {
+                    const todos = window.todoAdapter.selectAll(state.todos || { ids: [], entities: {} });
+                    return todos.filter(todo => todo.completed);
+                },
+                { memoize: true }
+            );
+
+            const todoStats = createSelector(
+                (state) => {
+                    const todos = window.todoAdapter.selectAll(state.todos || { ids: [], entities: {} });
+                    return {
+                        total: todos.length,
+                        completed: todos.filter(t => t.completed).length,
+                        pending: todos.filter(t => !t.completed).length
+                    };
+                },
+                { memoize: true }
+            );
+
+            // Register selectors
+            window.stateManager.registerSelector('doubleCounter', doubleCounter);
+            window.stateManager.registerSelector('isEvenCounter', isEvenCounter);
+            window.stateManager.registerSelector('allTodos', allTodos);
+            window.stateManager.registerSelector('completedTodos', completedTodos);
+            window.stateManager.registerSelector('todoStats', todoStats);
+        }
+
+        // Action functions
+        window.incrementCounter = () => {
+            window.stateManager.dispatch(window.actions.increment());
+            updateCounterDisplay();
+        };
+
+        window.decrementCounter = () => {
+            window.stateManager.dispatch(window.actions.decrement());
+            updateCounterDisplay();
+        };
+
+        window.resetCounter = () => {
+            window.stateManager.dispatch(window.actions.reset());
+            updateCounterDisplay();
+        };
+
+        window.setCounter = () => {
+            const value = parseInt(document.getElementById('counterValue').value) || 0;
+            window.stateManager.dispatch(window.actions.setValue(value));
+            updateCounterDisplay();
+            document.getElementById('counterValue').value = '';
+        };
+
+        window.addTodo = () => {
+            const title = document.getElementById('todoTitle').value.trim();
+            if (title) {
+                window.stateManager.dispatch(window.actions.add(title));
+                document.getElementById('todoTitle').value = '';
+                updateTodoDisplay();
+            }
+        };
+
+        window.toggleRandomTodo = () => {
+            const todos = window.stateManager.select('allTodos');
+            if (todos.length > 0) {
+                const randomTodo = todos[Math.floor(Math.random() * todos.length)];
+                window.stateManager.dispatch(window.actions.toggle(randomTodo.id));
+                updateTodoDisplay();
+            }
+        };
+
+        window.removeCompleted = () => {
+            window.stateManager.dispatch(window.actions.removeCompleted());
+            updateTodoDisplay();
+        };
+
+        window.clearAllTodos = () => {
+            window.stateManager.dispatch(window.actions.clear());
+            updateTodoDisplay();
+        };
+
+        // Update functions
+        function updateCounterDisplay() {
+            const counter = window.stateManager.getState('counter') || 0;
+            document.getElementById('counterDisplay').textContent = counter;
+        }
+
+        function updateTodoDisplay() {
+            const stats = window.stateManager.select('todoStats');
+            const todos = window.stateManager.select('allTodos');
+            
+            // Update entity output
+            const entityOutput = document.getElementById('entityOutput');
+            entityOutput.textContent = `Stats: ${JSON.stringify(stats, null, 2)}\n\nTodos:\n${JSON.stringify(todos, null, 2)}`;
+            
+            // Update UI list
+            const todoListUI = document.getElementById('todoListUI');
+            todoListUI.innerHTML = todos.map(todo => `
+                <div style="padding: 8px; border: 1px solid #ddd; margin: 4px 0; border-radius: 4px; background: ${todo.completed ? '#d4edda' : '#f8f9fa'}">
+                    <input type="checkbox" ${todo.completed ? 'checked' : ''} 
+                           onchange="window.stateManager.dispatch(window.actions.toggle(${todo.id})); updateTodoDisplay();">
+                    <span style="text-decoration: ${todo.completed ? 'line-through' : 'none'}">${todo.title}</span>
+                    <button onclick="window.stateManager.dispatch(window.actions.remove(${todo.id})); updateTodoDisplay();" 
+                            style="float: right; background: #dc3545; color: white; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer;">×</button>
+                </div>
+            `).join('') || '<div style="color: #666; font-style: italic;">No todos yet...</div>';
+        }
+
+        function updateActionLog(action) {
+            const log = document.getElementById('actionLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${action.type}${action.payload ? ` - ${JSON.stringify(action.payload)}` : ''}\n`;
+            log.textContent = logEntry + log.textContent;
+            
+            // Keep only last 20 entries
+            const lines = log.textContent.split('\n');
+            if (lines.length > 20) {
+                log.textContent = lines.slice(0, 20).join('\n');
+            }
+        }
+
+        window.clearActionLog = () => {
+            document.getElementById('actionLog').textContent = 'Action log cleared...';
+        };
+
+        window.dispatchCounterActions = () => {
+            window.incrementCounter();
+            setTimeout(() => window.incrementCounter(), 100);
+            setTimeout(() => window.decrementCounter(), 200);
+        };
+
+        window.dispatchUserActions = () => {
+            // Simulate user-related actions
+            const userAction = createAction('USER_LOGIN');
+            window.stateManager.dispatch(userAction({ userId: 123, name: 'Demo User' }));
+        };
+
+        window.dispatchTodoActions = () => {
+            window.stateManager.dispatch(window.actions.add('Demo Todo 1'));
+            setTimeout(() => window.stateManager.dispatch(window.actions.add('Demo Todo 2')), 100);
+            setTimeout(() => updateTodoDisplay(), 200);
+        };
+
+        window.demonstrateSelectors = () => {
+            const output = document.getElementById('selectorOutput');
+            let result = 'Selector Demo Results:\n\n';
+            
+            // Test memoization by calling selectors multiple times
+            const startTime = performance.now();
+            
+            for (let i = 0; i < 1000; i++) {
+                window.stateManager.select('doubleCounter');
+                window.stateManager.select('isEvenCounter');
+                window.stateManager.select('todoStats');
+            }
+            
+            const endTime = performance.now();
+            
+            result += `Memoization Performance Test:\n`;
+            result += `1000 selector calls took: ${(endTime - startTime).toFixed(2)}ms\n\n`;
+            
+            result += `Current Values:\n`;
+            result += `Counter: ${window.stateManager.getState('counter') || 0}\n`;
+            result += `Double Counter: ${window.stateManager.select('doubleCounter')}\n`;
+            result += `Is Even: ${window.stateManager.select('isEvenCounter')}\n`;
+            result += `Todo Stats: ${JSON.stringify(window.stateManager.select('todoStats'), null, 2)}\n`;
+            
+            output.textContent = result;
+        };
+
+        window.clearSelectorCache = () => {
+            window.stateManager.clearSelectorCache();
+            document.getElementById('selectorOutput').textContent = 'Selector caches cleared!';
+        };
+
+        window.registerAsyncEffect = () => {
+            if (window.demoState.effectRegistered) {
+                // Unregister effect
+                if (window.demoState.effectUnsubscribe) {
+                    window.demoState.effectUnsubscribe();
+                    window.demoState.effectUnsubscribe = null;
+                }
+                window.demoState.effectRegistered = false;
+                document.getElementById('effectIndicator').className = 'status-indicator status-inactive';
+                document.getElementById('effectOutput').textContent = 'Async effect unregistered.';
+            } else {
+                // Register effect
+                window.demoState.effectUnsubscribe = window.stateManager.registerEffect((effects) => {
+                    return effects.action$.map((action) => {
+                        if (action.type === '[Async] start') {
+                            // Simulate async operation
+                            setTimeout(() => {
+                                const success = Math.random() > 0.3; // 70% success rate
+                                if (success) {
+                                    window.stateManager.dispatch(window.actions.success({ data: 'Async operation completed!' }));
+                                } else {
+                                    window.stateManager.dispatch(window.actions.error({ message: 'Async operation failed!' }));
+                                }
+                            }, 1000 + Math.random() * 2000);
+                        }
+                        return null;
+                    }).filter(action => action !== null);
+                });
+                
+                window.demoState.effectRegistered = true;
+                document.getElementById('effectIndicator').className = 'status-indicator status-active';
+                document.getElementById('effectOutput').textContent = 'Async effect registered! Trigger async actions to see it work.';
+            }
+        };
+
+        window.triggerAsyncAction = () => {
+            if (!window.demoState.effectRegistered) {
+                document.getElementById('effectOutput').textContent = 'Please register the async effect first!';
+                return;
+            }
+            
+            window.stateManager.dispatch(window.actions.start());
+            document.getElementById('effectOutput').textContent = 'Async action triggered! Waiting for effect...';
+        };
+
+        window.showHistory = () => {
+            const history = window.stateManager.getActionHistory();
+            const output = document.getElementById('historyOutput');
+            
+            let result = `Action History (${history.length} actions):\n\n`;
+            history.forEach((action, index) => {
+                result += `${index}: [${new Date(action.meta.timestamp).toLocaleTimeString()}] ${action.type}\n`;
+            });
+            
+            output.textContent = result || 'No history available.';
+        };
+
+        window.goBackInTime = () => {
+            // This would require implementing time travel in the base StateManager
+            document.getElementById('historyOutput').textContent = 'Time travel feature would go here (requires StateManager extension)';
+        };
+
+        window.goForwardInTime = () => {
+            document.getElementById('historyOutput').textContent = 'Forward time travel feature would go here';
+        };
+
+        window.jumpToHistoryIndex = () => {
+            const index = document.getElementById('historyIndex').value;
+            document.getElementById('historyOutput').textContent = `Would jump to history index: ${index}`;
+        };
+
+        window.demonstrateImmutable = () => {
+            const output = document.getElementById('immutableOutput');
+            
+            try {
+                // Demonstrate immutable update
+                window.stateManager.updateState('counter', (draft) => {
+                    return (draft || 0) + 10;
+                });
+                
+                updateCounterDisplay();
+                output.textContent = 'Immutable update successful! Counter increased by 10.';
+            } catch (error) {
+                output.textContent = `Error: ${error.message}`;
+            }
+        };
+
+        window.demonstrateMutable = () => {
+            const output = document.getElementById('immutableOutput');
+            
+            if (!window.demoState.strictMode) {
+                output.textContent = 'Enable strict mode first to see mutable update errors!';
+                return;
+            }
+            
+            // This would trigger an error in strict mode
+            output.textContent = 'Mutable updates would be detected in strict mode (feature demonstration)';
+        };
+
+        window.toggleStrictMode = () => {
+            window.demoState.strictMode = !window.demoState.strictMode;
+            document.getElementById('strictModeText').textContent = window.demoState.strictMode ? 'Disable' : 'Enable';
+            
+            // Note: This is just UI demo - actual strict mode would need StateManager reconfiguration
+            document.getElementById('immutableOutput').textContent = `Strict mode ${window.demoState.strictMode ? 'enabled' : 'disabled'} (demo)`;
+        };
+
+        window.subscribeToStreams = () => {
+            if (window.demoState.streamSubscribed) {
+                // Unsubscribe
+                window.demoState.streamUnsubscribes.forEach(unsub => unsub());
+                window.demoState.streamUnsubscribes = [];
+                window.demoState.streamSubscribed = false;
+                document.getElementById('streamIndicator').className = 'status-indicator status-inactive';
+                document.getElementById('streamOutput').textContent = 'Unsubscribed from streams.';
+            } else {
+                // Subscribe to action stream
+                const actionSub = window.stateManager.actions.subscribe({
+                    next: (action) => {
+                        const output = document.getElementById('streamOutput');
+                        const timestamp = new Date().toLocaleTimeString();
+                        output.textContent = `[${timestamp}] Action: ${action.type}\n` + output.textContent;
+                    },
+                    error: (err) => console.error('Action stream error:', err),
+                    complete: () => console.log('Action stream completed')
+                });
+                
+                // Subscribe to state stream
+                const stateSub = window.stateManager.stateStream.subscribe({
+                    next: (state) => {
+                        const output = document.getElementById('streamOutput');
+                        const timestamp = new Date().toLocaleTimeString();
+                        output.textContent = `[${timestamp}] State: ${Object.keys(state).join(', ')}\n` + output.textContent;
+                        
+                        // Keep only last 10 entries
+                        const lines = output.textContent.split('\n');
+                        if (lines.length > 10) {
+                            output.textContent = lines.slice(0, 10).join('\n');
+                        }
+                    },
+                    error: (err) => console.error('State stream error:', err),
+                    complete: () => console.log('State stream completed')
+                });
+                
+                window.demoState.streamUnsubscribes = [actionSub.unsubscribe, stateSub.unsubscribe];
+                window.demoState.streamSubscribed = true;
+                document.getElementById('streamIndicator').className = 'status-indicator status-active';
+                document.getElementById('streamOutput').textContent = 'Subscribed to action and state streams! Dispatch actions to see updates.';
+            }
+        };
+
+        // Initialize everything
+        function initializeDemo() {
+            initializeReducers();
+            initializeSelectors();
+            
+            // Subscribe to all actions for logging
+            window.stateManager.actions.subscribe({
+                next: updateActionLog,
+                error: (err) => console.error('Action logging error:', err),
+                complete: () => console.log('Action logging completed')
+            });
+            
+            // Initial updates
+            updateCounterDisplay();
+            updateTodoDisplay();
+            
+            // Update status
+            document.getElementById('statusDisplay').textContent = `Enhanced State Manager initialized successfully!
+
+Configuration:
+- Actions: ✓ Enabled
+- Effects: ✓ Enabled  
+- Selectors: ✓ Enabled
+- Entities: ✓ Enabled
+- Time Travel: ✓ Enabled
+- Dev Tools: ✓ Enabled
+- Action Logging: ✓ Enabled
+
+Registered Reducers: ${window.stateManager.getRegisteredReducers().join(', ')}
+Registered Selectors: ${window.stateManager.getRegisteredSelectors().join(', ')}`;
+        }
+
+        // Start demo
+        initializeDemo();
+        
+        // Make state manager available globally for debugging
+        window.stateManagerDemo = window.stateManager;
+        
+        console.log('Annie Enhanced State Management Demo loaded!');
+        console.log('Access state manager via: window.stateManagerDemo');
+    </script>
+</body>
+</html>

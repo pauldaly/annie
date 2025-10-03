@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Form Positioning Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .demo-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: #007acc;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover { background: #005a9e; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .annie-form {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            border-radius: 4px;
+            min-height: 200px;
+        }
+        
+        .annie-field-group {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            background: #fafafa;
+            position: relative;
+        }
+        
+        .field-indicator {
+            position: absolute;
+            top: -8px;
+            right: 10px;
+            background: #007acc;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+        
+        .annie-label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .annie-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .ssr-example, .dynamic-example {
+            padding: 15px;
+            border-radius: 4px;
+            border: 2px solid;
+        }
+        
+        .ssr-example {
+            border-color: #ff9800;
+            background: #fff3e0;
+        }
+        
+        .dynamic-example {
+            border-color: #4caf50;
+            background: #e8f5e8;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        
+        h1, h2, h3 { color: #333; }
+        
+        .scenario-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .scenario-btn {
+            background: #2196f3;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .scenario-btn:hover {
+            background: #1976d2;
+        }
+        
+        .log {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            height: 150px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Dynamic Form Positioning vs SSR Demo</h1>
+
+    <div class="demo-container">
+        <h2>📍 Field Positioning Control</h2>
+        <p>Demonstration of Annie's dynamic field insertion capabilities:</p>
+        
+        <div class="controls">
+            <button onclick="addFieldAtEnd()">Add Field at End</button>
+            <button onclick="addFieldAfter('email')">Add After Email</button>
+            <button onclick="addFieldBefore('submit')">Add Before Submit</button>
+            <button onclick="addFieldAtPosition(1)">Add at Position 1</button>
+            <button onclick="clearForm()">Clear All Fields</button>
+            <button onclick="resetForm()">Reset Form</button>
+        </div>
+        
+        <div id="dynamic-form" class="annie-form">
+            <!-- Form will be built here -->
+        </div>
+        
+        <div class="log" id="action-log"></div>
+    </div>
+
+    <div class="demo-container">
+        <h2>🎬 Real-World Scenarios</h2>
+        <p>Click scenarios to see dynamic forms in action:</p>
+        
+        <div class="scenario-buttons">
+            <button class="scenario-btn" onclick="runScenario('ecommerce')">
+                <strong>E-commerce Product Config</strong><br>
+                <small>User selects product → Show relevant options</small>
+            </button>
+            <button class="scenario-btn" onclick="runScenario('survey')">
+                <strong>Survey Builder</strong><br>
+                <small>Admin adds questions → Form updates instantly</small>
+            </button>
+            <button class="scenario-btn" onclick="runScenario('conditional')">
+                <strong>Conditional Logic</strong><br>
+                <small>Field values → Show/hide other fields</small>
+            </button>
+            <button class="scenario-btn" onclick="runScenario('api')">
+                <strong>API-Driven Schema</strong><br>
+                <small>API response → Generate form structure</small>
+            </button>
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <div class="comparison">
+            <div class="ssr-example">
+                <h3>❌ SSR Approach</h3>
+                <div class="code-block">
+// User wants to add phone field
+1. Form submission to server
+2. Server processes request  
+3. Server re-renders page
+4. Full page reload
+5. User loses form state
+6. Poor UX
+
+// For conditional fields:
+- Complex server-side logic
+- Multiple page states to manage
+- Difficult to test all combinations
+                </div>
+            </div>
+            
+            <div class="dynamic-example">
+                <h3>✅ Annie Dynamic Forms</h3>
+                <div class="code-block">
+// User wants to add phone field
+renderer.addField({
+  name: 'phone2',
+  type: 'tel', 
+  label: 'Additional Phone',
+  validators: [FormValidators.phone()]
+}, { insertAfter: 'phone1' });
+
+// Instant:
+- No page reload
+- State preserved
+- Validation active
+- Great UX
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>🔧 Your Current Manual Method vs Annie</h2>
+        
+        <h3>Manual DOM Manipulation (Your Current Way):</h3>
+        <div class="code-block">
+function addPhoneField() {
+  const container = document.getElementById('phone-container');
+  const fieldHTML = `
+    &lt;div class="field-group" id="phone-${phoneCount}"&gt;
+      &lt;label&gt;Phone ${phoneCount}&lt;/label&gt;
+      &lt;input type="tel" name="phone${phoneCount}" /&gt;
+    &lt;/div&gt;
+  `;
+  container.insertAdjacentHTML('beforeend', fieldHTML);
+  
+  // Manual setup required:
+  setupValidation(document.querySelector(`input[name="phone${phoneCount}"]`));
+  bindEvents(document.getElementById(`phone-${phoneCount}`));
+  updateFormState();
+  phoneCount++;
+}
+
+// Issues:
+// ❌ Manual validation setup for each field
+// ❌ Manual event binding
+// ❌ Manual state management
+// ❌ Manual cleanup on removal
+// ❌ No positioning control
+// ❌ Error-prone HTML string construction
+</div>
+
+        <h3>Annie Dynamic Forms:</h3>
+        <div class="code-block">
+renderer.addField({
+  name: `phone${phoneCount}`,
+  type: 'tel',
+  label: `Phone ${phoneCount}`,
+  validators: [FormValidators.phone()],
+  required: false
+}, { insertAfter: 'email' });
+
+// Automatic:
+// ✅ Validation setup
+// ✅ Event binding  
+// ✅ State management
+// ✅ Error display
+// ✅ Form submission inclusion
+// ✅ Precise positioning
+// ✅ Type safety
+// ✅ Easy removal: renderer.removeField('phone2')
+</div>
+    </div>
+
+    <script>
+        let fieldCounter = 0;
+        let formFields = [];
+        
+        // Mock Annie FormRenderer for demo
+        class MockFormRenderer {
+            constructor() {
+                this.container = document.getElementById('dynamic-form');
+                this.fields = new Map();
+            }
+            
+            addField(config, position = {}) {
+                const fieldElement = this.createFieldElement(config);
+                
+                // Position logic (matches Annie's implementation)
+                if (position.insertAfter) {
+                    const reference = this.container.querySelector(`[data-field="${position.insertAfter}"]`);
+                    if (reference && reference.nextSibling) {
+                        this.container.insertBefore(fieldElement, reference.nextSibling);
+                    } else {
+                        this.container.appendChild(fieldElement);
+                    }
+                } else if (position.insertBefore) {
+                    const reference = this.container.querySelector(`[data-field="${position.insertBefore}"]`);
+                    if (reference) {
+                        this.container.insertBefore(fieldElement, reference);
+                    } else {
+                        this.container.appendChild(fieldElement);
+                    }
+                } else if (typeof position.insertAt === 'number') {
+                    const children = Array.from(this.container.children);
+                    if (position.insertAt >= 0 && position.insertAt < children.length) {
+                        this.container.insertBefore(fieldElement, children[position.insertAt]);
+                    } else {
+                        this.container.appendChild(fieldElement);
+                    }
+                } else {
+                    this.container.appendChild(fieldElement);
+                }
+                
+                this.fields.set(config.name, fieldElement);
+                this.logAction(`Added field "${config.name}" (${config.type}) at ${this.getPositionDescription(position)}`);
+            }
+            
+            removeField(name) {
+                const element = this.fields.get(name);
+                if (element) {
+                    element.remove();
+                    this.fields.delete(name);
+                    this.logAction(`Removed field "${name}"`);
+                }
+            }
+            
+            createFieldElement(config) {
+                const div = document.createElement('div');
+                div.className = 'annie-field-group';
+                div.setAttribute('data-field', config.name);
+                
+                const indicator = document.createElement('div');
+                indicator.className = 'field-indicator';
+                indicator.textContent = config.type;
+                
+                const label = document.createElement('label');
+                label.className = 'annie-label';
+                label.textContent = config.label;
+                
+                const input = document.createElement('input');
+                input.className = 'annie-input';
+                input.type = config.type;
+                input.name = config.name;
+                input.placeholder = config.placeholder || '';
+                
+                div.appendChild(indicator);
+                div.appendChild(label);
+                div.appendChild(input);
+                
+                return div;
+            }
+            
+            getPositionDescription(position) {
+                if (position.insertAfter) return `after "${position.insertAfter}"`;
+                if (position.insertBefore) return `before "${position.insertBefore}"`;
+                if (typeof position.insertAt === 'number') return `position ${position.insertAt}`;
+                return 'end of form';
+            }
+            
+            logAction(message) {
+                const log = document.getElementById('action-log');
+                const timestamp = new Date().toLocaleTimeString();
+                log.innerHTML += `[${timestamp}] ${message}\n`;
+                log.scrollTop = log.scrollHeight;
+            }
+            
+            clear() {
+                this.container.innerHTML = '';
+                this.fields.clear();
+                this.logAction('Form cleared');
+            }
+        }
+        
+        const renderer = new MockFormRenderer();
+        
+        // Initialize with basic form
+        function initializeForm() {
+            renderer.addField({
+                name: 'firstName',
+                type: 'text',
+                label: 'First Name',
+                placeholder: 'Enter first name'
+            });
+            
+            renderer.addField({
+                name: 'email',
+                type: 'email',
+                label: 'Email Address',
+                placeholder: 'Enter email'
+            });
+            
+            renderer.addField({
+                name: 'submit',
+                type: 'submit',
+                label: 'Submit Form',
+                placeholder: ''
+            });
+        }
+        
+        // Control functions
+        function addFieldAtEnd() {
+            fieldCounter++;
+            renderer.addField({
+                name: `dynamicField${fieldCounter}`,
+                type: 'text',
+                label: `Dynamic Field ${fieldCounter}`,
+                placeholder: 'Added at end'
+            });
+        }
+        
+        function addFieldAfter(afterField) {
+            fieldCounter++;
+            renderer.addField({
+                name: `afterField${fieldCounter}`,
+                type: 'tel',
+                label: `Phone Field ${fieldCounter}`,
+                placeholder: 'Added after email'
+            }, { insertAfter: afterField });
+        }
+        
+        function addFieldBefore(beforeField) {
+            fieldCounter++;
+            renderer.addField({
+                name: `beforeField${fieldCounter}`,
+                type: 'text',
+                label: `Before Submit ${fieldCounter}`,
+                placeholder: 'Added before submit'
+            }, { insertBefore: beforeField });
+        }
+        
+        function addFieldAtPosition(position) {
+            fieldCounter++;
+            renderer.addField({
+                name: `positionField${fieldCounter}`,
+                type: 'number',
+                label: `Position Field ${fieldCounter}`,
+                placeholder: `Added at position ${position}`
+            }, { insertAt: position });
+        }
+        
+        function clearForm() {
+            renderer.clear();
+            fieldCounter = 0;
+        }
+        
+        function resetForm() {
+            clearForm();
+            initializeForm();
+        }
+        
+        // Scenario demonstrations
+        function runScenario(type) {
+            clearForm();
+            
+            switch(type) {
+                case 'ecommerce':
+                    renderer.logAction('🛒 E-commerce scenario started');
+                    renderer.addField({name: 'product', type: 'select', label: 'Product Type'});
+                    
+                    setTimeout(() => {
+                        renderer.logAction('User selected "Custom T-Shirt"');
+                        renderer.addField({name: 'size', type: 'select', label: 'Size'}, {insertAfter: 'product'});
+                        renderer.addField({name: 'color', type: 'select', label: 'Color'}, {insertAfter: 'size'});
+                        renderer.addField({name: 'text', type: 'text', label: 'Custom Text'}, {insertAfter: 'color'});
+                    }, 1000);
+                    break;
+                    
+                case 'survey':
+                    renderer.logAction('📋 Survey builder scenario started');
+                    renderer.addField({name: 'title', type: 'text', label: 'Survey Title'});
+                    
+                    let questionCount = 0;
+                    const addQuestion = () => {
+                        questionCount++;
+                        renderer.addField({
+                            name: `question${questionCount}`,
+                            type: 'text',
+                            label: `Question ${questionCount}`
+                        });
+                    };
+                    
+                    setTimeout(addQuestion, 500);
+                    setTimeout(addQuestion, 1000);
+                    setTimeout(addQuestion, 1500);
+                    break;
+                    
+                case 'conditional':
+                    renderer.logAction('🔄 Conditional logic scenario started');
+                    renderer.addField({name: 'accountType', type: 'select', label: 'Account Type'});
+                    
+                    setTimeout(() => {
+                        renderer.logAction('User selected "Business Account"');
+                        renderer.addField({name: 'companyName', type: 'text', label: 'Company Name'}, {insertAfter: 'accountType'});
+                        renderer.addField({name: 'taxId', type: 'text', label: 'Tax ID'}, {insertAfter: 'companyName'});
+                        renderer.addField({name: 'employees', type: 'number', label: 'Number of Employees'}, {insertAfter: 'taxId'});
+                    }, 1000);
+                    break;
+                    
+                case 'api':
+                    renderer.logAction('🌐 API-driven schema scenario started');
+                    renderer.logAction('Fetching form schema from API...');
+                    
+                    // Simulate API response
+                    setTimeout(() => {
+                        const apiSchema = [
+                            {name: 'firstName', type: 'text', label: 'First Name'},
+                            {name: 'lastName', type: 'text', label: 'Last Name'},
+                            {name: 'country', type: 'select', label: 'Country'},
+                            {name: 'phone', type: 'tel', label: 'Phone (Required by country)'},
+                            {name: 'language', type: 'select', label: 'Preferred Language'}
+                        ];
+                        
+                        renderer.logAction('API response received, building form...');
+                        
+                        apiSchema.forEach((field, index) => {
+                            setTimeout(() => {
+                                renderer.addField(field);
+                            }, index * 200);
+                        });
+                    }, 800);
+                    break;
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', initializeForm);
+    </script>
+</body>
+</html>

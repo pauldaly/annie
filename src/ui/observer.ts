@@ -11,6 +11,7 @@ export interface ObserveConfig {
   field?: string;
   prepend?: string;
   append?: string;
+  'with-timestamp'?: boolean;
 }
 
 export class UIObserver implements IDisposable {
@@ -112,6 +113,12 @@ export class UIObserver implements IDisposable {
         }
         if (config.append && result) {
             result = result + config.append;
+        }
+        
+        // Add timestamp for cache busting (typically for src attributes)
+        if (config['with-timestamp'] && result) {
+            const separator = result.includes('?') ? '&' : '?';
+            result = result + separator + 'ts=' + Date.now();
         }
         
         return result;

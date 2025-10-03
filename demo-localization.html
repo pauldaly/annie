@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Client Formatting & Localization Utilities Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f7;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        h1 {
+            color: #1d1d1f;
+            border-bottom: 2px solid #007aff;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #007aff;
+            margin-top: 40px;
+        }
+        .demo-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007aff;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+        }
+        .output {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f1f8e9;
+            border-radius: 8px;
+            border: 1px solid #c8e6c9;
+            font-family: 'Monaco', 'Consolas', monospace;
+            white-space: pre-wrap;
+        }
+        button {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #0056cc;
+        }
+        select, input {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin: 5px;
+        }
+        .rtl-demo {
+            direction: rtl;
+            text-align: right;
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 Annie Framework - Client Formatting & Localization Utilities</h1>
+        
+        <div class="controls">
+            <label>Select Locale: 
+                <select id="localeSelect">
+                    <option value="en-US">English (US)</option>
+                    <option value="en-GB">English (UK)</option>
+                    <option value="es-ES">Español (Spain)</option>
+                    <option value="fr-FR">Français (France)</option>
+                    <option value="de-DE">Deutsch (Germany)</option>
+                    <option value="ja-JP">日本語 (Japan)</option>
+                    <option value="ar-SA">العربية (Saudi Arabia)</option>
+                    <option value="he-IL">עברית (Israel)</option>
+                    <option value="zh-CN">中文 (China)</option>
+                    <option value="ru-RU">Русский (Russia)</option>
+                    <option value="pt-BR">Português (Brazil)</option>
+                    <option value="ko-KR">한국어 (Korea)</option>
+                </select>
+            </label>
+            <button onclick="updateLocale()">Update Locale</button>
+            <button onclick="runAllDemos()">Run All Demos</button>
+        </div>
+
+        <div class="demo-section">
+            <h2>📊 Number Formatting</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Decimal Numbers</h3>
+                    <button onclick="demoNumberFormats()">Demo Number Formats</button>
+                    <div class="output" id="numberOutput"></div>
+                </div>
+                <div class="card">
+                    <h3>Currency Formatting</h3>
+                    <button onclick="demoCurrencyFormats()">Demo Currency Formats</button>
+                    <div class="output" id="currencyOutput"></div>
+                </div>
+                <div class="card">
+                    <h3>Percentage & Compact</h3>
+                    <button onclick="demoPercentAndCompact()">Demo Percent & Compact</button>
+                    <div class="output" id="percentOutput"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📅 Date and Time Formatting</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Date Formats</h3>
+                    <button onclick="demoDateFormats()">Demo Date Formats</button>
+                    <div class="output" id="dateOutput"></div>
+                </div>
+                <div class="card">
+                    <h3>Time Formats</h3>
+                    <button onclick="demoTimeFormats()">Demo Time Formats</button>
+                    <div class="output" id="timeOutput"></div>
+                </div>
+                <div class="card">
+                    <h3>Relative Time</h3>
+                    <button onclick="demoRelativeTime()">Demo Relative Time</button>
+                    <div class="output" id="relativeOutput"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>💬 Message Interpolation</h2>
+            <div class="card">
+                <h3>Dynamic Message Templates</h3>
+                <button onclick="demoMessageInterpolation()">Demo Message Interpolation</button>
+                <div class="output" id="messageOutput"></div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔤 Typography & Text Direction</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Text Direction Detection</h3>
+                    <button onclick="demoTypography()">Demo Typography</button>
+                    <div class="output" id="typographyOutput"></div>
+                </div>
+                <div class="card">
+                    <h3>RTL Demo Text</h3>
+                    <div id="rtlDemo" class="rtl-demo">
+                        This text will change direction based on locale
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎯 Practical Examples</h2>
+            <div class="card">
+                <button onclick="demoPracticalExamples()">Demo Practical Use Cases</button>
+                <div class="output" id="practicalOutput"></div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🛠️ API Usage Examples</h2>
+            <div class="card">
+                <h3>Code Examples</h3>
+                <pre><code>// Basic usage
+import { localization } from './annie';
+
+// Format numbers
+localization.formatNumber(1234.56);
+localization.formatCurrency(1234.56);
+localization.formatPercent(0.1234);
+
+// Format dates
+localization.formatDate(new Date());
+localization.formatTime(new Date());
+localization.formatRelativeTime(new Date(Date.now() - 3600000));
+
+// Message interpolation
+localization.interpolate("Hello {{name}}, you have {{count | number}} messages", {
+    name: "John",
+    count: 5
+});
+
+// Typography helpers
+localization.getTextDirection(); // 'ltr' or 'rtl'
+localization.isRightToLeft(); // boolean
+localization.applyTextDirection(element); // applies direction to DOM element</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { localization, createLocalizationUtils } from './src/index.js';
+
+        // Make available globally for demo functions
+        window.localization = localization;
+        window.createLocalizationUtils = createLocalizationUtils;
+
+        // Current locale utility instance
+        let currentUtils = localization;
+
+        // Update locale function
+        window.updateLocale = function() {
+            const select = document.getElementById('localeSelect');
+            const selectedLocale = select.value;
+            
+            // Create new utils instance with selected locale
+            currentUtils = createLocalizationUtils({ locale: selectedLocale });
+            
+            console.log(`Updated locale to: ${selectedLocale}`);
+            console.log('New config:', currentUtils.getConfig());
+            
+            // Update RTL demo
+            const rtlDemo = document.getElementById('rtlDemo');
+            currentUtils.applyTextDirection(rtlDemo);
+            
+            // Clear all outputs to show change
+            const outputs = document.querySelectorAll('.output');
+            outputs.forEach(output => output.textContent = '');
+        };
+
+        window.demoNumberFormats = function() {
+            const output = document.getElementById('numberOutput');
+            const testNumbers = [1234.567, 0.123, 1000000, -5432.1];
+            
+            let result = `Current Locale: ${currentUtils.getLocale()}\n\n`;
+            
+            testNumbers.forEach(num => {
+                result += `Number: ${num}\n`;
+                result += `  Default: ${currentUtils.formatNumber(num)}\n`;
+                result += `  2 decimals: ${currentUtils.formatNumber(num, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n`;
+                result += `  Compact: ${currentUtils.formatNumber(num, { preset: 'compact' })}\n`;
+                result += `\n`;
+            });
+            
+            output.textContent = result;
+        };
+
+        window.demoCurrencyFormats = function() {
+            const output = document.getElementById('currencyOutput');
+            const testAmounts = [1234.56, 0.99, 1000000, -50.25];
+            
+            let result = `Current Locale: ${currentUtils.getLocale()}\n`;
+            result += `Currency: ${currentUtils.getConfig().currency}\n\n`;
+            
+            testAmounts.forEach(amount => {
+                result += `Amount: ${amount}\n`;
+                result += `  Default: ${currentUtils.formatCurrency(amount)}\n`;
+                result += `  USD: ${currentUtils.formatCurrency(amount, { currency: 'USD' })}\n`;
+                result += `  EUR: ${currentUtils.formatCurrency(amount, { currency: 'EUR' })}\n`;
+                result += `  Name: ${currentUtils.formatCurrency(amount, { currencyDisplay: 'name' })}\n`;
+                result += `\n`;
+            });
+            
+            output.textContent = result;
+        };
+
+        window.demoPercentAndCompact = function() {
+            const output = document.getElementById('percentOutput');
+            const testValues = [0.1234, 0.05, 1.5, 0.001];
+            const largeNumbers = [1000, 1500000, 2300000000];
+            
+            let result = `Current Locale: ${currentUtils.getLocale()}\n\n`;
+            
+            result += "Percentages:\n";
+            testValues.forEach(val => {
+                result += `  ${val} = ${currentUtils.formatPercent(val)}\n`;
+            });
+            
+            result += "\nCompact Numbers:\n";
+            largeNumbers.forEach(num => {
+                result += `  ${num} = ${currentUtils.formatNumber(num, { preset: 'compact' })}\n`;
+            });
+            
+            output.textContent = result;
+        };
+
+        window.demoDateFormats = function() {
+            const output = document.getElementById('dateOutput');
+            const testDate = new Date('2025-10-02T14:30:00');
+            
+            let result = `Current Locale: ${currentUtils.getLocale()}\n`;
+            result += `Timezone: ${currentUtils.getConfig().timezone}\n\n`;
+            result += `Test Date: ${testDate.toISOString()}\n\n`;
+            
+            result += `Short: ${currentUtils.formatDate(testDate, { preset: 'short' })}\n`;
+            result += `Medium: ${currentUtils.formatDate(testDate, { preset: 'medium' })}\n`;
+            result += `Long: ${currentUtils.formatDate(testDate, { preset: 'long' })}\n`;
+            result += `Full: ${currentUtils.formatDate(testDate, { preset: 'full' })}\n\n`;
+            
+            result += `Custom (weekday + date):\n`;
+            result += `  ${currentUtils.formatDate(testDate, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\n`;
+            
+            output.textContent = result;
+        };
+
+        window.demoTimeFormats = function() {
+            const output = document.getElementById('timeOutput');
+            const testDate = new Date('2025-10-02T14:30:25');
+            
+            let result = `Current Locale: ${currentUtils.getLocale()}\n\n`;
+            result += `Test Time: ${testDate.toISOString()}\n\n`;
+            
+            result += `Default: ${currentUtils.formatTime(testDate)}\n`;
+            result += `Short: ${currentUtils.formatTime(testDate, { timeStyle: 'short' })}\n`;
+            result += `Medium: ${currentUtils.formatTime(testDate, { timeStyle: 'medium' })}\n`;
+            result += `Long: ${currentUtils.formatTime(testDate, { timeStyle: 'long' })}\n`;
+            result += `24h format: ${currentUtils.formatTime(testDate, { hour12: false })}\n`;
+            result += `12h format: ${currentUtils.formatTime(testDate, { hour12: true })}\n`;
+            
+            output.textContent = result;
+        };
+
+        window.demoRelativeTime = function() {
+            const output = document.getElementById('relativeOutput');
+            const now = new Date();
+            const testTimes = [
+                new Date(now.getTime() - 5 * 60 * 1000),     // 5 minutes ago
+                new Date(now.getTime() - 2 * 60 * 60 * 1000), // 2 hours ago
+                new Date(now.getTime() - 24 * 60 * 60 * 1000), // 1 day ago
+                new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
+                new Date(now.getTime() + 30 * 60 * 1000),     // 30 minutes from now
+                new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000) // 2 days from now
+            ];
+            
+            let result = `Current Locale: ${currentUtils.getLocale()}\n\n`;
+            result += `Current Time: ${now.toLocaleString()}\n\n`;
+            
+            testTimes.forEach((time, index) => {
+                result += `Test ${index + 1}: ${time.toLocaleString()}\n`;
+                result += `  Relative: ${currentUtils.formatRelativeTime(time)}\n`;
+                result += `  Always numeric: ${currentUtils.formatRelativeTime(time, { numeric: 'always' })}\n\n`;
+            });
+            
+            output.textContent = result;
+        };
+
+        window.demoMessageInterpolation = function() {
+            const output = document.getElementById('messageOutput');
+            
+            let result = `Current Locale: ${currentUtils.getLocale()}\n\n`;
+            
+            // Simple interpolation
+            const template1 = "Hello {{name}}, welcome to {{app}}!";
+            const values1 = { name: "Alice", app: "Annie Framework" };
+            result += `Template: "${template1}"\n`;
+            result += `Result: "${currentUtils.interpolate(template1, values1)}"\n\n`;
+            
+            // Number formatting in templates
+            const template2 = "You have {{count | number}} items worth {{total | currency}}.";
+            const values2 = { count: 1234, total: 567.89 };
+            result += `Template: "${template2}"\n`;
+            result += `Result: "${currentUtils.interpolate(template2, values2)}"\n\n`;
+            
+            // Date formatting in templates
+            const template3 = "Last updated: {{date | date}}, {{time | time}}";
+            const values3 = { date: new Date(), time: new Date() };
+            result += `Template: "${template3}"\n`;
+            result += `Result: "${currentUtils.interpolate(template3, values3)}"\n\n`;
+            
+            // Percentage in templates
+            const template4 = "Progress: {{progress | percent}}";
+            const values4 = { progress: 0.75 };
+            result += `Template: "${template4}"\n`;
+            result += `Result: "${currentUtils.interpolate(template4, values4)}"\n\n`;
+            
+            // Relative time in templates
+            const template5 = "Message sent {{when | relative}}";
+            const values5 = { when: new Date(Date.now() - 3600000) }; // 1 hour ago
+            result += `Template: "${template5}"\n`;
+            result += `Result: "${currentUtils.interpolate(template5, values5)}"\n`;
+            
+            output.textContent = result;
+        };
+
+        window.demoTypography = function() {
+            const output = document.getElementById('typographyOutput');
+            const config = currentUtils.getTypographyConfig();
+            
+            let result = `Current Locale: ${currentUtils.getLocale()}\n\n`;
+            result += `Text Direction: ${config.direction}\n`;
+            result += `Text Align: ${config.align}\n`;
+            result += `Is RTL: ${config.isRtl}\n`;
+            result += `Font Scale: ${config.fontScale}\n\n`;
+            
+            result += `Helper Methods:\n`;
+            result += `  getTextDirection(): ${currentUtils.getTextDirection()}\n`;
+            result += `  isRightToLeft(): ${currentUtils.isRightToLeft()}\n\n`;
+            
+            result += `Text Formatting Examples:\n`;
+            const longText = "This is a very long text that will be truncated to demonstrate the text formatting functionality of the typography helper.";
+            result += `  Original: "${longText}"\n`;
+            result += `  Truncated (50 chars): "${currentUtils.formatText(longText, { maxLength: 50 })}"\n`;
+            result += `  Truncated (30 chars, preserve words): "${currentUtils.formatText(longText, { maxLength: 30, preserveWords: true })}"\n`;
+            result += `  Truncated (25 chars, custom end): "${currentUtils.formatText(longText, { maxLength: 25, truncateEnd: '...' })}"\n`;
+            
+            output.textContent = result;
+        };
+
+        window.demoPracticalExamples = function() {
+            const output = document.getElementById('practicalOutput');
+            
+            let result = `Current Locale: ${currentUtils.getLocale()}\n\n`;
+            
+            // E-commerce example
+            result += "🛒 E-commerce Product Display:\n";
+            const product = {
+                name: "Wireless Headphones",
+                price: 199.99,
+                discount: 0.15,
+                stock: 1234,
+                lastUpdated: new Date(Date.now() - 2 * 60 * 60 * 1000)
+            };
+            
+            const productTemplate = "{{name}} - {{price | currency}} ({{discount | percent}} off)\nStock: {{stock | number}} units\nLast updated {{lastUpdated | relative}}";
+            result += currentUtils.interpolate(productTemplate, product) + "\n\n";
+            
+            // Banking example
+            result += "🏦 Banking Transaction:\n";
+            const transaction = {
+                type: "Transfer",
+                amount: -1500.50,
+                balance: 12345.67,
+                date: new Date('2025-10-01T09:30:00'),
+                fee: 2.50
+            };
+            
+            const transactionTemplate = "{{type}}: {{amount | currency}}\nNew Balance: {{balance | currency}}\nFee: {{fee | currency}}\nProcessed: {{date | date}}";
+            result += currentUtils.interpolate(transactionTemplate, transaction) + "\n\n";
+            
+            // Analytics dashboard
+            result += "📊 Analytics Dashboard:\n";
+            const analytics = {
+                visitors: 125000,
+                conversionRate: 0.0345,
+                revenue: 45678.90,
+                growth: 0.127,
+                reportDate: new Date()
+            };
+            
+            const analyticsTemplate = "Total Visitors: {{visitors | number}}\nConversion Rate: {{conversionRate | percent}}\nRevenue: {{revenue | currency}}\nGrowth: {{growth | percent}}\nReport Generated: {{reportDate | date}}";
+            result += currentUtils.interpolate(analyticsTemplate, analytics);
+            
+            output.textContent = result;
+        };
+
+        window.runAllDemos = function() {
+            demoNumberFormats();
+            demoCurrencyFormats();
+            demoPercentAndCompact();
+            demoDateFormats();
+            demoTimeFormats();
+            demoRelativeTime();
+            demoMessageInterpolation();
+            demoTypography();
+            demoPracticalExamples();
+        };
+
+        // Initialize with current locale
+        window.updateLocale();
+        console.log('Annie Framework Localization Demo loaded successfully!');
+        console.log('Available utilities:', window.localization);
+    </script>
+</body>
+</html>
