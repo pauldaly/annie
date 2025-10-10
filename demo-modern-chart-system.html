@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Modern Chart System</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .chart-container { margin: 20px 0; padding: 20px; border: 1px solid #e9ecef; border-radius: 4px; background: #ffffff; }
+        .demo-section { margin: 30px 0; }
+        .demo-controls { margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 4px; }
+        button { padding: 8px 16px; margin: 5px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        select { padding: 5px; margin: 5px; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .comparison-table th, .comparison-table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        .comparison-table th { background-color: #f8f9fa; }
+        .code-block { background: #f8f9fa; padding: 15px; border-radius: 4px; font-family: 'Courier New', monospace; margin: 10px 0; }
+        .advantage { color: #28a745; font-weight: bold; }
+        .chart-output { min-height: 300px; }
+        h1, h2 { color: #2c3e50; }
+        .architecture-diagram { background: #f0f0f0; padding: 20px; border-radius: 8px; margin: 20px 0; font-family: monospace; }
+    </style>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Annie Framework - Modern Chart System</h1>
+        
+        <div class="demo-section">
+            <h2>🏗️ Modern Architecture Overview</h2>
+            <p>The new Annie chart system uses a clean, modular architecture with TypeScript, standardized interfaces, and modern D3.js patterns.</p>
+            
+            <div class="architecture-diagram">
+<pre>
+📁 src/charts/
+├── 📁 base/
+│   ├── 📄 chart-config.ts      ← Standardized configuration interfaces
+│   ├── 📄 base-chart.ts        ← Abstract base class with common functionality
+│   └── 📄 chart-utils.ts       ← Utility functions for all charts
+├── 📄 pie-chart.ts             ← Modern pie chart implementation
+├── 📄 bar-chart.ts             ← Bar chart (next to implement)
+├── 📄 line-chart.ts            ← Line chart (next to implement)
+└── 📄 chart-registry.ts        ← Chart type registry and factory
+</pre>
+            </div>
+
+            <h3>✨ Key Benefits</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr><th>Feature</th><th>Old Approach</th><th>New Modern Approach</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Architecture</strong></td>
+                        <td>Monolithic functions</td>
+                        <td class="advantage">Modular classes with inheritance</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Configuration</strong></td>
+                        <td>Ad-hoc parameters</td>
+                        <td class="advantage">Standardized TypeScript interfaces</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Code Reuse</strong></td>
+                        <td>Copy-paste duplication</td>
+                        <td class="advantage">Shared base class with common functionality</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Type Safety</strong></td>
+                        <td>No type checking</td>
+                        <td class="advantage">Full TypeScript support with IntelliSense</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Maintainability</strong></td>
+                        <td>Hard to modify/extend</td>
+                        <td class="advantage">Easy to add new chart types</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Annie Integration</strong></td>
+                        <td>Manual integration</td>
+                        <td class="advantage">Built-in Annie ecosystem integration</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎯 Chart Configuration Interface</h2>
+            <p>Every chart uses standardized configuration with chart-specific options:</p>
+            
+            <div class="code-block">
+<pre>
+// Base configuration for all charts
+interface ChartConfig {
+  type: 'pie' | 'bar' | 'line' | 'scatter' | 'area';
+  width?: number;
+  height?: number;
+  title?: string;
+  subtitle?: string;
+  theme?: 'light' | 'dark';
+  colors?: string[];
+  animated?: boolean;
+  interactive?: boolean;
+  responsive?: boolean;
+  // ... more options
+}
+
+// Pie chart specific configuration
+interface PieChartOptions {
+  innerRadius?: number;       // For donut charts
+  outerRadius?: number;       // Chart size
+  cornerRadius?: number;      // Rounded corners
+  startAngle?: number;        // Start position
+  endAngle?: number;          // End position
+  showLabels?: boolean;       // Show data labels
+  showValues?: boolean;       // Show actual values
+  showPercentages?: boolean;  // Show percentages
+  labelPosition?: 'inside' | 'outside';
+  explodeOnHover?: boolean;   // Interactive explosion
+  // ... more pie-specific options
+}
+</pre>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎨 Interactive Pie Chart Demo</h2>
+            <p>Experience the modern pie chart with rich configuration options:</p>
+            
+            <div class="demo-controls">
+                <button onclick="updateChartData('sales')">Sales Data</button>
+                <button onclick="updateChartData('demographics')">Demographics</button>
+                <button onclick="updateChartData('performance')">Performance Metrics</button>
+                |
+                <button onclick="toggleTheme()">Toggle Theme</button>
+                <button onclick="toggleAnimation()">Toggle Animation</button>
+                <button onclick="toggleLabels()">Toggle Labels</button>
+                |
+                <select onchange="changeChartType(this.value)">
+                    <option value="pie">Pie Chart</option>
+                    <option value="donut">Donut Chart</option>
+                    <option value="half-pie">Half Pie</option>
+                </select>
+            </div>
+            
+            <div class="chart-container">
+                <div id="modern-pie-chart" class="chart-output"></div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔧 Annie Integration Example</h2>
+            <p>How the modern chart system integrates with Annie's data attributes:</p>
+            
+            <div class="code-block">
+<pre>
+&lt;!-- Simple Annie chart declaration --&gt;
+&lt;div annie-chart="pie" 
+     annie-data-source="salesData" 
+     annie-chart-config="{
+       title: 'Q4 Sales by Region',
+       theme: 'light',
+       animated: true,
+       options: {
+         showLabels: true,
+         showPercentages: true,
+         explodeOnHover: true
+       }
+     }"&gt;
+&lt;/div&gt;
+
+&lt;!-- Advanced configuration with JsonLogic --&gt;
+&lt;div annie-chart="pie"
+     annie-data-source="dynamicData"
+     annie-chart-config="{
+       title: 'Dynamic Chart Title',
+       theme: { 'if': [{ '==': [{'var': 'userPreference'}, 'dark'] }, 'dark', 'light'] },
+       colors: { 'if': [{ '==': [{'var': 'department'}, 'sales'] }, 
+                        ['#007bff', '#28a745', '#dc3545'], 
+                        ['#6f42c1', '#fd7e14', '#20c997']] }
+     }"&gt;
+&lt;/div&gt;
+</pre>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📊 Implementation Progress</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0;">
+                <div style="padding: 20px; background: #e8f5e8; border-radius: 8px;">
+                    <h3>✅ Completed</h3>
+                    <ul>
+                        <li>Chart configuration interfaces</li>
+                        <li>Base chart abstract class</li>
+                        <li>Chart utilities library</li>
+                        <li>Modern architecture design</li>
+                        <li>TypeScript integration</li>
+                    </ul>
+                </div>
+                
+                <div style="padding: 20px; background: #fff3cd; border-radius: 8px;">
+                    <h3>🚧 In Progress</h3>
+                    <ul>
+                        <li>Pie chart implementation</li>
+                        <li>Annie framework integration</li>
+                        <li>Event handling system</li>
+                        <li>Responsive behavior</li>
+                    </ul>
+                </div>
+                
+                <div style="padding: 20px; background: #f8d7da; border-radius: 8px;">
+                    <h3>📋 Next Steps</h3>
+                    <ul>
+                        <li>Bar chart implementation</li>
+                        <li>Line chart implementation</li>
+                        <li>Scatter plot implementation</li>
+                        <li>Chart registry system</li>
+                        <li>JsonLogic integration</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎮 Working Demo Preview</h2>
+            <p>Here's a preview of what the completed pie chart will look like (using simplified D3.js for demonstration):</p>
+            
+            <div class="chart-container">
+                <div id="preview-chart" class="chart-output"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart configuration and state
+        let currentConfig = {
+            type: 'pie',
+            width: 500,
+            height: 400,
+            title: 'Sales by Region',
+            theme: 'light',
+            animated: true,
+            showLabels: true,
+            options: {
+                innerRadius: 0,
+                showPercentages: true,
+                explodeOnHover: true
+            }
+        };
+
+        // Sample datasets
+        const datasets = {
+            sales: [
+                { label: 'North America', value: 45000, color: '#007bff' },
+                { label: 'Europe', value: 32000, color: '#28a745' },
+                { label: 'Asia Pacific', value: 28000, color: '#dc3545' },
+                { label: 'Latin America', value: 15000, color: '#ffc107' },
+                { label: 'Africa', value: 8000, color: '#17a2b8' }
+            ],
+            demographics: [
+                { label: '18-25', value: 2500, color: '#6f42c1' },
+                { label: '26-35', value: 4200, color: '#e83e8c' },
+                { label: '36-45', value: 3800, color: '#fd7e14' },
+                { label: '46-55', value: 2900, color: '#20c997' },
+                { label: '55+', value: 1600, color: '#6c757d' }
+            ],
+            performance: [
+                { label: 'Excellent', value: 35, color: '#28a745' },
+                { label: 'Good', value: 45, color: '#17a2b8' },
+                { label: 'Average', value: 15, color: '#ffc107' },
+                { label: 'Poor', value: 5, color: '#dc3545' }
+            ]
+        };
+
+        let currentDataset = 'sales';
+
+        // Modern chart rendering function (simplified for demo)
+        function renderModernChart() {
+            const container = d3.select('#modern-pie-chart');
+            container.selectAll('*').remove();
+
+            const data = datasets[currentDataset];
+            const width = currentConfig.width || 500;
+            const height = currentConfig.height || 400;
+            const radius = Math.min(width, height) / 2 - 50;
+
+            // Create SVG
+            const svg = container
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+                .style('background', currentConfig.theme === 'dark' ? '#2d3748' : '#ffffff');
+
+            // Add title
+            if (currentConfig.title) {
+                svg.append('text')
+                    .attr('x', width / 2)
+                    .attr('y', 30)
+                    .attr('text-anchor', 'middle')
+                    .style('font-size', '18px')
+                    .style('font-weight', 'bold')
+                    .style('fill', currentConfig.theme === 'dark' ? '#e2e8f0' : '#333333')
+                    .text(currentConfig.title);
+            }
+
+            const g = svg.append('g')
+                .attr('transform', `translate(${width / 2}, ${height / 2})`);
+
+            // Create pie and arc
+            const pie = d3.pie()
+                .value(d => d.value)
+                .sort(null);
+
+            const arc = d3.arc()
+                .innerRadius(currentConfig.options?.innerRadius || 0)
+                .outerRadius(radius);
+
+            const arcHover = d3.arc()
+                .innerRadius(currentConfig.options?.innerRadius || 0)
+                .outerRadius(radius + 10);
+
+            // Create tooltip
+            const tooltip = d3.select('body').append('div')
+                .attr('class', 'tooltip')
+                .style('position', 'absolute')
+                .style('background', 'rgba(0,0,0,0.8)')
+                .style('color', 'white')
+                .style('padding', '8px')
+                .style('border-radius', '4px')
+                .style('font-size', '12px')
+                .style('pointer-events', 'none')
+                .style('opacity', 0);
+
+            // Draw slices
+            const slices = g.selectAll('.slice')
+                .data(pie(data))
+                .enter()
+                .append('g')
+                .attr('class', 'slice');
+
+            const paths = slices.append('path')
+                .attr('fill', d => d.data.color)
+                .attr('stroke', currentConfig.theme === 'dark' ? '#2d3748' : '#ffffff')
+                .attr('stroke-width', 2)
+                .style('cursor', 'pointer');
+
+            // Animation
+            if (currentConfig.animated) {
+                paths.attr('d', arc.outerRadius(0))
+                    .transition()
+                    .duration(750)
+                    .ease(d3.easeElastic.amplitude(1).period(0.3))
+                    .attr('d', arc);
+            } else {
+                paths.attr('d', arc);
+            }
+
+            // Interactions
+            paths
+                .on('mouseenter', function(event, d) {
+                    if (currentConfig.options?.explodeOnHover) {
+                        d3.select(this)
+                            .transition()
+                            .duration(150)
+                            .attr('d', arcHover);
+                    }
+
+                    const total = d3.sum(data, d => d.value);
+                    const percentage = ((d.data.value / total) * 100).toFixed(1);
+                    
+                    tooltip.transition().duration(200).style('opacity', .9);
+                    tooltip.html(`<strong>${d.data.label}</strong><br/>Value: ${d.data.value.toLocaleString()}<br/>Percentage: ${percentage}%`)
+                        .style('left', (event.pageX + 10) + 'px')
+                        .style('top', (event.pageY - 28) + 'px');
+                })
+                .on('mouseleave', function(event, d) {
+                    if (currentConfig.options?.explodeOnHover) {
+                        d3.select(this)
+                            .transition()
+                            .duration(150)
+                            .attr('d', arc);
+                    }
+                    tooltip.transition().duration(500).style('opacity', 0);
+                });
+
+            // Labels
+            if (currentConfig.showLabels) {
+                const labelArc = d3.arc()
+                    .innerRadius(radius + 20)
+                    .outerRadius(radius + 20);
+
+                slices.append('text')
+                    .attr('transform', d => `translate(${labelArc.centroid(d)})`)
+                    .attr('text-anchor', 'middle')
+                    .style('font-size', '12px')
+                    .style('fill', currentConfig.theme === 'dark' ? '#e2e8f0' : '#333333')
+                    .text(d => {
+                        const total = d3.sum(data, d => d.value);
+                        const percentage = ((d.data.value / total) * 100).toFixed(1);
+                        return currentConfig.options?.showPercentages ? 
+                            `${d.data.label} (${percentage}%)` : 
+                            d.data.label;
+                    });
+            }
+
+            // Cleanup previous tooltip
+            setTimeout(() => {
+                d3.select('.tooltip').remove();
+            }, 100);
+        }
+
+        // Demo controls
+        function updateChartData(datasetName) {
+            currentDataset = datasetName;
+            currentConfig.title = {
+                'sales': 'Sales by Region',
+                'demographics': 'Age Demographics',
+                'performance': 'Performance Distribution'
+            }[datasetName];
+            renderModernChart();
+        }
+
+        function toggleTheme() {
+            currentConfig.theme = currentConfig.theme === 'light' ? 'dark' : 'light';
+            renderModernChart();
+        }
+
+        function toggleAnimation() {
+            currentConfig.animated = !currentConfig.animated;
+            renderModernChart();
+        }
+
+        function toggleLabels() {
+            currentConfig.showLabels = !currentConfig.showLabels;
+            renderModernChart();
+        }
+
+        function changeChartType(type) {
+            switch(type) {
+                case 'pie':
+                    currentConfig.options.innerRadius = 0;
+                    break;
+                case 'donut':
+                    currentConfig.options.innerRadius = 60;
+                    break;
+                case 'half-pie':
+                    currentConfig.options.innerRadius = 0;
+                    // Would implement start/end angles for half pie
+                    break;
+            }
+            renderModernChart();
+        }
+
+        // Create preview chart
+        function createPreviewChart() {
+            const container = d3.select('#preview-chart');
+            const width = 400;
+            const height = 300;
+            const radius = 100;
+
+            const svg = container.append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', 30)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '16px')
+                .style('font-weight', 'bold')
+                .style('fill', '#333')
+                .text('Modern Annie Chart Preview');
+
+            const g = svg.append('g')
+                .attr('transform', `translate(${width / 2}, ${height / 2})`);
+
+            // Simple demo data
+            const demoData = [
+                { label: 'Feature A', value: 40, color: '#007bff' },
+                { label: 'Feature B', value: 30, color: '#28a745' },
+                { label: 'Feature C', value: 20, color: '#dc3545' },
+                { label: 'Feature D', value: 10, color: '#ffc107' }
+            ];
+
+            const pie = d3.pie().value(d => d.value);
+            const arc = d3.arc().innerRadius(0).outerRadius(radius);
+
+            g.selectAll('.preview-slice')
+                .data(pie(demoData))
+                .enter()
+                .append('path')
+                .attr('class', 'preview-slice')
+                .attr('d', arc)
+                .attr('fill', d => d.data.color)
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 2)
+                .style('opacity', 0.8)
+                .on('mouseenter', function() {
+                    d3.select(this).style('opacity', 1);
+                })
+                .on('mouseleave', function() {
+                    d3.select(this).style('opacity', 0.8);
+                });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderModernChart();
+            createPreviewChart();
+        });
+    </script>
+</body>
+</html>

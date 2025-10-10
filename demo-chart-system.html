@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Framework - Chart System Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .demo-section {
+            background: white;
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .chart-container {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .code-example {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border-left: 4px solid #007bff;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+                        linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+                        linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            border: 2px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 18px;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+        }
+
+        .btn.secondary {
+            background: #6c757d;
+        }
+
+        .btn.secondary:hover {
+            background: #545b62;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .feature-card h4 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .syntax-highlight {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 2px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Annie Chart System - The Future of Data Visualization</h1>
+            <p>Declarative, AI-friendly charts with zero JavaScript required</p>
+        </div>
+
+        <div class="demo-section">
+            <h2>🚀 Revolutionary Chart Approach</h2>
+            <p>Annie transforms complex chart libraries into simple, declarative data attributes. No more JavaScript configuration!</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>🎯 Zero Configuration</h4>
+                    <p>Just add data attributes. Annie handles all the D3.js complexity behind the scenes.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🤖 AI-Friendly</h4>
+                    <p>AI can generate charts by writing simple HTML attributes. No JavaScript knowledge needed.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>📱 Responsive by Default</h4>
+                    <p>All charts automatically adapt to screen size and orientation changes.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🎨 Theme Aware</h4>
+                    <p>Charts automatically match your application's design system and color scheme.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📈 Basic Chart Examples</h2>
+            
+            <h3>Line Chart - Sales Over Time</h3>
+            <div class="code-example">&lt;div data-annie-chart="line" 
+     data-source="sales-data"
+     data-x="month" 
+     data-y="revenue"
+     data-title="Monthly Revenue"
+     data-height="300"&gt;
+&lt;/div&gt;</div>
+            <div class="chart-container">
+                <div class="chart-placeholder">📈 Line Chart: Monthly Revenue<br>Data: sales-data.month → sales-data.revenue</div>
+            </div>
+
+            <h3>Bar Chart - Product Comparison</h3>
+            <div class="code-example">&lt;div data-annie-chart="bar" 
+     data-source="products"
+     data-x="name" 
+     data-y="sales"
+     data-color="category"
+     data-title="Product Sales by Category"&gt;
+&lt;/div&gt;</div>
+            <div class="chart-container">
+                <div class="chart-placeholder">📊 Bar Chart: Product Sales<br>Grouped by Category</div>
+            </div>
+
+            <h3>Pie Chart - Market Share</h3>
+            <div class="code-example">&lt;div data-annie-chart="pie" 
+     data-source="market-share"
+     data-label="company" 
+     data-value="percentage"
+     data-title="Market Share Distribution"
+     data-show-legend="true"&gt;
+&lt;/div&gt;</div>
+            <div class="chart-container">
+                <div class="chart-placeholder">🥧 Pie Chart: Market Share<br>With Interactive Legend</div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔥 Advanced Chart Features</h2>
+            
+            <h3>Multi-Series Line Chart</h3>
+            <div class="code-example">&lt;div data-annie-chart="line" 
+     data-source="performance"
+     data-x="date" 
+     data-y="['revenue', 'profit', 'expenses']"
+     data-colors="['#007bff', '#28a745', '#dc3545']"
+     data-title="Financial Performance"
+     data-legend="true"
+     data-interactive="true"&gt;
+&lt;/div&gt;</div>
+            <div class="chart-container">
+                <div class="chart-placeholder">📈 Multi-Series Chart<br>Revenue, Profit & Expenses<br>🖱️ Interactive with Tooltips</div>
+            </div>
+
+            <h3>Stacked Bar Chart with Filters</h3>
+            <div class="code-example">&lt;div data-annie-chart="stacked-bar" 
+     data-source="quarterly-sales"
+     data-x="quarter" 
+     data-y="amount"
+     data-stack="region"
+     data-filter="year:2024"
+     data-title="Q1-Q4 Sales by Region"&gt;
+&lt;/div&gt;</div>
+            <div class="chart-container">
+                <div class="chart-placeholder">📊 Stacked Bar Chart<br>Quarterly Sales by Region<br>🔍 Filtered for 2024</div>
+            </div>
+
+            <h3>Real-time Dashboard Chart</h3>
+            <div class="code-example">&lt;div data-annie-chart="area" 
+     data-source="live-metrics"
+     data-x="timestamp" 
+     data-y="value"
+     data-real-time="true"
+     data-update-interval="5000"
+     data-max-points="100"
+     data-title="Live System Metrics"&gt;
+&lt;/div&gt;</div>
+            <div class="chart-container">
+                <div class="chart-placeholder">📈 Real-time Area Chart<br>Updates every 5 seconds<br>⚡ Live data streaming</div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎯 Annie vs Angular Charts Comparison</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>📝 Angular (ng2-charts)</h4>
+                    <div class="syntax-highlight">// Component setup required
+@Component({
+  selector: 'my-chart',
+  template: `&lt;canvas 
+    baseChart 
+    [data]="chartData"
+    [options]="chartOptions"
+    [type]="chartType"&gt;
+  &lt;/canvas&gt;`
+})
+export class ChartComponent {
+  chartData = {
+    labels: ['Jan', 'Feb', 'Mar'],
+    datasets: [{
+      label: 'Sales',
+      data: [100, 200, 150],
+      backgroundColor: 'rgba(75,192,192,0.4)'
+    }]
+  };
+  chartOptions = {
+    responsive: true,
+    scales: {
+      y: { beginAtZero: true }
+    }
+  };
+  chartType = 'line';
+}</div>
+                    <span class="tag">60+ lines</span>
+                    <span class="tag">TypeScript required</span>
+                    <span class="tag">Component knowledge needed</span>
+                </div>
+
+                <div class="feature-card">
+                    <h4>🚀 Annie Framework</h4>
+                    <div class="syntax-highlight">&lt;!-- Just HTML attributes --&gt;
+&lt;div data-annie-chart="line"
+     data-source="sales-data"
+     data-x="month"
+     data-y="amount"
+     data-title="Sales Chart"&gt;
+&lt;/div&gt;</div>
+                    <span class="tag">5 lines</span>
+                    <span class="tag">No JavaScript</span>
+                    <span class="tag">AI-friendly</span>
+                    <span class="tag">Visual builder ready</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🛠️ Chart Configuration Options</h2>
+            
+            <h3>📊 Chart Types</h3>
+            <div class="code-example">data-annie-chart="line"          // Line chart
+data-annie-chart="bar"           // Bar chart  
+data-annie-chart="pie"           // Pie chart
+data-annie-chart="donut"         // Donut chart
+data-annie-chart="area"          // Area chart
+data-annie-chart="scatter"       // Scatter plot
+data-annie-chart="histogram"     // Histogram
+data-annie-chart="heatmap"       // Heat map
+data-annie-chart="treemap"       // Tree map
+data-annie-chart="sankey"        // Sankey diagram</div>
+
+            <h3>🎨 Styling Options</h3>
+            <div class="code-example">data-theme="light|dark|auto"              // Color theme
+data-colors="['#ff6384', '#36a2eb']"      // Custom colors
+data-width="800"                           // Chart width
+data-height="400"                          // Chart height  
+data-margin="{'top': 20, 'right': 30}"    // Chart margins
+data-font-size="14"                        // Text size
+data-background="#ffffff"                  // Background color</div>
+
+            <h3>📈 Data Mapping</h3>
+            <div class="code-example">data-source="sales-data"                   // Dataset name
+data-x="date"                              // X-axis field
+data-y="revenue"                           // Y-axis field
+data-y="['sales', 'profit']"               // Multiple Y series
+data-color="category"                      // Color grouping field
+data-size="volume"                         // Size field (scatter plots)
+data-filter="status:active"                // Data filtering</div>
+
+            <h3>🔧 Interactive Features</h3>
+            <div class="code-example">data-interactive="true"                    // Enable interactions
+data-zoom="true"                           // Allow zooming
+data-pan="true"                            // Allow panning
+data-brush="true"                          // Selection brush
+data-tooltip="true"                        // Show tooltips
+data-legend="true"                         // Show legend
+data-export="png,svg,pdf"                  // Export options</div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🤖 AI Integration Examples</h2>
+            
+            <h3>Natural Language Chart Generation</h3>
+            <div class="code-example">AI Prompt: "Show me a bar chart of monthly sales by product category"
+
+Generated HTML:
+&lt;div data-annie-chart="bar"
+     data-source="monthly-sales"
+     data-x="month"
+     data-y="sales"
+     data-color="category"
+     data-title="Monthly Sales by Product Category"
+     data-legend="true"&gt;
+&lt;/div&gt;</div>
+
+            <h3>Smart Chart Suggestions</h3>
+            <div class="code-example">&lt;!-- AI analyzes data and suggests optimal chart type --&gt;
+&lt;div data-annie-ai="suggest-chart"
+     data-source="customer-data"
+     data-goal="show-trends"&gt;
+  &lt;!-- AI determines: time series data → line chart recommended --&gt;
+&lt;/div&gt;</div>
+
+            <h3>Automatic Optimization</h3>
+            <div class="code-example">&lt;div data-annie-chart="auto"
+     data-source="complex-dataset" 
+     data-annie-ai="optimize"&gt;
+  &lt;!-- AI chooses best chart type, colors, and layout --&gt;
+  &lt;!-- Automatically handles large datasets with sampling --&gt;
+  &lt;!-- Suggests drill-down capabilities --&gt;
+&lt;/div&gt;</div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎛️ Interactive Demo Controls</h2>
+            <div class="controls">
+                <button class="btn" onclick="generateSampleChart()">📊 Generate Sample Chart</button>
+                <button class="btn" onclick="showRealTimeDemo()">⚡ Real-time Demo</button>
+                <button class="btn" onclick="demonstrateAI()">🤖 AI Chart Generation</button>
+                <button class="btn secondary" onclick="showCodeExamples()">💻 Show Implementation</button>
+            </div>
+            
+            <div id="demo-output" style="margin-top: 20px;">
+                <p>👆 Click buttons above to see Annie Chart System in action!</p>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🌟 Implementation Roadmap</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>📦 Phase 1: Core Charts (Week 1-2)</h4>
+                    <ul>
+                        <li>Line, Bar, Pie charts</li>
+                        <li>Data attribute parsing</li>
+                        <li>D3.js integration layer</li>
+                        <li>Responsive design</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>🔥 Phase 2: Advanced Features (Week 3-4)</h4>
+                    <ul>
+                        <li>Multi-series support</li>
+                        <li>Interactive tooltips</li>
+                        <li>Real-time updates</li>
+                        <li>Export functionality</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>🤖 Phase 3: AI Integration (Month 2)</h4>
+                    <ul>
+                        <li>Chart type suggestions</li>
+                        <li>Automatic optimization</li>
+                        <li>Natural language generation</li>
+                        <li>Smart data analysis</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>🏢 Phase 4: Enterprise (Month 3)</h4>
+                    <ul>
+                        <li>Advanced chart types</li>
+                        <li>Dashboard integration</li>
+                        <li>Performance optimization</li>
+                        <li>Custom themes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generateSampleChart() {
+            const output = document.getElementById('demo-output');
+            output.innerHTML = `
+                <h4>🎯 Sample Chart Generated!</h4>
+                <div class="code-example">&lt;div data-annie-chart="line"
+     data-source="sample-sales"
+     data-x="month"
+     data-y="revenue"
+     data-title="Sample Revenue Chart"
+     data-interactive="true"&gt;
+&lt;/div&gt;</div>
+                <div class="chart-placeholder">📈 Interactive Line Chart<br>Sample Sales Data<br>🖱️ Hover for details</div>
+                <p><strong>Behind the scenes:</strong> Annie would parse these attributes, load D3.js if needed, fetch data from 'sample-sales' dataset, and render an interactive line chart automatically.</p>
+            `;
+        }
+
+        function showRealTimeDemo() {
+            const output = document.getElementById('demo-output');
+            output.innerHTML = `
+                <h4>⚡ Real-time Chart Demo</h4>
+                <div class="code-example">&lt;div data-annie-chart="area"
+     data-source="live-data"
+     data-real-time="true"
+     data-update-interval="2000"
+     data-x="timestamp"
+     data-y="value"&gt;
+&lt;/div&gt;</div>
+                <div class="chart-placeholder">📈 Live Area Chart<br>Updates every 2 seconds<br>⏳ Simulating real-time data...</div>
+                <p><strong>Real-time features:</strong> Automatic data polling, smooth animations, rolling window of recent data points, WebSocket support for instant updates.</p>
+            `;
+        }
+
+        function demonstrateAI() {
+            const output = document.getElementById('demo-output');
+            output.innerHTML = `
+                <h4>🤖 AI Chart Generation</h4>
+                <p><strong>User says:</strong> "I want to see our Q1 sales performance compared to last year"</p>
+                <div class="code-example">AI Generated Chart:
+&lt;div data-annie-chart="grouped-bar"
+     data-source="quarterly-sales"
+     data-x="quarter"
+     data-y="sales"
+     data-group="year"
+     data-filter="quarter:Q1"
+     data-title="Q1 Sales: 2024 vs 2023"
+     data-colors="['#007bff', '#28a745']"&gt;
+&lt;/div&gt;</div>
+                <div class="chart-placeholder">📊 AI-Generated Chart<br>Q1 Sales Comparison<br>🧠 Smart data analysis</div>
+                <p><strong>AI Magic:</strong> Understood intent, selected appropriate chart type, applied filters, chose colors, and generated descriptive title.</p>
+            `;
+        }
+
+        function showCodeExamples() {
+            const output = document.getElementById('demo-output');
+            output.innerHTML = `
+                <h4>💻 Implementation Preview</h4>
+                <div class="syntax-highlight">// Annie Chart System Core
+class AnnieChartProcessor {
+  processChart(element) {
+    const config = this.parseAttributes(element);
+    const data = this.fetchData(config.source);
+    const chart = this.createChart(config.type, data, config);
+    this.renderChart(element, chart);
+  }
+  
+  parseAttributes(element) {
+    return {
+      type: element.dataset.annieChart,
+      source: element.dataset.source,
+      x: element.dataset.x,
+      y: element.dataset.y,
+      // ... other attributes
+    };
+  }
+}</div>
+                <p><strong>Key Features:</strong> Automatic attribute parsing, data integration with Annie's DataStore, D3.js wrapper with sensible defaults, responsive design built-in.</p>
+            `;
+        }
+    </script>
+</body>
+</html>

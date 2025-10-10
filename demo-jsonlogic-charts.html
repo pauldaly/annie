@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Charts + JsonLogic - Dynamic Reactive Visualizations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .demo-section {
+            background: white;
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .code-example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+            white-space: pre-wrap;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(45deg, #f0f8ff 25%, transparent 25%),
+                        linear-gradient(-45deg, #f0f8ff 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #f0f8ff 75%),
+                        linear-gradient(-45deg, transparent 75%, #f0f8ff 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            border: 2px dashed #007bff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #007bff;
+            font-size: 16px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .feature-card h4 {
+            color: #007bff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 2px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Annie Charts + JsonLogic Integration</h1>
+            <h2>🚀 Dynamic, Reactive, AI-Friendly Data Visualizations</h2>
+            <p>The most advanced declarative charting system ever created</p>
+        </div>
+
+        <div class="demo-section">
+            <h2>🧠 Revolutionary JsonLogic Chart Integration</h2>
+            
+            <div class="highlight">
+                <strong>💡 Game Changer:</strong> Charts that automatically adapt their type, colors, data, and behavior based on conditions, user preferences, device type, time of day, or any other dynamic factors!
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>🎯 Conditional Chart Types</h4>
+                    <p>Charts automatically switch types based on data size, device, or user preferences</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🎨 Dynamic Theming</h4>
+                    <p>Colors, styles, and layouts adapt to user themes, time of day, or data values</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🔍 Smart Data Filtering</h4>
+                    <p>Charts automatically filter and transform data based on user roles and permissions</p>
+                </div>
+                <div class="feature-card">
+                    <h4>📱 Responsive Intelligence</h4>
+                    <p>Charts intelligently adapt to screen size, orientation, and device capabilities</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎯 Conditional Chart Types with JsonLogic</h2>
+            
+            <h3>📊 Smart Chart Type Selection</h3>
+            <div class="code-example">&lt;!-- Chart type changes based on data size and device --&gt;
+&lt;div data-annie-chart='{"jsonlogic": {
+    "if": [
+        {"and": [
+            {"var": "isMobile"}, 
+            {"&gt;": [{"var": "dataCount"}, 50]}
+        ]}, 
+        "bar",
+        {"if": [
+            {"&lt;": [{"var": "dataCount"}, 10]},
+            "pie",
+            "line"
+        ]}
+    ]
+}}'
+     data-source="sales-data"
+     data-x="date" 
+     data-y="revenue"
+     data-title="Smart Sales Chart"&gt;
+&lt;/div&gt;</div>
+            <div class="chart-placeholder">
+                📱 Mobile + Large Dataset = Bar Chart<br>
+                🖥️ Desktop + Small Dataset = Pie Chart<br>
+                🖥️ Desktop + Medium/Large = Line Chart<br>
+                <strong>🤖 Automatically selects optimal visualization</strong>
+            </div>
+
+            <h3>📈 Multi-Condition Chart Selection</h3>
+            <div class="code-example">&lt;!-- Complex business logic for chart selection --&gt;
+&lt;div data-annie-chart='{"jsonlogic": {
+    "if": [
+        {"==": [{"var": "user.role"}, "executive"]},
+        "area",
+        {"if": [
+            {"==": [{"var": "reportType"}, "comparison"]},
+            "grouped-bar",
+            {"if": [
+                {"var": "showTrends"},
+                "line",
+                "bar"
+            ]}
+        ]}
+    ]
+}}'
+     data-source="business-metrics"
+     data-title='{"jsonlogic": {"cat": [{"var": "user.name"}, " - ", {"var": "reportTitle"}]}}'&gt;
+&lt;/div&gt;</div>
+            <div class="chart-placeholder">
+                👔 Executive Role = Area Chart (high-level overview)<br>
+                📊 Comparison Report = Grouped Bar Chart<br>
+                📈 Trend Analysis = Line Chart<br>
+                📋 Default = Bar Chart
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎨 Dynamic Styling and Colors</h2>
+            
+            <h3>🌙 Theme-Aware Colors</h3>
+            <div class="code-example">&lt;div data-annie-chart="line"
+     data-source="performance-data"
+     data-colors='{"jsonlogic": {
+        "if": [
+            {"==": [{"var": "theme"}, "dark"]},
+            ["#64ffda", "#ff6b9d", "#ffd54f"],
+            {"if": [
+                {"==": [{"var": "theme"}, "corporate"]},
+                ["#1976d2", "#388e3c", "#f57c00"],
+                ["#007bff", "#28a745", "#dc3545"]
+            ]}
+        ]
+     }}'
+     data-background='{"jsonlogic": {
+        "if": [{"==": [{"var": "theme"}, "dark"]}, "#2d3748", "#ffffff"]
+     }}'&gt;
+&lt;/div&gt;</div>
+            <div class="chart-placeholder">
+                🌙 Dark Theme = Neon Colors + Dark Background<br>
+                🏢 Corporate Theme = Professional Blue/Green/Orange<br>
+                ☀️ Light Theme = Standard Blue/Green/Red
+            </div>
+
+            <h3>📊 Data-Driven Colors</h3>
+            <div class="code-example">&lt;!-- Colors change based on performance metrics --&gt;
+&lt;div data-annie-chart="bar"
+     data-source="sales-performance" 
+     data-colors='{"jsonlogic": {
+        "map": [
+            {"var": "data"},
+            {
+                "if": [
+                    {"&gt;=": [{"var": "performance"}, 0.9]},
+                    "#28a745",
+                    {"if": [
+                        {"&gt;=": [{"var": "performance"}, 0.7]},
+                        "#ffc107", 
+                        "#dc3545"
+                    ]}
+                ]
+            }
+        ]
+     }}'&gt;
+&lt;/div&gt;</div>
+            <div class="chart-placeholder">
+                🟢 Performance ≥ 90% = Green (Excellent)<br>
+                🟡 Performance ≥ 70% = Yellow (Good)<br>
+                🔴 Performance &lt; 70% = Red (Needs Attention)<br>
+                <strong>Each bar gets its own color based on data!</strong>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔍 Smart Data Filtering and Transformation</h2>
+            
+            <h3>👤 Role-Based Data Access</h3>
+            <div class="code-example">&lt;!-- Data automatically filtered by user permissions --&gt;
+&lt;div data-annie-chart="line"
+     data-source="financial-data"
+     data-filter='{"jsonlogic": {
+        "if": [
+            {"==": [{"var": "user.role"}, "admin"]},
+            {},
+            {"if": [
+                {"==": [{"var": "user.role"}, "manager"]},
+                {"department": {"var": "user.department"}},
+                {"and": [
+                    {"department": {"var": "user.department"}},
+                    {"public": true}
+                ]}
+            ]}
+        ]
+     }}'
+     data-y='{"jsonlogic": {
+        "if": [
+            {"in": [{"var": "user.role"}, ["admin", "finance"]]},
+            "revenue",
+            "sales_count"
+        ]
+     }}'&gt;
+&lt;/div&gt;</div>
+            <div class="chart-placeholder">
+                👑 Admin = All Data + Revenue Values<br>
+                👨‍💼 Manager = Department Data + Revenue<br>
+                👤 Employee = Department + Public Data + Sales Count Only<br>
+                <strong>🔒 Automatic data security!</strong>
+            </div>
+
+            <h3>⏰ Time-Based Data Windows</h3>
+            <div class="code-example">&lt;div data-annie-chart="area"
+     data-source="metrics"
+     data-time-range='{"jsonlogic": {
+        "if": [
+            {"==": [{"var": "viewMode"}, "realtime"]},
+            "last_hour",
+            {"if": [
+                {"==": [{"var": "viewMode"}, "daily"]},
+                "last_24_hours",
+                {"if": [
+                    {"==": [{"var": "viewMode"}, "weekly"]},
+                    "last_7_days",
+                    "last_30_days"
+                ]}
+            ]}
+        ]
+     }}'
+     data-update-interval='{"jsonlogic": {
+        "if": [{"==": [{"var": "viewMode"}, "realtime"]}, 5000, 300000]
+     }}'&gt;
+&lt;/div&gt;</div>
+            <div class="chart-placeholder">
+                ⚡ Real-time Mode = Last Hour + 5s Updates<br>
+                📅 Daily Mode = Last 24 Hours + 5min Updates<br>
+                📊 Weekly Mode = Last 7 Days + 5min Updates<br>
+                📈 Monthly Mode = Last 30 Days + 5min Updates
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📱 Responsive and Context-Aware Charts</h2>
+            
+            <h3>📲 Device-Optimized Configurations</h3>
+            <div class="code-example">&lt;div data-annie-chart="bar"
+     data-source="customer-data"
+     data-orientation='{"jsonlogic": {
+        "if": [{"var": "isMobile"}, "vertical", "horizontal"]
+     }}'
+     data-show-legend='{"jsonlogic": {
+        "if": [{"var": "isMobile"}, false, true]
+     }}'
+     data-font-size='{"jsonlogic": {
+        "if": [{"var": "isMobile"}, 12, 14]
+     }}'
+     data-height='{"jsonlogic": {
+        "if": [{"var": "isMobile"}, 250, 400]
+     }}'&gt;
+&lt;/div&gt;</div>
+            <div class="chart-placeholder">
+                📱 Mobile = Vertical Bars, No Legend, Small Font, Compact Height<br>
+                🖥️ Desktop = Horizontal Bars, Legend, Normal Font, Full Height<br>
+                <strong>Perfect UX on every device!</strong>
+            </div>
+
+            <h3>🕐 Time-of-Day Adaptations</h3>
+            <div class="code-example">&lt;div data-annie-chart="line"
+     data-source="activity-data"
+     data-theme='{"jsonlogic": {
+        "if": [
+            {"and": [
+                {"&gt;=": [{"var": "currentHour"}, 18]},
+                {"&lt;": [{"var": "currentHour"}, 6]}
+            ]},
+            "dark",
+            "light"
+        ]
+     }}'
+     data-animation-speed='{"jsonlogic": {
+        "if": [
+            {"==": [{"var": "user.preference.reducedMotion"}, true]},
+            0,
+            1000
+        ]
+     }}'&gt;
+&lt;/div&gt;</div>
+            <div class="chart-placeholder">
+                🌙 Evening/Night (6PM-6AM) = Dark Theme<br>
+                ☀️ Day (6AM-6PM) = Light Theme<br>
+                ♿ Reduced Motion Preference = No Animations<br>
+                <strong>Accessible and user-friendly!</strong>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🤖 AI-Enhanced JsonLogic Charts</h2>
+            
+            <h3>🧠 AI-Generated Conditional Logic</h3>
+            <div class="code-example">AI Prompt: "Create a sales chart that shows bars for mobile users, 
+           lines for desktop, uses dark colors at night, 
+           and hides sensitive data for non-managers"
+
+Generated Chart:
+&lt;div data-annie-chart='{"jsonlogic": {
+    "if": [{"var": "isMobile"}, "bar", "line"]
+}}'
+     data-source="sales-data"
+     data-colors='{"jsonlogic": {
+        "if": [
+            {"and": [
+                {"&gt;=": [{"var": "hour"}, 18]},
+                {"&lt;=": [{"var": "hour"}, 6]}
+            ]},
+            ["#2d3748", "#4a5568", "#718096"],
+            ["#007bff", "#28a745", "#ffc107"]
+        ]
+     }}'
+     data-y='{"jsonlogic": {
+        "if": [
+            {"in": [{"var": "user.role"}, ["manager", "admin"]]},
+            "revenue",
+            "unit_count"
+        ]
+     }}'&gt;
+&lt;/div&gt;</div>
+            <div class="chart-placeholder">
+                🤖 <strong>AI automatically generated complex JsonLogic!</strong><br>
+                ✅ Device detection ✅ Time-based theming ✅ Role-based security<br>
+                All from natural language description!
+            </div>
+
+            <h3>🔄 Self-Optimizing Charts</h3>
+            <div class="code-example">&lt;!-- Chart learns from user interactions --&gt;
+&lt;div data-annie-chart="auto"
+     data-source="user-analytics"
+     data-ai-optimize="true"
+     data-learn-from='["clicks", "hovers", "time_spent"]'
+     data-optimization-goal="engagement"
+     data-adaptive-config='{"jsonlogic": {
+        "if": [
+            {"&gt;": [{"var": "user.engagement_score"}, 0.8]},
+            {"show_details": true, "interactive": true},
+            {"simplified": true, "auto_highlight": true}
+        ]
+     }}'&gt;
+&lt;/div&gt;</div>
+            <div class="chart-placeholder">
+                🧠 AI analyzes user behavior patterns<br>
+                📊 High engagement users → Detailed interactive charts<br>
+                👤 Lower engagement users → Simplified auto-highlighting<br>
+                <strong>Charts get smarter with use!</strong>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎛️ Interactive Demos</h2>
+            <div class="controls">
+                <button class="btn" onclick="demonstrateConditionalChart()">🎯 Conditional Chart Demo</button>
+                <button class="btn" onclick="demonstrateThemeAdaptation()">🎨 Theme Adaptation Demo</button>
+                <button class="btn" onclick="demonstrateRoleBasedData()">👤 Role-Based Demo</button>
+                <button class="btn" onclick="demonstrateAIGeneration()">🤖 AI Generation Demo</button>
+            </div>
+            
+            <div id="demo-output" style="margin-top: 20px;">
+                <p>👆 Click buttons above to see JsonLogic chart integration in action!</p>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🚀 Implementation Architecture</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>🔧 JsonLogic Parser</h4>
+                    <div class="code-example">// Parse JsonLogic in chart attributes
+parseChartConfig(element) {
+  const config = {};
+  for (let attr of element.attributes) {
+    if (attr.value.includes('jsonlogic')) {
+      config[attr.name] = jsonLogic.apply(
+        JSON.parse(attr.value).jsonlogic, 
+        this.getContextData()
+      );
+    }
+  }
+  return config;
+}</div>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>👁️ Observer Integration</h4>
+                    <div class="code-example">// Watch for data changes and re-evaluate
+class ChartObserver {
+  observeData(chartElement, dependencies) {
+    dependencies.forEach(dep => {
+      dataStore.observe(dep, () => {
+        this.updateChart(chartElement);
+      });
+    });
+  }
+}</div>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>🎯 Context Provider</h4>
+                    <div class="code-example">// Provide rich context for JsonLogic
+getContextData() {
+  return {
+    user: getCurrentUser(),
+    device: getDeviceInfo(),
+    time: getTimeContext(),
+    data: getDataMetrics(),
+    preferences: getUserPreferences()
+  };
+}</div>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>🔄 Real-time Updates</h4>
+                    <div class="code-example">// Automatic re-evaluation on context changes
+updateChartOnContextChange() {
+  this.charts.forEach(chart => {
+    const newConfig = this.parseChartConfig(chart.element);
+    if (hasChanges(chart.config, newConfig)) {
+      this.rerenderChart(chart, newConfig);
+    }
+  });
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>💫 Why This is Revolutionary</h2>
+            
+            <div class="highlight">
+                <strong>🎯 No Framework Has This!</strong> Annie would be the first to combine declarative charts with intelligent conditional logic. Angular, React, Vue - none offer this level of dynamic, AI-friendly visualization.
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>🚀 For Developers</h4>
+                    <ul>
+                        <li>Write complex chart logic in HTML attributes</li>
+                        <li>No JavaScript chart configuration needed</li>
+                        <li>Automatic reactivity and updates</li>
+                        <li>Built-in accessibility and responsive design</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>🤖 For AI Systems</h4>
+                    <ul>
+                        <li>Generate complex charts from natural language</li>
+                        <li>Understand business requirements automatically</li>
+                        <li>Create adaptive, context-aware visualizations</li>
+                        <li>No programming knowledge required</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>👥 For Non-Developers</h4>
+                    <ul>
+                        <li>Visual builder can create intelligent charts</li>
+                        <li>No coding skills required</li>
+                        <li>Charts adapt to user needs automatically</li>
+                        <li>Enterprise-grade functionality</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>🏢 For Enterprises</h4>
+                    <ul>
+                        <li>Built-in security and role-based access</li>
+                        <li>Automatic compliance with data policies</li>
+                        <li>Consistent branding and theming</li>
+                        <li>Performance optimization built-in</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo functions
+        function demonstrateConditionalChart() {
+            const output = document.getElementById('demo-output');
+            output.innerHTML = `
+                <h4>🎯 Conditional Chart Type Demo</h4>
+                <div class="code-example">// Simulating different conditions:
+Current Context:
+- isMobile: false
+- dataCount: 25
+- user.role: "manager"
+
+JsonLogic Evaluation:
+{
+  "if": [
+    {"and": [{"var": "isMobile"}, {"&gt;": [{"var": "dataCount"}, 50]}]}, 
+    "bar",     // ❌ False: not mobile OR not > 50 points
+    {"if": [
+      {"&lt;": [{"var": "dataCount"}, 10]},
+      "pie",   // ❌ False: 25 is not < 10
+      "line"   // ✅ True: default case
+    ]}
+  ]
+}
+
+Result: Chart Type = "line"</div>
+                <div class="chart-placeholder">
+                    📈 <strong>Line Chart Selected!</strong><br>
+                    Desktop device + Medium dataset (25 points)<br>
+                    JsonLogic automatically chose optimal visualization
+                </div>
+            `;
+        }
+
+        function demonstrateThemeAdaptation() {
+            const output = document.getElementById('demo-output');
+            const hour = new Date().getHours();
+            const isDark = hour >= 18 || hour < 6;
+            
+            output.innerHTML = `
+                <h4>🎨 Theme Adaptation Demo</h4>
+                <div class="code-example">Current Time: ${new Date().toLocaleTimeString()}
+Current Hour: ${hour}
+
+JsonLogic Evaluation:
+{
+  "if": [
+    {"and": [
+      {"&gt;=": [{"var": "currentHour"}, 18]},
+      {"&lt;": [{"var": "currentHour"}, 6]}
+    ]},
+    "dark",
+    "light"
+  ]
+}
+
+Result: Theme = "${isDark ? 'dark' : 'light'}"
+Colors: ${isDark ? '["#64ffda", "#ff6b9d", "#ffd54f"]' : '["#007bff", "#28a745", "#dc3545"]'}</div>
+                <div class="chart-placeholder" style="background: ${isDark ? '#2d3748' : '#f0f8ff'}; color: ${isDark ? '#e2e8f0' : '#007bff'};">
+                    ${isDark ? '🌙' : '☀️'} <strong>${isDark ? 'Dark' : 'Light'} Theme Active!</strong><br>
+                    Time-based automatic theme switching<br>
+                    ${isDark ? 'Neon colors for night viewing' : 'Standard colors for day viewing'}
+                </div>
+            `;
+        }
+
+        function demonstrateRoleBasedData() {
+            const output = document.getElementById('demo-output');
+            output.innerHTML = `
+                <h4>👤 Role-Based Data Access Demo</h4>
+                <div class="code-example">Simulating different user roles:
+
+Admin User:
+- data-filter: {} (no restrictions)
+- data-y: "revenue" (sensitive financial data)
+- Access: All departments, all data
+
+Manager User:
+- data-filter: {"department": "sales"}
+- data-y: "revenue" (has financial access)
+- Access: Own department only
+
+Employee User:
+- data-filter: {"department": "sales", "public": true}
+- data-y: "sales_count" (no financial data)
+- Access: Own department, public data only</div>
+                <div class="chart-placeholder">
+                    🔒 <strong>Automatic Data Security!</strong><br>
+                    Charts show only authorized data<br>
+                    No special code required - JsonLogic handles it
+                </div>
+            `;
+        }
+
+        function demonstrateAIGeneration() {
+            const output = document.getElementById('demo-output');
+            output.innerHTML = `
+                <h4>🤖 AI Chart Generation Demo</h4>
+                <div class="code-example">User Request: "Show me a chart that adapts to mobile users and hides revenue from non-managers"
+
+AI Analysis:
+1. "adapts to mobile" → conditional chart type
+2. "hides revenue" → role-based data filtering
+3. Generates JsonLogic automatically
+
+Generated Attributes:
+data-annie-chart='{"jsonlogic": {"if": [{"var": "isMobile"}, "bar", "line"]}}'
+data-y='{"jsonlogic": {"if": [{"in": [{"var": "user.role"}, ["manager", "admin"]]}, "revenue", "units"]}}'
+data-height='{"jsonlogic": {"if": [{"var": "isMobile"}, 250, 400]}}'</div>
+                <div class="chart-placeholder">
+                    🧠 <strong>AI Generated Complex Logic!</strong><br>
+                    📱 Mobile → Bar chart, shorter height<br>
+                    🖥️ Desktop → Line chart, full height<br>
+                    👤 Role-based data access built in
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

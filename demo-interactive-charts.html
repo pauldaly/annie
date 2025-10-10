@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Interactive Charts - Navigation & Actions Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .chart-container { margin: 20px 0; padding: 20px; border: 1px solid #e9ecef; border-radius: 4px; background: #ffffff; min-height: 400px; }
+        .demo-section { margin: 30px 0; }
+        .demo-controls { margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 4px; }
+        button { padding: 8px 16px; margin: 5px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
+        .code-example { background: #f8f9fa; padding: 15px; border-radius: 4px; font-family: 'Courier New', monospace; margin: 10px 0; overflow-x: auto; }
+        .interaction-demo { background: #e8f4fd; padding: 15px; border-radius: 4px; margin: 10px 0; border-left: 4px solid #007bff; }
+        .status { padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .status.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        h1, h2 { color: #2c3e50; }
+        
+        /* Interactive tooltip styles */
+        .annie-interactive-tooltip {
+            font-family: Arial, sans-serif !important;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Annie Interactive Charts - Navigation & Actions</h1>
+        
+        <div class="status success">
+            ✅ This demo showcases Annie Framework's interactive chart system with navigation, actions, and element-specific interactions
+        </div>
+
+        <div class="demo-section">
+            <h2>🚀 Interactive Features Overview</h2>
+            
+            <div class="grid">
+                <div>
+                    <h3>Navigation Actions</h3>
+                    <ul>
+                        <li><strong>URL Navigation:</strong> Direct links with parameters</li>
+                        <li><strong>Annie Routes:</strong> SPA navigation integration</li>
+                        <li><strong>Parameter Replacement:</strong> Dynamic URLs from data</li>
+                        <li><strong>Target Windows:</strong> _self, _blank, etc.</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3>Popup & Modal Actions</h3>
+                    <ul>
+                        <li><strong>Modals:</strong> Rich data detail views</li>
+                        <li><strong>Tooltips:</strong> Enhanced hover information</li>
+                        <li><strong>Sidebars:</strong> Related content panels</li>
+                        <li><strong>Drawers:</strong> Slide-out information</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3>Custom Actions</h3>
+                    <ul>
+                        <li><strong>Function Calls:</strong> Execute custom code</li>
+                        <li><strong>Annie Triggers:</strong> Fire framework events</li>
+                        <li><strong>Data Updates:</strong> Modify datasets</li>
+                        <li><strong>State Changes:</strong> Update application state</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3>Analytics & Tracking</h3>
+                    <ul>
+                        <li><strong>Google Analytics:</strong> Event tracking</li>
+                        <li><strong>Custom Events:</strong> Annie event system</li>
+                        <li><strong>User Behavior:</strong> Interaction patterns</li>
+                        <li><strong>Performance:</strong> Chart interaction metrics</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📊 Interactive Sales Dashboard</h2>
+            <p>Click, hover, and right-click on chart elements to see different actions:</p>
+            
+            <div class="interaction-demo">
+                <strong>Try these interactions:</strong>
+                <ul>
+                    <li><strong>Click</strong> on a slice → Navigate to detailed report</li>
+                    <li><strong>Hover</strong> over slices → Enhanced tooltip with metadata</li>
+                    <li><strong>Double-click</strong> → Drill down to sub-data</li>
+                    <li><strong>Right-click</strong> → Context menu with actions</li>
+                </ul>
+            </div>
+            
+            <div class="chart-container">
+                <div id="sales-dashboard"></div>
+            </div>
+            
+            <div id="interaction-log" style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-top: 15px; height: 150px; overflow-y: auto;">
+                <strong>Interaction Log:</strong><br/>
+                <span style="color: #666;">Interact with the chart above to see events...</span>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>💻 Annie Declarative Usage</h2>
+            <p>How to define interactive charts using Annie's declarative syntax:</p>
+            
+            <div class="code-example">
+&lt;!-- Basic interactive chart --&gt;
+&lt;div annie-chart="pie"
+     annie-data-source="salesData"
+     annie-chart-config='{
+       "title": "Sales by Region",
+       "interactions": {
+         "global": {
+           "onClick": {
+             "navigate": {
+               "url": "/reports/region/{label}",
+               "params": {"value": "{value}"}
+             },
+             "analytics": {
+               "event": "chart_click",
+               "category": "sales_dashboard"
+             }
+           }
+         },
+         "hoverEffect": {"enabled": true, "style": "explode"},
+         "clickEffect": {"enabled": true, "style": "pulse"}
+       }
+     }'&gt;
+&lt;/div&gt;
+
+&lt;!-- Element-specific interactions --&gt;
+&lt;script&gt;
+const interactiveData = [
+  {
+    label: "North America",
+    value: 45000,
+    onClick: {
+      navigate: { url: "/na-report" }
+    },
+    onHover: {
+      popup: { 
+        type: "tooltip",
+        content: "&lt;h3&gt;North America&lt;/h3&gt;&lt;p&gt;Top performing region&lt;/p&gt;"
+      }
+    },
+    contextMenu: [
+      {
+        navigate: { url: "/na-details" }
+      },
+      {
+        action: { function: "exportRegionData", params: ["NA"] }
+      }
+    ],
+    metadata: {
+      growth: "+12%",
+      manager: "Alice Johnson",
+      lastUpdated: "2025-10-03"
+    }
+  }
+];
+&lt;/script&gt;
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔧 Advanced Configuration Options</h2>
+            
+            <div class="code-example">
+// Complete interactive chart configuration
+const config = {
+  type: 'pie',
+  title: 'Regional Performance Dashboard',
+  
+  // Visual configuration
+  width: 500,
+  height: 400,
+  theme: 'light',
+  animated: true,
+  
+  // Interaction configuration
+  interactions: {
+    // Global interactions (apply to all elements)
+    global: {
+      onClick: {
+        navigate: { url: '/reports/{label}' },
+        analytics: { event: 'region_click', category: 'dashboard' }
+      }
+    },
+    
+    // Visual feedback
+    hoverEffect: { enabled: true, style: 'explode', intensity: 1.2 },
+    clickEffect: { enabled: true, style: 'pulse', duration: 300 },
+    
+    // Behavior
+    elementInteractions: true,    // Allow element-specific overrides
+    preventDefault: false,        // Allow default browser actions
+    stopPropagation: false       // Allow event bubbling
+  },
+  
+  // Annie integration
+  annieIntegration: {
+    autoProcess: true,
+    dataSource: 'regionSales',
+    contextBindings: ['selectedRegion', 'dateRange']
+  }
+};
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>⚡ Action Types Reference</h2>
+            
+            <div class="grid">
+                <div class="code-example">
+<strong>Navigation Actions:</strong>
+{
+  navigate: {
+    url: "/page/{label}",
+    route: "/app/details/{value}",
+    target: "_blank",
+    params: {
+      "id": "{metadata.id}",
+      "source": "dashboard"
+    }
+  }
+}
+                </div>
+                
+                <div class="code-example">
+<strong>Popup Actions:</strong>
+{
+  popup: {
+    type: "modal",
+    template: "regionDetails",
+    data: "{metadata}",
+    size: "large"
+  }
+}
+                </div>
+                
+                <div class="code-example">
+<strong>Custom Functions:</strong>
+{
+  action: {
+    function: "window.myApp.showDetails",
+    params: ["{label}", "{value}"],
+    context: window.myApp
+  }
+}
+                </div>
+                
+                <div class="code-example">
+<strong>Annie Framework:</strong>
+{
+  annie: {
+    trigger: "regionSelected",
+    dataUpdate: "selectedRegionData",
+    stateChange: {"region": "{label}"},
+    notification: {
+      message: "Selected {label}",
+      type: "info"
+    }
+  }
+}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simplified InteractiveSimpleChart class for demo
+        class DemoInteractiveChart {
+            constructor(config) {
+                this.config = {
+                    width: 500,
+                    height: 400,
+                    theme: 'light',
+                    animated: true,
+                    showLabels: true,
+                    showTooltip: true,
+                    ...config
+                };
+            }
+
+            render(containerId, data) {
+                const container = document.getElementById(containerId);
+                if (!container || !d3) return;
+
+                // Clear existing content
+                d3.select(container).selectAll('*').remove();
+
+                const width = this.config.width;
+                const height = this.config.height;
+                const radius = Math.min(width, height) / 2 - 60;
+                const innerRadius = this.config.type === 'donut' ? radius * 0.4 : 0;
+
+                // Create SVG
+                const svg = d3.select(container)
+                    .append('svg')
+                    .attr('width', width)
+                    .attr('height', height)
+                    .style('background', this.config.theme === 'dark' ? '#2d3748' : '#ffffff');
+
+                // Add title
+                if (this.config.title) {
+                    svg.append('text')
+                        .attr('x', width / 2)
+                        .attr('y', 30)
+                        .attr('text-anchor', 'middle')
+                        .style('font-size', '18px')
+                        .style('font-weight', 'bold')
+                        .style('fill', '#333333')
+                        .text(this.config.title);
+                }
+
+                const chartGroup = svg.append('g')
+                    .attr('transform', `translate(${width / 2}, ${height / 2})`);
+
+                // Create pie and arcs
+                const pie = d3.pie().value(d => d.value).sort(null);
+                const arc = d3.arc().innerRadius(innerRadius).outerRadius(radius);
+                const hoverArc = d3.arc().innerRadius(innerRadius).outerRadius(radius + 8);
+
+                // Create slices
+                const slices = chartGroup.selectAll('.pie-slice')
+                    .data(pie(data))
+                    .enter()
+                    .append('g')
+                    .attr('class', 'pie-slice')
+                    .style('cursor', 'pointer');
+
+                const paths = slices.append('path')
+                    .attr('fill', (d, i) => this.getColor(d.data, i))
+                    .attr('stroke', '#ffffff')
+                    .attr('stroke-width', 2);
+
+                // Animation
+                if (this.config.animated) {
+                    paths.attr('d', d3.arc().innerRadius(innerRadius).outerRadius(0))
+                        .transition()
+                        .duration(750)
+                        .ease(d3.easeElastic.amplitude(1).period(0.3))
+                        .attr('d', arc);
+                } else {
+                    paths.attr('d', arc);
+                }
+
+                // Interactive behaviors
+                slices
+                    .on('click', (event, d) => {
+                        this.handleClick(event, d.data, 'click');
+                    })
+                    .on('dblclick', (event, d) => {
+                        this.handleClick(event, d.data, 'doubleclick');
+                    })
+                    .on('contextmenu', (event, d) => {
+                        event.preventDefault();
+                        this.handleClick(event, d.data, 'rightclick');
+                    })
+                    .on('mouseenter', (event, d) => {
+                        // Hover effect
+                        d3.select(event.currentTarget).select('path')
+                            .transition()
+                            .duration(200)
+                            .attr('d', hoverArc)
+                            .style('filter', 'brightness(1.1)');
+
+                        // Enhanced tooltip
+                        this.showTooltip(event, d.data);
+                        this.handleClick(event, d.data, 'hover');
+                    })
+                    .on('mouseleave', (event, d) => {
+                        // Remove hover effect
+                        d3.select(event.currentTarget).select('path')
+                            .transition()
+                            .duration(200)
+                            .attr('d', arc)
+                            .style('filter', 'none');
+
+                        this.hideTooltip();
+                    });
+
+                // Add labels
+                if (this.config.showLabels) {
+                    const labelArc = d3.arc()
+                        .innerRadius(radius + 20)
+                        .outerRadius(radius + 20);
+
+                    slices.append('text')
+                        .attr('transform', d => `translate(${labelArc.centroid(d)})`)
+                        .attr('text-anchor', 'middle')
+                        .style('font-size', '12px')
+                        .style('fill', '#333333')
+                        .text(d => d.data.label);
+                }
+            }
+
+            showTooltip(event, data) {
+                d3.select('.demo-tooltip').remove();
+
+                const tooltip = d3.select('body')
+                    .append('div')
+                    .attr('class', 'demo-tooltip annie-interactive-tooltip')
+                    .style('position', 'absolute')
+                    .style('background', 'rgba(0,0,0,0.9)')
+                    .style('color', 'white')
+                    .style('padding', '12px 16px')
+                    .style('border-radius', '6px')
+                    .style('font-size', '12px')
+                    .style('box-shadow', '0 4px 12px rgba(0,0,0,0.3)')
+                    .style('pointer-events', 'none')
+                    .style('z-index', 1000);
+
+                let content = `<strong>${data.label}</strong><br/>Value: ${data.value.toLocaleString()}`;
+                
+                if (data.metadata) {
+                    Object.entries(data.metadata).forEach(([key, value]) => {
+                        content += `<br/><small style="color: #93c5fd;">${key}: ${value}</small>`;
+                    });
+                }
+                
+                content += '<br/><small style="color: #ffd700;">💡 Try clicking, double-clicking, or right-clicking!</small>';
+
+                tooltip.html(content)
+                    .style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 10) + 'px')
+                    .style('opacity', 0)
+                    .transition()
+                    .duration(200)
+                    .style('opacity', 1);
+            }
+
+            hideTooltip() {
+                d3.selectAll('.demo-tooltip')
+                    .transition()
+                    .duration(200)
+                    .style('opacity', 0)
+                    .remove();
+            }
+
+            handleClick(event, data, actionType) {
+                const log = document.getElementById('interaction-log');
+                const timestamp = new Date().toLocaleTimeString();
+                
+                let message = `<span style="color: #007bff;">[${timestamp}]</span> `;
+                
+                switch(actionType) {
+                    case 'click':
+                        message += `🖱️ <strong>Clicked</strong> on "${data.label}" (Value: ${data.value})`;
+                        if (data.onClick) {
+                            message += ` → 🚀 Navigate to: ${data.onClick.navigate?.url || 'action'}`;
+                        }
+                        break;
+                    case 'doubleclick':
+                        message += `⚡ <strong>Double-clicked</strong> on "${data.label}" → 🔍 Drill-down action`;
+                        break;
+                    case 'rightclick':
+                        message += `📋 <strong>Right-clicked</strong> on "${data.label}" → 📄 Context menu`;
+                        break;
+                    case 'hover':
+                        message += `👆 <strong>Hovering</strong> over "${data.label}"`;
+                        break;
+                }
+
+                log.innerHTML = message + '<br/>' + log.innerHTML;
+
+                // Simulate actual actions for demo
+                if (actionType === 'click' && data.onClick) {
+                    setTimeout(() => {
+                        const actionLog = `<span style="color: #28a745;">[${new Date().toLocaleTimeString()}]</span> ✅ <strong>Action executed:</strong> Navigation to ${data.onClick.navigate?.url || 'target'}`;
+                        log.innerHTML = actionLog + '<br/>' + log.innerHTML;
+                    }, 500);
+                }
+            }
+
+            getColor(data, index) {
+                if (data.color) return data.color;
+                const colors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1'];
+                return colors[index % colors.length];
+            }
+        }
+
+        // Demo data with interactive configurations
+        const salesData = [
+            {
+                label: "North America",
+                value: 45000,
+                color: '#007bff',
+                onClick: {
+                    navigate: { url: '/reports/north-america' },
+                    analytics: { event: 'region_click', category: 'sales', label: 'North America' }
+                },
+                onDoubleClick: {
+                    popup: { type: 'modal', content: 'North America detailed view' }
+                },
+                metadata: {
+                    growth: '+12%',
+                    manager: 'Alice Johnson',
+                    lastUpdated: '2025-10-03',
+                    topCity: 'New York'
+                }
+            },
+            {
+                label: "Europe",
+                value: 32000,
+                color: '#28a745',
+                onClick: {
+                    navigate: { url: '/reports/europe' },
+                    analytics: { event: 'region_click', category: 'sales', label: 'Europe' }
+                },
+                metadata: {
+                    growth: '+8%',
+                    manager: 'Bob Smith',
+                    lastUpdated: '2025-10-02',
+                    topCity: 'London'
+                }
+            },
+            {
+                label: "Asia Pacific",
+                value: 28000,
+                color: '#dc3545',
+                onClick: {
+                    navigate: { url: '/reports/asia-pacific' },
+                    analytics: { event: 'region_click', category: 'sales', label: 'Asia Pacific' }
+                },
+                metadata: {
+                    growth: '+15%',
+                    manager: 'Chen Wei',
+                    lastUpdated: '2025-10-01',
+                    topCity: 'Tokyo'
+                }
+            },
+            {
+                label: "Latin America",
+                value: 15000,
+                color: '#ffc107',
+                onClick: {
+                    navigate: { url: '/reports/latin-america' },
+                    analytics: { event: 'region_click', category: 'sales', label: 'Latin America' }
+                },
+                metadata: {
+                    growth: '+5%',
+                    manager: 'Maria Garcia',
+                    lastUpdated: '2025-09-30',
+                    topCity: 'São Paulo'
+                }
+            }
+        ];
+
+        // Initialize interactive chart
+        document.addEventListener('DOMContentLoaded', function() {
+            const chart = new DemoInteractiveChart({
+                type: 'pie',
+                title: 'Regional Sales Performance - Interactive Demo',
+                width: 500,
+                height: 400,
+                animated: true,
+                showLabels: true,
+                interactions: {
+                    hoverEffect: { enabled: true, style: 'explode' },
+                    clickEffect: { enabled: true, style: 'pulse' }
+                }
+            });
+
+            chart.render('sales-dashboard', salesData);
+
+            // Log initial message
+            const log = document.getElementById('interaction-log');
+            log.innerHTML = `<span style="color: #28a745;">[${new Date().toLocaleTimeString()}]</span> 🚀 <strong>Interactive chart loaded!</strong> Try interacting with the chart above.<br/>`;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annie Charts - D3.js Integration Demo</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .demo-section {
+            background: white;
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .chart-container {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+            min-height: 300px;
+        }
+
+        .code-example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+            white-space: pre-wrap;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .btn.secondary {
+            background: #6c757d;
+        }
+
+        .btn.secondary:hover {
+            background: #545b62;
+        }
+
+        /* Chart styles */
+        .annie-chart {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: bold;
+            text-anchor: middle;
+        }
+
+        .legend-item {
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .legend-item:hover {
+            opacity: 0.7;
+        }
+
+        .pie-slice {
+            stroke: white;
+            stroke-width: 2px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .pie-slice:hover {
+            opacity: 0.8;
+        }
+
+        .axis {
+            font-size: 12px;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Annie Charts + D3.js Integration</h1>
+            <h2>Your Existing Chart Code + Annie's Smart Attributes</h2>
+            <p>Preserving your legacy logic while adding JsonLogic superpowers</p>
+        </div>
+
+        <div class="demo-section">
+            <h2>📊 Your Legacy Dashboard - Annie Enhanced</h2>
+            <p>This demonstrates how your existing <code>createDashboard</code> function integrates with Annie's attribute system.</p>
+            
+            <div class="code-example"><!-- Your legacy usage -->
+createDashboard('dashboardpie', salesData, 'drilldownid', 'filter', 'Client Usage');
+
+<!-- Annie enhanced version -->
+&lt;div id="annie-dashboard"
+     data-annie-chart="dashboard"
+     data-source="sales-data" 
+     data-drillid="drilldownid"
+     data-filter="filter"
+     data-title="Client Usage"
+     data-width="450"
+     data-height="250"&gt;
+&lt;/div&gt;</div>
+
+            <div class="chart-container">
+                <div id="legacy-dashboard"></div>
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="createLegacyDashboard()">🔄 Render Legacy Dashboard</button>
+                <button class="btn secondary" onclick="clearChart('legacy-dashboard')">🗑️ Clear</button>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎯 JsonLogic Enhanced Dashboard</h2>
+            <p>Same chart logic, but now with conditional behavior based on user context!</p>
+            
+            <div class="code-example"><!-- JsonLogic enhanced version -->
+&lt;div data-annie-chart='{"jsonlogic": {"if": [{"var": "isMobile"}, "pie", "dashboard"]}}'
+     data-source="sales-data"
+     data-title='{"jsonlogic": {"cat": [{"var": "user.name"}, " - Client Usage"]}}'
+     data-colors='{"jsonlogic": {
+        "if": [{"==": [{"var": "theme"}, "dark"]}, 
+               ["#64ffda", "#ff6b9d", "#ffd54f"],
+               ["#007bff", "#28a745", "#dc3545"]]
+     }}'
+     data-drillid='{"jsonlogic": {
+        "if": [{"var": "user.canDrillDown"}, "drilldownid", ""]
+     }}'&gt;
+&lt;/div&gt;</div>
+
+            <div class="chart-container">
+                <div id="smart-dashboard"></div>
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="createSmartDashboard()">🧠 Render Smart Dashboard</button>
+                <button class="btn" onclick="toggleTheme()">🌓 Toggle Theme</button>
+                <button class="btn" onclick="toggleDevice()">📱 Toggle Device</button>
+                <button class="btn secondary" onclick="clearChart('smart-dashboard')">🗑️ Clear</button>
+            </div>
+
+            <div id="context-display" style="margin-top: 15px; padding: 10px; background: #e3f2fd; border-radius: 4px;">
+                <strong>Current Context:</strong> <span id="current-context">Loading...</span>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔧 Implementation Architecture</h2>
+            
+            <h3>1. Legacy Code Preservation</h3>
+            <div class="code-example">// Your existing createDashboard function (minimal changes)
+function createDashboard(id, data, drillid, filter, title) {
+    // Existing logic preserved exactly as-is
+    var svg = d3.selectAll("#" + id).append("svg")
+        .attr("width", 450).attr("height", 250);
+    svg.append("g").attr("id", id + "pie");
+    
+    // Keep using gradPie if you have it
+    if (window.gradPie) {
+        gradPie.draw(id + "pie", piedata(data), 125, 130, 100);
+    }
+    
+    // Your existing legend/title logic
+    createLegend(svg, data, title);
+}
+
+// Annie wrapper - converts attributes to your function calls
+class DashboardRenderer {
+    render(element, config, data) {
+        createDashboard(
+            element.id,
+            this.convertData(data), 
+            config.drillid,
+            config.filter,
+            config.title
+        );
+    }
+}</div>
+
+            <h3>2. Annie Integration Layer</h3>
+            <div class="code-example">// Annie chart processor
+class AnnieChartProcessor {
+    processChart(element) {
+        // 1. Parse data attributes (with JsonLogic support)
+        const config = this.parseAttributes(element);
+        
+        // 2. Get data from Annie DataStore
+        const data = annie.dataset(config.source);
+        
+        // 3. Call your existing chart function
+        const renderer = this.getRenderer(config.type);
+        renderer.render(element, config, data);
+        
+        // 4. Setup observers for real-time updates
+        this.setupObservers(element, config);
+    }
+    
+    parseAttributes(element) {
+        // Handle JsonLogic expressions in attributes
+        const context = this.getContext(); // user, device, theme, etc.
+        
+        for (let attr of element.attributes) {
+            if (this.isJsonLogic(attr.value)) {
+                attr.value = jsonLogic.apply(JSON.parse(attr.value), context);
+            }
+        }
+    }
+}</div>
+
+            <h3>3. Adding New Chart Types</h3>
+            <div class="code-example">// Easy to add new charts
+class MyBarChartRenderer {
+    render(element, config, data) {
+        // Standard D3.js bar chart implementation
+        const svg = d3.select(element).append("svg");
+        // ... D3.js bar chart code
+    }
+}
+
+// Register new chart type
+chartProcessor.register('mybar', new MyBarChartRenderer());
+
+// Use in HTML
+// &lt;div data-annie-chart="mybar" data-source="mydata"&gt;&lt;/div&gt;</div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📋 Integration Roadmap</h2>
+            
+            <div class="code-example">Week 1: Basic Integration
+✅ Port createDashboard with minimal changes
+✅ Create Annie attribute parser  
+✅ Test with existing data format
+✅ Basic D3.js loading strategy
+
+Week 2: Annie Enhancement  
+🔄 Integrate with Annie DataStore
+🔄 Add observer system for real-time updates
+🔄 Add JsonLogic attribute parsing
+🔄 Test conditional behaviors
+
+Week 3: JsonLogic Power
+🔄 Conditional chart types (mobile vs desktop)
+🔄 Dynamic colors (theme-based, data-driven)
+🔄 Role-based data filtering
+🔄 Context-aware responsive design
+
+Week 4: Ecosystem Expansion
+🔄 Add standard bar/line/scatter charts
+🔄 Performance optimization
+🔄 AI integration for chart generation
+🔄 Documentation and examples</div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data (simulating your salesData)
+        const salesData = [
+            { label: 'Product A', value: 150, color: '#007bff', drillid: 'product-a' },
+            { label: 'Product B', value: 230, color: '#28a745', drillid: 'product-b' },
+            { label: 'Product C', value: 180, color: '#dc3545', drillid: 'product-c' },
+            { label: 'Product D', value: 90, color: '#ffc107', drillid: 'product-d' }
+        ];
+
+        // Current context for JsonLogic
+        let currentContext = {
+            user: { name: 'John Doe', role: 'manager', canDrillDown: true },
+            isMobile: window.innerWidth < 768,
+            theme: 'light'
+        };
+
+        // Your existing createDashboard function (ported)
+        function createDashboard(id, data, drillid, filter, title) {
+            // Clear existing content
+            d3.select("#" + id).selectAll("*").remove();
+            
+            var svg = d3.select("#" + id).append("svg")
+                .attr("width", 450)
+                .attr("height", 250)
+                .attr("class", "annie-chart");
+            
+            svg.append("g").attr("id", id + "pie");
+
+            // Create pie chart (simplified version of your gradPie)
+            createPieChart(id + "pie", piedata(data), 125, 130, 100);
+
+            // Create legend (your createTitle logic)
+            createLegend(svg, data, title);
+
+            // Add main title
+            if (title) {
+                svg.append("g")
+                    .attr("class", "y axis axisLeft")
+                    .attr("transform", "translate(0, 45)")
+                    .append("text")
+                    .attr("class", "chart-title")
+                    .attr("y", "10px")
+                    .attr("dy", "-2em")
+                    .attr("dx", "13px")
+                    .style("text-anchor", "start")
+                    .text(title);
+            }
+
+            function piedata(data) {
+                return data.map(function (d) {
+                    return { 
+                        label: d.label, 
+                        value: d.value, 
+                        color: d.color, 
+                        drillid: d.drillid 
+                    };
+                });
+            }
+        }
+
+        // Simplified pie chart implementation
+        function createPieChart(containerId, data, centerX, centerY, radius) {
+            const container = d3.select("#" + containerId);
+            
+            const pie = d3.pie()
+                .value(d => d.value)
+                .sort(null);
+            
+            const arc = d3.arc()
+                .innerRadius(0)
+                .outerRadius(radius);
+            
+            const g = container.append("g")
+                .attr("transform", `translate(${centerX}, ${centerY})`);
+            
+            const arcs = g.selectAll(".arc")
+                .data(pie(data))
+                .enter().append("g")
+                .attr("class", "arc");
+            
+            arcs.append("path")
+                .attr("d", arc)
+                .attr("fill", d => d.data.color)
+                .attr("class", "pie-slice")
+                .on("click", function(event, d) {
+                    alert(`Drill down: ${d.data.label} (${d.data.drillid})`);
+                });
+        }
+
+        // Your createTitle logic as createLegend
+        function createLegend(svg, data, title) {
+            let yTitle = 0;
+            const gElement = svg.append("g")
+                .attr("class", "y axis axisLeft")
+                .attr("transform", "translate(280, 50)");
+
+            data.forEach(function(element) {
+                if (element.label !== '') {
+                    yTitle += 25;
+
+                    const gElement2 = gElement.append("a")
+                        .attr("class", "legend-item")
+                        .style("cursor", "pointer")
+                        .on("click", function() {
+                            alert(`Navigate to: /admin/user-drill?i=${element.label}`);
+                        });
+
+                    gElement2.append("text")
+                        .attr("class", "legend-text")
+                        .attr("y", yTitle)
+                        .attr("dy", "-2em")
+                        .attr("dx", "13px")
+                        .style("text-anchor", "start")
+                        .text(element.label);
+
+                    gElement2.append("rect")
+                        .attr("style", "fill:" + element.color + ";")
+                        .attr("x", -20)
+                        .attr("width", 20)
+                        .attr("y", yTitle - 57)
+                        .attr("height", 20);
+                }
+            });
+        }
+
+        // JsonLogic simulation
+        const jsonLogic = {
+            apply: function(logic, data) {
+                // Simplified JsonLogic implementation
+                if (logic.if) {
+                    const condition = this.apply(logic.if[0], data);
+                    return condition ? this.apply(logic.if[1], data) : this.apply(logic.if[2], data);
+                } else if (logic.var) {
+                    return this.getVar(logic.var, data);
+                } else if (logic['==']) {
+                    return this.apply(logic['=='][0], data) === this.apply(logic['=='][1], data);
+                } else if (logic.cat) {
+                    return logic.cat.map(item => this.apply(item, data)).join('');
+                } else {
+                    return logic;
+                }
+            },
+            
+            getVar: function(path, data) {
+                return path.split('.').reduce((obj, key) => obj && obj[key], data);
+            }
+        };
+
+        // Demo functions
+        function createLegacyDashboard() {
+            createDashboard('legacy-dashboard', salesData, 'drilldownid', 'filter', 'Client Usage');
+        }
+
+        function createSmartDashboard() {
+            // Simulate Annie's JsonLogic processing
+            const config = {
+                type: jsonLogic.apply({
+                    "if": [{"var": "isMobile"}, "pie", "dashboard"]
+                }, currentContext),
+                title: jsonLogic.apply({
+                    "cat": [{"var": "user.name"}, " - Client Usage"]
+                }, currentContext),
+                colors: jsonLogic.apply({
+                    "if": [{"==": [{"var": "theme"}, "dark"]}, 
+                           ["#64ffda", "#ff6b9d", "#ffd54f"],
+                           ["#007bff", "#28a745", "#dc3545"]]
+                }, currentContext),
+                drillid: jsonLogic.apply({
+                    "if": [{"var": "user.canDrillDown"}, "drilldownid", ""]
+                }, currentContext)
+            };
+
+            // Apply smart colors to data
+            const smartData = salesData.map((item, index) => ({
+                ...item,
+                color: config.colors[index] || item.color
+            }));
+
+            // Render with smart configuration
+            if (config.type === 'dashboard') {
+                createDashboard('smart-dashboard', smartData, config.drillid, 'filter', config.title);
+            } else {
+                // Would render pie chart only
+                createSimplePie('smart-dashboard', smartData, config.title);
+            }
+
+            updateContextDisplay();
+        }
+
+        function createSimplePie(id, data, title) {
+            d3.select("#" + id).selectAll("*").remove();
+            
+            const svg = d3.select("#" + id).append("svg")
+                .attr("width", 300)
+                .attr("height", 300)
+                .attr("class", "annie-chart");
+            
+            createPieChart(id + "pie", data, 150, 150, 100);
+            svg.append("g").attr("id", id + "pie");
+            
+            if (title) {
+                svg.append("text")
+                    .attr("x", 150)
+                    .attr("y", 30)
+                    .attr("class", "chart-title")
+                    .style("text-anchor", "middle")
+                    .text(title);
+            }
+        }
+
+        function toggleTheme() {
+            currentContext.theme = currentContext.theme === 'light' ? 'dark' : 'light';
+            document.body.style.filter = currentContext.theme === 'dark' ? 'invert(1) hue-rotate(180deg)' : '';
+            updateContextDisplay();
+        }
+
+        function toggleDevice() {
+            currentContext.isMobile = !currentContext.isMobile;
+            updateContextDisplay();
+        }
+
+        function updateContextDisplay() {
+            document.getElementById('current-context').textContent = JSON.stringify(currentContext, null, 2);
+        }
+
+        function clearChart(id) {
+            d3.select("#" + id).selectAll("*").remove();
+        }
+
+        // Initialize
+        updateContextDisplay();
+    </script>
+</body>
+</html>
